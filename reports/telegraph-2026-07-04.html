@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>财联社电报 - 2026-07-04</title>
+<style>
+    :root {
+        --color-b: #dc2626;
+        --color-c: #2563eb;
+        --color-other: #6b7280;
+        --bg: #f8fafc;
+        --card-bg: #ffffff;
+        --text: #1f2937;
+        --text-secondary: #64748b;
+        --border: #e2e8f0;
+        --radius: 12px;
+        --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    }
+    * { box-sizing: border-box; }
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+    }
+    .container { max-width: 900px; margin: 0 auto; padding: 24px 16px 64px; }
+    header { text-align: center; margin-bottom: 24px; }
+    header h1 { margin: 0 0 8px; font-size: 28px; }
+    header p { margin: 0; color: var(--text-secondary); }
+    .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+    .stat-card {
+        background: var(--card-bg);
+        border-radius: var(--radius);
+        padding: 16px;
+        box-shadow: var(--shadow);
+        text-align: center;
+        border-top: 4px solid var(--color-other);
+    }
+    .stat-card.stat-b { border-top-color: var(--color-b); }
+    .stat-card.stat-c { border-top-color: var(--color-c); }
+    .stat-value { font-size: 24px; font-weight: 700; }
+    .stat-label { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+    .filters {
+        position: sticky;
+        top: 0;
+        background: rgba(248, 250, 252, 0.96);
+        backdrop-filter: blur(8px);
+        padding: 12px 0;
+        margin-bottom: 16px;
+        border-bottom: 1px solid var(--border);
+        z-index: 10;
+    }
+    .search-box {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1px solid var(--border);
+        border-radius: 9999px;
+        font-size: 14px;
+        margin-bottom: 10px;
+        outline: none;
+    }
+    .search-box:focus { border-color: var(--color-c); }
+    .topic-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+    .topic-pill {
+        border: 1px solid var(--border);
+        background: var(--card-bg);
+        border-radius: 9999px;
+        padding: 6px 12px;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+    .topic-pill:hover, .topic-pill.active {
+        background: #eff6ff;
+        border-color: var(--color-c);
+        color: var(--color-c);
+    }
+    .topic-section { margin-bottom: 24px; }
+    .topic-heading {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 18px;
+        margin: 0 0 12px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid var(--border);
+    }
+    .topic-count {
+        background: var(--border);
+        color: var(--text-secondary);
+        font-size: 12px;
+        padding: 2px 8px;
+        border-radius: 9999px;
+    }
+    .toggle-btn {
+        margin-left: auto;
+        background: transparent;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 12px;
+        cursor: pointer;
+        color: var(--text-secondary);
+    }
+    .news-card {
+        background: var(--card-bg);
+        border-radius: var(--radius);
+        padding: 14px 16px;
+        margin-bottom: 10px;
+        box-shadow: var(--shadow);
+        border-left: 4px solid var(--color-other);
+        transition: transform 0.1s;
+    }
+    .news-card:hover { transform: translateY(-1px); }
+    .news-card.level-b { border-left-color: var(--color-b); }
+    .news-card.level-c { border-left-color: var(--color-c); }
+    .card-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+        flex-wrap: wrap;
+    }
+    .time-badge { font-size: 12px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+    .level-badge {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 2px 6px;
+        border-radius: 4px;
+        color: white;
+    }
+    .level-badge.level-b { background: var(--color-b); }
+    .level-badge.level-c { background: var(--color-c); }
+    .level-badge.level-other { background: var(--color-other); }
+    .topic-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+    .topic-chip {
+        font-size: 11px;
+        background: #f1f5f9;
+        color: var(--text-secondary);
+        padding: 2px 8px;
+        border-radius: 9999px;
+    }
+    .news-title { margin: 0 0 8px; font-size: 15px; line-height: 1.5; }
+    .content-body {
+        font-size: 14px;
+        color: var(--text-secondary);
+        white-space: pre-wrap;
+    }
+    .empty-state { text-align: center; color: var(--text-secondary); padding: 40px; }
+    @media (max-width: 640px) {
+        .stats { grid-template-columns: repeat(2, 1fr); }
+        header h1 { font-size: 22px; }
+    }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>📰 财联社电报</h1>
+        <p>2026-07-04 16:00 起 · 共 54 条</p>
+    </header>
+    <div class="stats">
+        
+        <div class="stat-card stat-total">
+            <div class="stat-value">54</div>
+            <div class="stat-label">总计</div>
+        </div>
+        
+
+        <div class="stat-card stat-b">
+            <div class="stat-value">3</div>
+            <div class="stat-label">Level B</div>
+        </div>
+        
+
+        <div class="stat-card stat-c">
+            <div class="stat-value">51</div>
+            <div class="stat-label">Level C</div>
+        </div>
+        
+
+        <div class="stat-card stat-other">
+            <div class="stat-value">0</div>
+            <div class="stat-label">其他</div>
+        </div>
+        
+    </div>
+    <div class="filters">
+        <input class="search-box" id="search" type="text" placeholder="搜索标题 / 内容 / 主题...">
+        <div class="topic-pills">
+            <button class="topic-pill" data-topic="其他">其他 (34)</button>
+<button class="topic-pill" data-topic="行业动态">行业动态 (7)</button>
+<button class="topic-pill" data-topic="公司公告">公司公告 (5)</button>
+<button class="topic-pill" data-topic="国际市场">国际市场 (5)</button>
+<button class="topic-pill" data-topic="宏观经济">宏观经济 (3)</button>
+        </div>
+    </div>
+    <main id="news-list">
+        
+            <section class="topic-section" data-topic="其他">
+                <h2 class="topic-heading">
+                    <span class="topic-name">其他</span>
+                    <span class="topic-count">34</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-b" data-topic="其他" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">07:40</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">PC及内存硬盘价格持续高位：硬盘一天三个价 经销商喊出“非刚需别买”</h3>
+                    <div class="content-body">【PC及内存硬盘价格持续高位：硬盘一天三个价 经销商喊出“非刚需别买”】财联社7月5日电，数码终端市场正在经历一场看不到尽头的结构性震荡。记者走访上海多个数码城，多位PC（个人电脑）经销商表示，目前零部件和整机的价格已经处于极端高位，但未来还要涨价，且至少在一年内看不到（涨价）尽头。这轮价格持续上涨已经持续相当长一段时间，最近的导火索就是苹果高调官宣涨价。一位PC经销商则更加坦诚，建议记者“不是刚需就先别买”，尽管不知道什么时候才能降价：“（整机）这个月还要涨，特别是游戏本，涨得最厉害。我觉得至少在一年之内都不会降，会涨到明年这个时候。不急的话建议不要买，不是刚需就先别买。”在这种一眼望不到头的看涨行情下，不仅品牌整机价格居高不下，DIY装机市场和配件价格更是每天都在经历剧烈的波动。一位组装机商家介绍，自己在5天前为客户装了一台电脑，安装同配置电脑的价格在这5天内就要涨300元。不仅是电脑，硬盘更是“早上一个价，下午、晚上一个价”。一款闪迪1TB的SSD硬盘，可能早上标价820元，当晚就涨到860元。 （澎湃新闻）</div>
+                </article>
+                
+                <article class="news-card level-b" data-topic="其他" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">23:16</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">沙特媒体：美伊新一轮会谈11日将在巴基斯坦举行</h3>
+                    <div class="content-body">【沙特媒体：美伊新一轮会谈11日将在巴基斯坦举行】财联社7月4日电，沙特阿拉伯阿拉比亚电视台4日援引消息人士的话说，美国和伊朗之间新一轮谈判将于11日在巴基斯坦举行。 （新华社）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:05</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">我国第一架综合航测飞机首飞成功</h3>
+                    <div class="content-body">【我国第一架综合航测飞机首飞成功】财联社7月5日电，据中国航空工业集团消息，我国首架大气环境综合探测固定翼飞机平台“运12F大气综合航测飞机”近日在哈尔滨平房机场首飞成功。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:56</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">广西东兴市将防御台风三级应急响应提升为二级应急响应</h3>
+                    <div class="content-body">【广西东兴市将防御台风三级应急响应提升为二级应急响应】财联社7月5日电，根据东兴市气象信息，东兴市气象局已于7月5日3时40分提升重大气象灾害（台风）Ⅳ级应急响应为Ⅱ级应急响应。按照《东兴市防御台风应急预案》的规定，经防汛抗旱指挥部领导批准，决定于7月5日4时将东兴市防御台风三级应急响应提升为二级应急响应。请各成员单位按照职责分工落实好各项防御措施，确保防汛防台安全。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:18</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">普京与特朗普通话 重申仍倾向政治解决乌克兰问题</h3>
+                    <div class="content-body">【普京与特朗普通话 重申仍倾向政治解决乌克兰问题】财联社7月5日电，俄罗斯总统助理乌沙科夫5日通报，俄总统普京4日与美国总统特朗普通话时重申倾向于通过政治外交手段解决乌克兰问题，同时他强调必须考虑到俄方的原则立场。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:07</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">法国战胜巴拉圭 晋级八强</h3>
+                    <div class="content-body">【法国战胜巴拉圭 晋级八强】财联社7月5日电，北京时间5日，2026美加墨世界杯1/8决赛，法国1-0战胜巴拉圭，成功晋级八强。上半场比赛结束，双方均无进球，比分0-0。下半场比赛，姆巴佩点球破门，法国1-0领先巴拉圭。最终，法国将优势保持到最后，1-0战胜巴拉圭，晋级八强。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:21</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">美国新泽西州报告19起“疑似高温相关”死亡病例</h3>
+                    <div class="content-body">【美国新泽西州报告19起“疑似高温相关”死亡病例】财联社7月5日电，当地时间7月4日，美国新泽西州卫生厅厅长雷纳德·华盛顿表示，自7月2日以来，该州已报告至少19起“疑似高温相关”死亡病例。雷纳德·华盛顿称，死者年龄和所处环境各不相同，其中许多人被发现时身处没有空调的家中，也有少数人在住所外、街头或停放的车辆内被发现。他强调，死者并非只有老年人，也包括较年轻的成年人。雷纳德·华盛顿还表示，本周以来，新泽西州因高温相关疾病就医的人数也出现上升。他呼吁居民保持补水、避暑，避免长时间待在户外。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:06</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">山火持续蔓延 葡萄牙向欧盟请求支援</h3>
+                    <div class="content-body">【山火持续蔓延 葡萄牙向欧盟请求支援】财联社7月5日电，受极端高温天气影响，葡萄牙一处持续燃烧数日的山火火势仍在蔓延。截至4日，过火面积已超一万公顷。已有1100名消防员参与灭火工作，政府还派出380辆消防车以及8架飞机和直升机协同作业。由于火情严峻，葡方已向欧盟请求支援。欧盟3日表示，将与葡萄牙共同应对此次严重山火。目前，已有来自西班牙的118名消防员和45辆消防车辆抵达葡萄牙，参与灭火工作。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">05:33</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">俄方回应泽连斯基与普京会面提议</h3>
+                    <div class="content-body">【俄方回应泽连斯基与普京会面提议】财联社7月5日电，据俄罗斯方面4日消息，乌克兰总统泽连斯基当天稍早前称，如果顿涅茨克重镇康斯坦丁诺夫卡在俄方控制之下，俄罗斯总统普京可以在此与他见面。对此，俄总统新闻秘书佩斯科夫回应称，康斯坦丁诺夫卡已完全转由俄方控制，如果泽连斯基以这样的方式表达来俄意愿，俄方表示欢迎。佩斯科夫表示，一旦泽连斯基愿意作出“重大且负责任的决定”，就可以前往莫斯科，因为俄罗斯首都是莫斯科，而不是康斯坦丁诺夫卡。普京此前已多次表示愿在莫斯科与泽连斯基会面。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">05:23</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">泽连斯基与特朗普通话 商定在北约峰会期间会谈</h3>
+                    <div class="content-body">【泽连斯基与特朗普通话 商定在北约峰会期间会谈】财联社7月5日电，当地时间4日，乌克兰总统泽连斯基在社交媒体发文表示，他于美国独立日当天同美国总统特朗普通话。泽连斯基表示，通话期间，两国总统围绕俄乌冲突前线最新局势、外交推进动态以及停战的现实前景深入交换意见。双方商定，将在安卡拉北约峰会期间举行面对面会晤，继续围绕相关议题开展深入磋商。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">04:06</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">内塔尼亚胡近期将访美与特朗普会晤</h3>
+                    <div class="content-body">【内塔尼亚胡近期将访美与特朗普会晤】财联社7月5日电，当地时间7月4日，美国总统特朗普在接受电话采访时表示，以色列总理内塔尼亚胡已请求在白宫与他会面，双方会晤最早可能在下周特朗普结束北约峰会行程后举行。据以色列总理办公室7月3日发表的声明称，以色列总理内塔尼亚胡和美国总统特朗普通电话，同意在不久的将来双方在美国会面。此外，特朗普称，美伊双方决定在伊朗已故最高领袖阿里·哈梅内伊葬礼相关活动结束前暂停谈判一周，期间双方都不会开火。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">03:13</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">摩洛哥3-0加拿大率先闯入八强</h3>
+                    <div class="content-body">【摩洛哥3-0加拿大率先闯入八强】财联社7月5日电，北京时间7月5日，2026美加墨世界杯1/8决赛，摩洛哥3比0加拿大，成功晋级八强。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">02:48</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">委内瑞拉地震死亡人数升至2954人</h3>
+                    <div class="content-body">【委内瑞拉地震死亡人数升至2954人】财联社7月5日电，当地时间4日，委内瑞拉通讯部通报称，该国日前发生的两次强震造成的死亡人数上升至2954人，受伤人数上升至16592人，另有6462人获救。此外，地震还导致16309人流离失所。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">02:16</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">以军称在黎南部打死一名黎真主党武装人员</h3>
+                    <div class="content-body">【以军称在黎南部打死一名黎真主党武装人员】财联社7月5日电，当地时间4日，以色列国防军发表声明称，以军当天在黎巴嫩南部的“安全区”发现并打死了一名出现在其部队附近的黎巴嫩真主党武装人员。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">01:45</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">俄称愿移交乌军阵亡人员遗体 要求乌停止炮击康斯坦丁诺夫卡</h3>
+                    <div class="content-body">【俄称愿移交乌军阵亡人员遗体 要求乌停止炮击康斯坦丁诺夫卡】财联社7月5日电，当地时间4日，俄罗斯国防部发布消息称，俄方准备开展人道主义行动，向乌方移交乌军阵亡人员遗体，因此提议乌方于莫斯科时间6日12时至18时停止对康斯坦丁诺夫卡的炮击。乌方需在莫斯科时间5日12时前就遗体移交事宜作出决定。目前，乌克兰方面对此暂无回应。俄罗斯总统普京3日表示，俄军已控制康斯坦丁诺夫卡。乌克兰武装部队总参谋部4日否认俄军控制康斯坦丁诺夫卡的消息，称该居民点仍由乌军掌控。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">23:52</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">土耳其总统与巴基斯坦总理举行会谈 讨论多领域合作</h3>
+                    <div class="content-body">【土耳其总统与巴基斯坦总理举行会谈 讨论多领域合作】财联社7月4日电，当地时间4日，土耳其总统埃尔多安在总统府与巴基斯坦总理夏巴兹举行会谈，两人随后举行新闻发布会。发布会上，埃尔多安表示，土耳其正在密切关注中东地区局势。埃尔多安还表示，双方讨论了进一步发展贸易和投资关系，以及土方希望深化与巴基斯坦在能源、交通运输、关键矿产和信息技术领域的合作。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">21:30</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">伊朗称捣毁多个与美以有关的“恐怖和极端组织”窝点</h3>
+                    <div class="content-body">【伊朗称捣毁多个与美以有关的“恐怖和极端组织”窝点】财联社7月4日电，当地时间4日获悉，伊朗情报部发表声明称，伊朗安全部门近日捣毁4个与美国和以色列情报机构有关联的“恐怖和极端组织”窝点。声明称，伊朗情报部联合伊朗伊斯兰革命卫队和国家警察部队，在锡斯坦-俾路支斯坦省扎黑丹等地开展多次行动，抓获5名行动小组主要成员，并打死2名武装人员。声明还表示，伊朗安全部门在该省两地发现并捣毁另一个由5人组成的行动小组，该团伙涉嫌参与针对军事单位和司法机构的袭击，相关人员已被逮捕。伊方称，在搜查过程中，安全部门缴获大量枪支、多枚手榴弹、4部无线电设备以及1套“星链”卫星通信设备，并查获大量弹药。声明称，这些人员此前曾在境外接受军事和爆炸物使用培训，计划进入伊朗实施破坏、暗杀及恐怖活动，但在采取行动前即被伊朗安全部门抓获，其组织网络已被瓦解。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">21:26</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">马里军方说击退针对多地军方阵地的袭击</h3>
+                    <div class="content-body">【马里军方说击退针对多地军方阵地的袭击】财联社7月4日电，马里武装部队4日发布公报说，马里多地军方阵地当天遭袭，所有袭击均被击退，遇袭阵地目前处于军方“完全控制之下”。公报说，遭袭阵地位于该国北部阿盖洛克、阿内菲斯、加奥以及中部塞瓦雷等地。在塞瓦雷，军方击毙20名恐怖分子；在加奥，军方击毙6名恐怖分子，军方有1人丧生、4人受伤。军方仍在开展清剿行动。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">20:39</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">阿里·阿兹马伊被任命为伊朗伊斯兰革命卫队海军司令</h3>
+                    <div class="content-body">【阿里·阿兹马伊被任命为伊朗伊斯兰革命卫队海军司令】财联社7月4日电，当地时间4日获悉，伊朗伊斯兰革命卫队原海军副司令阿里·阿兹马伊已被任命为伊朗伊斯兰革命卫队海军司令。阿兹马伊此前长期在伊朗伊斯兰革命卫队海军任职。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">20:10</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">伊朗警告域外国家勿在霍尔木兹海峡制造危机</h3>
+                    <div class="content-body">【伊朗警告域外国家勿在霍尔木兹海峡制造危机】财联社7月4日电，英国首相斯塔默与法国总统马克龙3日发表联合声明，称两国将与阿曼合作保障其主权领海航运安全。伊朗副外长加里巴巴迪4日就此回应，霍尔木兹海峡不是域外国家进行军事展示的场所，伊方反对任何可能影响该水道安全的军事行动。作为霍尔木兹海峡安全保障方，伊朗将对相关军事动向保持高度警惕。霍尔木兹海峡安全应由沿岸国家共同维护，任何制造危机的行为都将由相关方自行承担后果。他同时强调，上述警告“是严肃的”。 （新华社）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:22</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">我国成功发射千帆极轨13组卫星</h3>
+                    <div class="content-body">【我国成功发射千帆极轨13组卫星】财联社7月4日电，北京时间2026年7月4日17时30分，我国在太原卫星发射中心使用长征六号改运载火箭，成功将千帆极轨13组卫星发射升空，卫星顺利进入预定轨道，发射任务取得圆满成功。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:54</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">云南省大理州宾川县1小时内发生3次四级以上地震</h3>
+                    <div class="content-body">【云南省大理州宾川县1小时内发生3次四级以上地震】财联社7月4日电，据中国地震台网速报，云南省大理州宾川县在一个小时内接连发生3次四级以上地震，造成当地震感明显。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:30</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">马里多地军方阵地遭袭</h3>
+                    <div class="content-body">【马里多地军方阵地遭袭】财联社7月4日电，马里武装部队4日发布公报说，马里多地军方阵地当天清晨遭到袭击，目前军方正跟踪局势发展。 公报说，遭袭阵地位于该国北部阿盖洛克、阿内菲斯、加奥以及中部塞瓦雷等地。公报未说明袭击者身份、具体经过以及是否有人员伤亡。 （新华社）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:11</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">超200架无人机来袭 俄称莫斯科再遭大规模袭击</h3>
+                    <div class="content-body">【超200架无人机来袭 俄称莫斯科再遭大规模袭击】财联社7月4日电，当地时间7月4日，俄罗斯莫斯科市长索比亚宁通报称，过去24小时，有超过200架乌军无人机袭击莫斯科地区，其中大部分在远处被拦截，有62架在接近莫斯科市时被摧毁。俄罗斯方面称，这是近两年来针对莫斯科地区最大规模的无人机袭击之一。乌克兰方面对此暂无回应。 （央视）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:55</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">乌方否认俄军控制康斯坦丁诺夫卡</h3>
+                    <div class="content-body">【乌方否认俄军控制康斯坦丁诺夫卡】财联社7月4日电，乌克兰武装部队总参谋部4日说，有关俄罗斯军队控制顿涅茨克地区康斯坦丁诺夫卡的消息不实。据乌克兰通讯社报道，乌武装部队总参谋部发言人科瓦廖夫当天发表声明说，俄军仍试图夺取康斯坦丁诺夫卡，有小股俄军渗入乌军阵地，乌军正在清剿。目前康斯坦丁诺夫卡局势严峻，但仍处于乌军控制下。俄罗斯总统普京3日表示，俄军已控制康斯坦丁诺夫卡，“解放”康斯坦丁诺夫卡具有重要战略意义。 （新华社）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:47</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">云南大理州宾川县发生4.4级地震 震源深度10公里</h3>
+                    <div class="content-body">【云南大理州宾川县发生4.4级地震 震源深度10公里】财联社7月4日电，中国地震台网正式测定：7月4日17时33分，在云南大理州宾川县（北纬25.95度，东经100.59度）发生4.4级地震，震源深度10公里。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:39</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">云南大理州宾川县附近发生4.2级左右地震</h3>
+                    <div class="content-body">【云南大理州宾川县附近发生4.2级左右地震】财联社7月4日电，中国地震台网自动测定：7月4日17时33分，在云南大理州宾川县附近（北纬25.96度，东经100.58度）发生4.2级左右地震。最终结果以正式速报为准。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:14</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">泽连斯基证实打击俄圣彼得堡附近石油基础设施</h3>
+                    <div class="content-body">【泽连斯基证实打击俄圣彼得堡附近石油基础设施】财联社7月4日电，当地时间4日，乌克兰总统泽连斯基在社交媒体发文证实，乌方于当日凌晨发起远程打击行动，击中俄罗斯圣彼得堡附近港口的石油基础设施。与此同时，乌国防力量还打击了圣彼得堡附近喀琅施塔得的重要军事目标。 （央视）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:06</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">云南大理州宾川县发生3.4级地震 震源深度10千米</h3>
+                    <div class="content-body">【云南大理州宾川县发生3.4级地震 震源深度10千米】财联社7月4日电，中国地震台网自动测定：07月04日17时00分在云南大理州宾川县附近（北纬25.95度，东经100.57度）发生3.4级左右地震，最终结果以正式速报为准。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:02</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">英法将与阿曼合作 保障该国领海航行安全</h3>
+                    <div class="content-body">【英法将与阿曼合作 保障该国领海航行安全】财联社7月4日电，当地时间7月3日，英国和法国发表联合声明说，阿曼已同意与英国、法国开展合作，保障该国领海范围内的航行安全。英法两国随时准备部署规模更大的多国联合军事行动，维护霍尔木兹海峡的航行自由。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:39</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">普京：继续猛打乌克兰军工设施</h3>
+                    <div class="content-body">【普京：继续猛打乌克兰军工设施】财联社7月4日电，俄罗斯总统普京3日说，必须继续对乌克兰军工综合体及相关设施进行大规模打击。据俄罗斯总统网站3日发布的消息，普京当天视察俄联合部队集群某辅助指挥所，与俄军总参谋部负责人及各部队指挥员就特别军事行动区域当前局势和近期战况召开了军事会议。普京在会上宣布俄军已“完全解放”卢甘斯克，并在顿涅茨克取得重大进展。普京说，俄军继续在特别军事行动区域内保持战略主动权，“解放”康斯坦丁诺夫卡具有重要战略意义，俄军在顿涅茨克、扎波罗热和赫尔松等地歼灭乌克兰武装部队的行动仍在持续。他表示，应继续大规模打击乌克兰军工体系的基础设施及相关设备。 （新华社）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:34</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">中国海军舰艇编队将访问越南</h3>
+                    <div class="content-body">【中国海军舰艇编队将访问越南】财联社7月4日电，7月初，应越南海军邀请，中国人民解放军海军戚继光舰、昆仑山舰组成的舰艇编队将赴越南胡志明市访问。近年来，中越海军在舰艇互访、联合巡逻等领域深化合作，为增进两国互信、维护地区稳定发挥积极作用。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:23</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">俄称圣彼得堡市遭大规模无人机袭击</h3>
+                    <div class="content-body">【俄称圣彼得堡市遭大规模无人机袭击】财联社7月4日电，当地时间7月4日，俄罗斯圣彼得堡市市长别格洛夫称，该市遭到乌军大规模无人机袭击。据他介绍，有72架无人机被拦截。别格洛夫称，该市基洛夫区的石油码头区域被击中，袭击造成的影响已被消除，没有造成人员伤亡。乌克兰方面对此暂无回应。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:16</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">涉留神峪煤矿事故 国家矿山安全监察局山西局监察执法八处2人被查</h3>
+                    <div class="content-body">【涉留神峪煤矿事故 国家矿山安全监察局山西局监察执法八处2人被查】财联社7月4日电，据山西省纪委监委网站消息，涉留神峪煤矿事故，国家矿山安全监察局山西局监察执法八处2人被查。国家矿山安全监察局山西局监察执法八处一级调研员胡慧松接受山西省监察委员会监察调查。国家矿山安全监察局山西局监察执法八处二级调研员于张庆接受山西省监察委员会监察调查。</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="公司公告">
+                <h2 class="topic-heading">
+                    <span class="topic-name">公司公告</span>
+                    <span class="topic-count">5</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-b" data-topic="公司公告" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">19:55</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">国际市场</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">7月4日周六《新闻联播》要闻18条</h3>
+                    <div class="content-body">【7月4日周六《新闻联播》要闻18条】财联社7月4日电，今天《新闻联播》主要内容有：<br>1、牢记初心使命 勇担时代重任——习近平总书记在庆祝中国共产党成立105周年大会上的重要讲话引发热烈反响； <br>2、为中华民族伟大复兴凝聚磅礴力量——习近平主席重要讲话引发港澳台人士热烈反响； <br>3、《习近平谈治国理政》第五卷中斯读者会在斯里兰卡首都科伦坡举行； <br>4、“七一勋章”获得者李连成：当干部就应该能吃亏； <br>5、“七一”前后红色文艺作品集中上演 传承革命精神； <br>6、我国加快建设循环经济高质量发展体系； <br>7、【活力中国调研行】天津：打通科研成果转化“最后一公里”； <br>8、各地积极应对强降雨天气； <br>9、【暖心一瞬】危急时刻伸援手 凡人善举暖人心； <br>10、四部门延续实施失业保险稳岗扩岗政策举措； <br>11、《国际科技组织成立登记指引》出台； <br>12、西渝高铁石家梁隧道贯通； <br>13、全球数字经济首批灯塔案例在北京发布； <br>14、多国人士高度评价习近平在庆祝中国共产党成立105周年大会上的重要讲话； <br>15、俄称控制重镇康斯坦丁诺夫卡 乌称袭击圣彼得堡； <br>16、伊朗举行哈梅内伊遗体告别仪式； <br>17、用电超负荷 美国部分电力公司实施限电； <br>18、西班牙东北部发生林火 近万人受影响。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:26</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">中国空调在欧洲卖爆 多品牌正加急补货</h3>
+                    <div class="content-body">【中国空调在欧洲卖爆 多品牌正加急补货】财联社7月4日电，欧洲多国极端高温持续，中国“避暑神器”在当地被卖爆。多家国内厂商向财联社记者证实，近期以便携式分体空调为代表的制冷家电在欧洲出货量成倍增长。格力电器和TCL方面均表示，区域渠道的移动空调已全面售罄，目前正加急补货。海信相关负责人称，“销售额远超预期，出现脱销现象。现在欧洲这边的订单全都优先安排生产，车间两班倒连轴转，全天不停工。”受访业内人士普遍认为，随着厄尔尼诺现象增多，未来欧洲空调市场仍具增长潜力，而受高基数叠加气候影响，国内空调市场全年销量增长面临一定压力。 （财联社记者 陆婷婷）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:50</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">美国国防部启动碳酸锂战略收储 五年拟采购1.62万吨补充国防储备</h3>
+                    <div class="content-body">【 美国国防部启动碳酸锂战略收储 五年拟采购1.62万吨补充国防储备】财联社7月5日电，随着全球地缘竞争加剧，关键矿产正从商业商品升级为战略资源。美国关键矿产战略储备正在从政策规划进入执行阶段。当地时间7月2日，美国国防部后勤局（DLA）发布招标公告，计划通过一项为期五年的固定价格合同采购电池级碳酸锂，用于补充美国国家国防储备。这是美国首次将锂纳入国家国防储备的大规模采购行动。根据招标文件，本次采购总量上限为1.6167万吨电池级碳酸锂，合同最高金额达3亿美元。DLA将于7月17日前接受投标，计划向技术方案符合要求且报价最低的供应商授予合同，最低保证采购金额为100万美元。采购计划显示，首个合同年度预计采购约3657吨，此后逐年递减，至第五个合同年度降至约2839吨。招标文件要求产品为纯度不低于99.5%的粉末状电池级碳酸锂，交付至纽约州、内华达州、印第安纳州或俄亥俄州的DLA指定仓库。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:38</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">常州三大项目正式签约 总投资超15亿</h3>
+                    <div class="content-body">【常州三大项目正式签约 总投资超15亿】财联社7月4日电，据常州发布，近日，常州三大用地项目成功签约，分别为：高端新型装饰材料智能研发生产项目、精密机床核心组件生产基地项目、塑编产装一体化智能制造项目。项目总投资超15亿元，用地约130亩，达产后预计年新增工业产值超17亿元。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:01</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">高雄往返宁波等两岸直飞航线陆续复航</h3>
+                    <div class="content-body">【高雄往返宁波等两岸直飞航线陆续复航】财联社7月4日电，由春秋航空运营的高雄往返宁波直飞航线4日正式复航，由空客A320机型执飞，每周二、六各开行一班。 该航线9C8685航班于15时30分从宁波栎社机场起飞，17时35分抵达高雄机场；9C8686航班于18时35分从高雄机场起飞，20时35分抵达宁波栎社机场。 春秋航空表示，此前旅客在两地间往返需要中转，单程在途时间通常超过5个小时，直航恢复后单程飞行时间缩短至约2小时，出行效率大幅提升。 近期，多家大陆航空公司接连恢复两岸直飞航线。东方航空本月1日起恢复台中往返成都直飞航线，山东航空预计23日起恢复台中往返青岛直飞航线。 （新华社）</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="国际市场">
+                <h2 class="topic-heading">
+                    <span class="topic-name">国际市场</span>
+                    <span class="topic-count">5</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:00</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">广州白云国际机场口岸外籍客流占比突破四成创历史新高</h3>
+                    <div class="content-body">【广州白云国际机场口岸外籍客流占比突破四成创历史新高】财联社7月4日电，广州出入境边防检查总站4日发布消息，截至3日，广州白云国际机场口岸今年入出境外国人超390万人次，同比增长34%，占口岸出入境人员总量41%以上，数量与占比均创下历史新高。整体而言，该口岸出入境人员已超1000万人次，同比增长19.6%，较2025年提前34天突破千万大关。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:33</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">今年前5个月我国机器人出口近200亿元</h3>
+                    <div class="content-body">【今年前5个月我国机器人出口近200亿元】财联社7月5日电，今年以来，我国机器人出口规模持续扩大，品类结构不断优化，为高端制造出海注入新动能。据海关统计，今年前5个月，国产机器人加速走向全球。各类单独列名的机器人合计出口1037.7万台，出口总值达199.9亿元，产品远销全球150多个国家和地区。其中，欧盟和东盟为主要出口目的地。从细分品类看，我国机器人出口已形成多元矩阵格局。清洁机器人领跑全品类，出口额达140亿元，占机器人出口总值的七成以上。依托自主导航、自动集尘、智能污水循环等核心技术，国产清洁机器人精准匹配海外差异化的居住环境，优势显著。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:32</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span> <span class="topic-chip">公司公告</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">王毅会见瑞典银瑞达集团董事会主席雅各布·瓦伦堡</h3>
+                    <div class="content-body">【王毅会见瑞典银瑞达集团董事会主席雅各布·瓦伦堡】财联社7月5日电，据外交部官网，当地时间2026年7月4日，中共中央政治局委员、外交部长王毅在斯德哥尔摩会见瑞典银瑞达集团董事会主席雅各布·瓦伦堡。<br><br>王毅说，瓦伦堡家族同中国渊源深厚，是中国改革开放后首批进入中国市场的欧洲财团，发挥了先锋示范作用，也为中国同瑞典关系作出独特贡献。在习近平主席和中国共产党领导下，中国正走在符合自身国情、受到人民拥护的发展道路上，大踏步迈向中国式现代化。中国的发展有着强大内生动力和清晰历史逻辑，我们将继续以新发展理念引领高质量发展，持续拉动内需，扩大高水平开放，维护自由贸易和市场经济原则，同世界分享发展机遇，推动构建人类命运共同体。拥抱中国就是拥抱机遇，投资中国就是投资未来。欢迎包括瓦伦堡家族在内的瑞典及欧洲工商界进一步加强对华合作，实现互利共赢。<br><br>王毅表示，目前中瑞双方正着力改善互信、聚焦合作，推动双边关系重回健康发展轨道。这需要两国各界共同努力。希望瓦伦堡家族及瑞典工商界继续发挥积极作用，推动瑞典政府奉行理性务实对华政策，向瑞典民众介绍真实的中国，为双边关系改善创造更好民意基础。<br><br>雅各布·瓦伦堡表示，瓦伦堡家族自上世纪70、80年代以来就进入中国市场，亲身经历中国改革开放发展进程，深度参与瑞中各领域交流合作，并从中获益良多。中国取得举世瞩目发展成就，经济竞争力和国际影响力持续提升。深化对华合作对欧洲及瑞典至关重要，瓦伦堡家族看好中国发展前景，愿继续投资中国、深耕中国、融入中国，并为促进瑞中、欧中经贸关系健康稳定发展作出不懈努力。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">03:51</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">黎巴嫩官员同伊朗外长举行会晤 讨论地区局势</h3>
+                    <div class="content-body">【黎巴嫩官员同伊朗外长举行会晤 讨论地区局势】财联社7月5日电，当地时间4日，黎巴嫩议会议长纳比·贝里的特别代表哈利勒·哈姆丹率团访问伊朗首都德黑兰，并出席对伊朗已故最高领袖的悼念与致敬活动。当天下午，哈利勒·哈姆丹同伊朗外交部长阿拉格齐举行会晤。哈利勒·哈姆丹向伊朗方面转达了纳比·贝里议长对伊朗最高领袖、总统、政府和人民的慰问，并致以哀悼。他表示，黎巴嫩方面高度赞赏伊朗在维护黎巴嫩领土完整和国家主权方面的原则立场，并强调伊朗对推动停止以色列对黎巴嫩侵略的重要作用。阿拉格齐赞扬黎巴嫩人民在应对以色列军事威胁中展现出的坚韧与抗争精神，并高度评价纳比·贝里议长在维护黎巴嫩各政治派别团结、抵御外部干涉方面发挥的重要作用。同时，他重申伊朗方面的原则立场，即必须彻底结束以色列的侵略行为，并要求以色列占领者全面撤出黎巴嫩领土。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:09</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">伊朗外长会晤黎真主党及哈马斯代表</h3>
+                    <div class="content-body">【伊朗外长会晤黎真主党及哈马斯代表】财联社7月4日电，今天（7月4日），伊朗外交部长阿拉格齐在伊朗首都德黑兰分别会晤黎巴嫩真主党及巴勒斯坦伊斯兰抵抗运动（哈马斯）代表。 （CCTV国际时讯）</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="行业动态">
+                <h2 class="topic-heading">
+                    <span class="topic-name">行业动态</span>
+                    <span class="topic-count">7</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:18</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">光大证券：半导体与AI浪潮驱动含氟新材料进入高速成长期</h3>
+                    <div class="content-body">【光大证券：半导体与AI浪潮驱动含氟新材料进入高速成长期】财联社7月5日电，光大证券研报认为，国内氟化工领军企业正加速布局含氟新材料，聚焦打造第二成长曲线。在半导体领域，高纯度（如G5级）电子级氢氟酸作为芯片制造不可或缺的关键湿电子化学品，过去长期被日美企业垄断。近年来，国内企业凭借产业链一体化优势突破了超净高纯工艺瓶颈，电子级氢氟酸顺利通过国内外一线晶圆代工厂的严苛认证，并进入规模化放量阶段。与此同时，AI、HPC和超大规模数据中心算力的快速攀升致使数据中心的热密度不断提高，传统风冷方案在高功率密度场景下已逐渐难以满足需求，液冷正在成为高效散热的必选方案。氟化工企业顺应高效散热趋势，积极布局全氟聚醚（PFPE）等高性能含氟冷却液，凭借其绝缘、不燃及优异的热管理性能，在浸没式液冷等高安全性、高功率场景中占据不可替代的地位。含氟新材料正推动氟化工企业向高技术壁垒、高附加值方向深度转型。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:44</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">美光科技93亿美元扩建广岛项目动工 预计2028下半年出货HBM</h3>
+                    <div class="content-body">【美光科技93亿美元扩建广岛项目动工 预计2028下半年出货HBM】财联社7月5日电，美光科技当地时间周六（7月4日）正式启动其位于日本西部广岛工厂的扩建工程。这项总投资达1.5万亿日元（约合93亿美元）的项目，旨在生产包括高带宽存储器（HBM）在内的先进存储芯片，以满足人工智能（AI）浪潮带来的旺盛需求。HBM是英伟达AI处理器的关键组件，工厂预计将于2028年夏季左右开始出货。近期，美光、三星电子和SK海力士各自都宣布了扩充制造能力的计划。本周早些时候，SK海力士宣布，计划投资80万亿韩元（约合514.6亿美元），在韩国忠清北道首府清州市新建一座NAND存储芯片工厂。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">21:01</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">机器人出口每4元产值有1元深圳造 深圳机器人全球卖爆</h3>
+                    <div class="content-body">【机器人出口每4元产值有1元深圳造 深圳机器人全球卖爆】财联社7月4日电，深圳海关最新统计数据显示，今年前4月深圳机器人出口额达40.3亿元，占全国同类产品出口总额的25.5%。这意味着，全国每4元机器人出口产值就有至少1元来自深圳，深圳机器人“出海”跑出加速度。依托完备的产业生态，大湾区将核心部件、整机、控制系统到集成服务压成一条“短链”，产品迭代速度快、交付能力灵活，深圳机器人如今已远销全球100多个国家和地区。 （央视财经）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">20:38</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">公司公告</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">特斯拉限制员工AI使用开销 美国多家科技企业收紧AI支出</h3>
+                    <div class="content-body">【特斯拉限制员工AI使用开销 美国多家科技企业收紧AI支出】财联社7月4日电，据报道，特斯拉公司将从本月6日开始，限制员工在人工智能工具上的开销。类似措施也被其他多家美国科技企业采用。据报道，特斯拉已向员工发出内部备忘录，宣布自7月6日起，每名员工每周在AI工具上的花费上限为200美元，超出部分须经主管批准。不过，特斯拉员工使用马斯克旗下xAI的Grok模型不计入200美元额度。据悉，Grok在特斯拉员工群体中接受度偏低，多数员工依旧选择使用Anthropic旗下的克劳德。 （央视财经）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:43</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">巴基斯坦一检查站遭汽车炸弹袭击 多人死伤</h3>
+                    <div class="content-body">【巴基斯坦一检查站遭汽车炸弹袭击 多人死伤】财联社7月4日电，巴基斯坦官方消息人士4日说，该国西南部俾路支省一个海岸警卫队检查站3日遭到汽车炸弹袭击和武装攻击，造成4名安全人员死亡、16人受伤。该消息人士称，爆炸彻底摧毁了该检查站。随后，潜伏在附近的一伙武装人员向检查站射击，后逃离现场。3名海岸警卫队人员和1名陆军士兵在当天袭击中身亡，16名安全人员受伤，部分伤者伤势严重。伤者目前已被送往附近医院接受治疗。有消息人士披露，恐怖组织“俾路支解放武装”宣称制造了此次袭击。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:52</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">【电报解读】华为何庭波发布V2版“韬定律”论文！机构称华为的创新和实践或将利好国产晶圆代工厂、先进封装测试、键合等半导体设备、EDA等环节，这家公司将形成多维异构先进封装产品9万片的生产能力</h3>
+                    <div class="content-body">华为何庭波发布V2版“韬定律”论文！机构称华为的创新和实践或将利好国产晶圆代工厂、先进封装测试、键合等半导体设备、EDA等环节，这家公司将形成多维异构先进封装产品9万片的生产能力，另一家的设备可对使用2.5D、3D封装技术的芯片进行成品测试分选。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:40</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">北京市经信局：已构建全国领先的AIGC产业链条 未来将通过专项政策与资金持续深化场景赋能</h3>
+                    <div class="content-body">【北京市经信局：已构建全国领先的AIGC产业链条 未来将通过专项政策与资金持续深化场景赋能】财联社7月4日电，2026全球数字经济大会—&quot;AIGC for Future论坛&quot;今日在北京举行，北京市经济和信息化局副局长王滨在论坛上表示，北京已构建起全国领先的AIGC产业链条，未来将通过专项政策与资金持续深化场景赋能，并以东城数字化试点为契机推广产文融合的“北京模式”。 （财联社记者 郭松峤）</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="宏观经济">
+                <h2 class="topic-heading">
+                    <span class="topic-name">宏观经济</span>
+                    <span class="topic-count">3</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-c" data-topic="宏观经济" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:39</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">宏观经济</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">工信部：支持北京在国家未来产业总体布局中发挥引领示范作用</h3>
+                    <div class="content-body">【工信部：支持北京在国家未来产业总体布局中发挥引领示范作用】财联社7月4日电，工业和信息化部高新技术司副司长毛俊锋在2026全球数字经济大会未来产业大会上表示，未来产业正处于孕育突破、加速演进的重要窗口期，是抢占科技和产业制高点、把握发展主动权及发展新质生产力的关键。工信部已联合七部门印发实施意见，系统布局未来制造、未来信息等六大方向，构建起产业发展的&quot;四梁八柱&quot;，并从顶层设计、区域布局、技术攻关和生态营造四个维度持续发力，引导&quot;耐心资本&quot;投早、投小、投硬科技。工信部将一如既往支持北京，通过强化部市协同、加大前沿赛道技术攻关支持、推动创新要素集聚三大举措，助力北京在国家未来产业布局中发挥引领示范作用，共同推动未来产业高质量发展。 （财联社记者 郭松峤）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="宏观经济" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:37</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">宏观经济</span> <span class="topic-chip">股市政策</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">电影院要成为潮玩新地标</h3>
+                    <div class="content-body">【电影院要成为潮玩新地标】财联社7月4日电，近日，国家电影局、市场监管总局联合发文，部署三方面10条举措，给电影院赋能。业态融合，支持电影院打造国潮电影美食、开发IP联名食品，引入AI智能体、电玩游戏等娱乐业态，打造超级文化场域。品牌经营，鼓励电影院走差异化路线，利用大数据做精准推荐。服务升级，鼓励电影院积极开展设备技术升级改造，支持放映虚拟现实电影，让视听体验再上一层楼。这些措施指向同一个目标，让电影院转型成为集观影、社交、娱乐、消费于一体的综合性文化体验空间。除了看大片，还可以逛市集、品美食，听讲座、体验AI互动项目等。创新涌动，市场长青，光影经济将持续生辉。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="宏观经济" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:05</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">今年我国快递业务量已超1000亿件</h3>
+                    <div class="content-body">【今年我国快递业务量已超1000亿件】财联社7月4日电，国家邮政局数据显示，截至6月30日，今年我国快递业务量已超1000亿件，比2025年提前9天。邮政快递业的发展韧性，折射出我国消费市场平稳增长、经济发展稳中有进的良好态势。</div>
+                </article>
+                
+                </div>
+            </section>
+            
+    </main>
+</div>
+<script>
+    const searchInput = document.getElementById('search');
+    const topicPills = document.querySelectorAll('.topic-pill');
+    const sections = document.querySelectorAll('.topic-section');
+    let activeTopic = 'all';
+
+    function updateFilter() {
+        const query = (searchInput.value || '').toLowerCase();
+        sections.forEach(section => {
+            const topic = section.dataset.topic;
+            const visibleByTopic = activeTopic === 'all' || activeTopic === topic;
+            let hasVisibleCard = false;
+            section.querySelectorAll('.news-card').forEach(card => {
+                const text = card.innerText.toLowerCase();
+                const visible = visibleByTopic && text.includes(query);
+                card.style.display = visible ? '' : 'none';
+                if (visible) hasVisibleCard = true;
+            });
+            section.style.display = visibleByTopic && hasVisibleCard ? '' : 'none';
+        });
+    }
+
+    searchInput.addEventListener('input', updateFilter);
+
+    topicPills.forEach(pill => {
+        pill.addEventListener('click', () => {
+            const topic = pill.dataset.topic;
+            if (activeTopic === topic) {
+                activeTopic = 'all';
+                topicPills.forEach(p => p.classList.remove('active'));
+            } else {
+                activeTopic = topic;
+                topicPills.forEach(p => p.classList.toggle('active', p.dataset.topic === topic));
+            }
+            updateFilter();
+        });
+    });
+
+    document.querySelectorAll('.toggle-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const content = btn.closest('.topic-heading').nextElementSibling;
+            const expanded = btn.getAttribute('aria-expanded') === 'true';
+            content.style.display = expanded ? 'none' : 'block';
+            btn.setAttribute('aria-expanded', String(!expanded));
+            btn.textContent = expanded ? '展开' : '折叠';
+        });
+    });
+    </script>
+</body>
+</html>
