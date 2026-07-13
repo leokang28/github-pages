@@ -1,0 +1,1791 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>财联社电报 - 2026-07-12</title>
+<style>
+    :root {
+        --color-b: #dc2626;
+        --color-c: #2563eb;
+        --color-other: #6b7280;
+        --bg: #f8fafc;
+        --card-bg: #ffffff;
+        --text: #1f2937;
+        --text-secondary: #64748b;
+        --border: #e2e8f0;
+        --radius: 12px;
+        --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    }
+    * { box-sizing: border-box; }
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+    }
+    .container { max-width: 900px; margin: 0 auto; padding: 24px 16px 64px; }
+    header { text-align: center; margin-bottom: 24px; }
+    header h1 { margin: 0 0 8px; font-size: 28px; }
+    header p { margin: 0; color: var(--text-secondary); }
+    .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+    .stat-card {
+        background: var(--card-bg);
+        border-radius: var(--radius);
+        padding: 16px;
+        box-shadow: var(--shadow);
+        text-align: center;
+        border-top: 4px solid var(--color-other);
+    }
+    .stat-card.stat-b { border-top-color: var(--color-b); }
+    .stat-card.stat-c { border-top-color: var(--color-c); }
+    .stat-value { font-size: 24px; font-weight: 700; }
+    .stat-label { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+    .filters {
+        position: sticky;
+        top: 0;
+        background: rgba(248, 250, 252, 0.96);
+        backdrop-filter: blur(8px);
+        padding: 12px 0;
+        margin-bottom: 16px;
+        border-bottom: 1px solid var(--border);
+        z-index: 10;
+    }
+    .search-box {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1px solid var(--border);
+        border-radius: 9999px;
+        font-size: 14px;
+        margin-bottom: 10px;
+        outline: none;
+    }
+    .search-box:focus { border-color: var(--color-c); }
+    .topic-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+    .topic-pill {
+        border: 1px solid var(--border);
+        background: var(--card-bg);
+        border-radius: 9999px;
+        padding: 6px 12px;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+    .topic-pill:hover, .topic-pill.active {
+        background: #eff6ff;
+        border-color: var(--color-c);
+        color: var(--color-c);
+    }
+    .topic-section { margin-bottom: 24px; }
+    .topic-heading {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 18px;
+        margin: 0 0 12px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid var(--border);
+    }
+    .topic-count {
+        background: var(--border);
+        color: var(--text-secondary);
+        font-size: 12px;
+        padding: 2px 8px;
+        border-radius: 9999px;
+    }
+    .toggle-btn {
+        margin-left: auto;
+        background: transparent;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 12px;
+        cursor: pointer;
+        color: var(--text-secondary);
+    }
+    .news-card {
+        background: var(--card-bg);
+        border-radius: var(--radius);
+        padding: 14px 16px;
+        margin-bottom: 10px;
+        box-shadow: var(--shadow);
+        border-left: 4px solid var(--color-other);
+        transition: transform 0.1s;
+    }
+    .news-card:hover { transform: translateY(-1px); }
+    .news-card.level-b { border-left-color: var(--color-b); }
+    .news-card.level-c { border-left-color: var(--color-c); }
+    .card-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+        flex-wrap: wrap;
+    }
+    .time-badge { font-size: 12px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+    .level-badge {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 2px 6px;
+        border-radius: 4px;
+        color: white;
+    }
+    .level-badge.level-b { background: var(--color-b); }
+    .level-badge.level-c { background: var(--color-c); }
+    .level-badge.level-other { background: var(--color-other); }
+    .topic-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+    .topic-chip {
+        font-size: 11px;
+        background: #f1f5f9;
+        color: var(--text-secondary);
+        padding: 2px 8px;
+        border-radius: 9999px;
+    }
+    .news-title { margin: 0 0 8px; font-size: 15px; line-height: 1.5; }
+    .content-body {
+        font-size: 14px;
+        color: var(--text-secondary);
+        white-space: pre-wrap;
+    }
+    .empty-state { text-align: center; color: var(--text-secondary); padding: 40px; }
+    @media (max-width: 640px) {
+        .stats { grid-template-columns: repeat(2, 1fr); }
+        header h1 { font-size: 22px; }
+    }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>📰 财联社电报</h1>
+        <p>2026-07-12 16:00 起 · 共 143 条</p>
+    </header>
+    <div class="stats">
+        
+        <div class="stat-card stat-total">
+            <div class="stat-value">143</div>
+            <div class="stat-label">总计</div>
+        </div>
+        
+
+        <div class="stat-card stat-b">
+            <div class="stat-value">16</div>
+            <div class="stat-label">Level B</div>
+        </div>
+        
+
+        <div class="stat-card stat-c">
+            <div class="stat-value">127</div>
+            <div class="stat-label">Level C</div>
+        </div>
+        
+
+        <div class="stat-card stat-other">
+            <div class="stat-value">0</div>
+            <div class="stat-label">其他</div>
+        </div>
+        
+    </div>
+    <div class="filters">
+        <input class="search-box" id="search" type="text" placeholder="搜索标题 / 内容 / 主题...">
+        <div class="topic-pills">
+            <button class="topic-pill" data-topic="其他">其他 (52)</button>
+<button class="topic-pill" data-topic="行业动态">行业动态 (27)</button>
+<button class="topic-pill" data-topic="公司公告">公司公告 (27)</button>
+<button class="topic-pill" data-topic="国际市场">国际市场 (22)</button>
+<button class="topic-pill" data-topic="宏观经济">宏观经济 (6)</button>
+<button class="topic-pill" data-topic="商品期货">商品期货 (3)</button>
+<button class="topic-pill" data-topic="债券固收">债券固收 (3)</button>
+<button class="topic-pill" data-topic="股市政策">股市政策 (2)</button>
+<button class="topic-pill" data-topic="货币政策">货币政策 (1)</button>
+        </div>
+    </div>
+    <main id="news-list">
+        
+            <section class="topic-section" data-topic="行业动态">
+                <h2 class="topic-heading">
+                    <span class="topic-name">行业动态</span>
+                    <span class="topic-count">27</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-b" data-topic="行业动态" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">08:03</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">国际市场</span> <span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">财联社7月13日早间新闻精选</h3>
+                    <div class="content-body">【财联社7月13日早间新闻精选】<br>1、李强7月10日主持召开国务院常务会议，听取数字中国建设情况汇报。会议指出，要系统推进数字中国建设，加快新一代通信网、算力网建设，全面赋能经济社会发展。要加强前沿科技攻关，增强对新型安全风险的评估和防控能力。<br>2、商务部、海关总署10日公告，对氦气实施临时禁止出口管理，公告自公布之日起执行，后续相关调整将另行公告。<br>3、长征十号乙运载火箭成功实现一子级可控回收，预计年底前完成一子级火箭复用飞行。 <br>4、有机构预测，到2029年，中国国内算力卡采购额将达到1.44万亿元。庞大的算力需求让投资机构相信，中国将诞生多家市值万亿甚至十万亿的上市企业。<br>5、据DigiTimes上周五发布的一份报告，行业消息人士指出，受到人工智能需求激增与产能结构性瓶颈的双重推动，高带宽内存（HBM）的价格到2027年有望翻倍。<br>6、研究机构SemiAnalysis创始人Dylan Patel表示，存储面临长达数年的结构性短缺，仍有2至3倍上行空间。<br>7、《科创板日报》记者近日在华强北实地走访MLCC看到的情况：“村田1206-476料号单日再涨5%”“GPU超高容型号散货加价15%仍一料难求”“高容产品一天一价和价格小幅波动同时存在”。<br>8、据中国石化消息，长征十号乙运载火箭首次规模化应用了液化天然气制备的高纯甲烷新型航天燃料，标志着我国商业航天在燃料多元化供给领域取得关键性技术突破。<br>9、国务院原则同意《中医药振兴发展“十五五”规划》，加快推进中医药现代化，推动中医药走向世界，为推动“十五五”时期健康中国建设取得决定性进展提供有力支撑。<br>10、7月10日全国用电负荷今年以来首次创历史新高，最高达到15.18亿千瓦。<br>11、据国家网信办消息，2026年5月至6月新增120款生成式人工智能服务在国家网信办完成备案。<br>12、长江存储IPO辅导工作于7月10日更新，当前股东穿透辅导工作量较大。<br>13、经深圳证监局调查，7月6日，乔某（男）涉嫌编造传播涉及上市公司共进股份的虚假误导性信息，严重扰乱证券市场秩序，破坏公序良俗，违反证券法规，证监会决定对其立案调查。<br>14、记者从多方渠道了解到，已有证监局对基金销售机构开展合规摸底工作。<br>15、鼎龙股份公告，玻璃基板专用软抛光垫已完成多家头部封测企业及晶圆制造企业的送样工作；华工科技公告，TGV玻璃通孔激光加工智能装备已完成整机定型及初步中试验证。<br>16、粤海饲料公告，预计2026年半年度净利润同比增长966%-1303%；杉杉股份公告，预计上半年净利润同比增长262%-334%；紫光股份公告，预计上半年净利润同比增长84%-123%；亿道信息公告，预计上半年净利同比增长1442%-1792%；方正科技公告，上半年净利同比预增196%-265%；风华高科公告，Q2净利润预计环比增长104%-138%；翔鹭钨业公告，预计上半年净利润同比增长2348%-3436%；中信证券公告，预计上半年净利润同比增长69.59%；香农芯创公告，预计上半年净利润同比增长2118%-2434%；融捷股份公告，预计上半年净利同比增长957%-1192%。<br>17、烽火通信公告，拟定增募资不超过29.13亿元，拟5亿元收购藤仓烽火60%股权；陕鼓动力公告，拟发行股份购买陕西秦风气体36.06%股权；中国人寿公告，拟出资49.99亿元与关联方共同成立半导体产业基金；东阳光公告，控股子公司签署130亿元至150亿元算力服务采购合同；日科化学公告，拟收购亘元新材70.75%股份；领益智造公告，拟不超40亿元参与富通嘉善重整投资。<br>18、2连板星网宇达公告，卫星通信业务与长征十号乙运载火箭海上回收技术突破不存在业务关联。<br>19、世运电路公告，预计上半年净利同比下降73.97%-82.56%；多氟多公告，Q2净利润预计环比下降50%-80%。<br>20、巨力索具公告，收到行政处罚决定书，因误导性陈述被罚450万元。<br>21、中国卫星公告，预计上半年净利润3050万元-3650万元同比扭亏为盈。<br>22、赛力斯公告，预计上半年净亏损15亿元-18亿元；广汽集团公告，预计上半年净亏损40.6亿元-45.7亿元；牧原股份公告，预计上半年净亏损57亿元-67亿元。<br>23、周末美伊战争再起，美军称开始对伊朗发动一周内第三轮打击；伊朗称打击阿曼杜库姆港美军目标。<br>24、据报道，行业消息人士透露，三星电子正着手将其龙仁芯片集群首座半导体工厂的投产时间提前至2029年，比原计划提早一至两年。<br>25、SK海力士CEO郭鲁正表示，当前冲击电脑、汽车及消费电子市场的存储芯片短缺局面，大概率会延续至2030年之后。<br>26、苹果公司以窃取商业机密为由起诉OpenAI，指控该公司通过协同行动窃取苹果未发布产品的相关信息。<br>27、OpenAI回应苹果就硬件商业机密提起的诉讼，称对其他公司的商业秘密不感兴趣，OpenAI仍专注于打造创新技术。<br>28、美联储最新半年度《货币政策报告》显示，美国通胀已由去年同期的持续回落转为明显升温，总体PCE同比升至4.1%，关税、能源和AI相关需求成为主要推手。<br>29、上周五美股三大指数集体收涨，道指涨0.29%，上周累跌0.5%；纳指涨0.29%，上周累涨1.74%；标普500指数涨0.42%，上周累涨1.23%。SK海力士ADR在美股上市首日收涨近13%，市值达到1.23万亿美元。利弗莫尔中概股龙头指数收跌0.32%，热门中概股涨跌不一。<br>30、上周五WTI原油期货结算价报跌0.93%，布伦特原油期货结算价跌0.38%。COMEX黄金期货收跌0.29%，COMEX白银期货收跌0.74%。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">20:06</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">公司公告</span> <span class="topic-chip">货币政策</span></div>
+                    </div>
+                    <h3 class="news-title">中信建投：市场延续震荡格局 指数获得下方关键均线支撑</h3>
+                    <div class="content-body">【中信建投：市场延续震荡格局 指数获得下方关键均线支撑】财联社7月12日电，中信建投证券研报认为，市场震荡格局仍将延续，指数下跌时无需过度担忧。本周市场在前期下跌后低位反弹，主要宽基指数均在下方关键均线处获得有力支撑。考虑到当前A股企业盈利仍处于上行周期，国内流动性依然宽松，美联储也尚未加息，三季度市场风险偏好依然较高，判断市场尚不具备牛熊转换的基础。对于当前市场来说，核心矛盾在于增量资金不足，资金面的存量博弈导致市场无法开启全面普涨行情，市场结构分化和板块间“跷跷板”效应明显。偏高的估值水平和边际收紧的全球货币政策是增量资金流入放缓的关键原因。<br><br>预计市场短期仍然强势，但长期脆弱性上升。往后看，进入8月后，市场方向有望趋于明朗，大型IPO上市落地、FOMC会议结果、关键公司财报业绩等变数明确后，市场有望确定方向，开启新一轮行情。<br><br>行业配置上以科技主线+超跌轮动为核心，行业重点关注：AI（半导体、光通信）、券商、人形机器人、商业航天、生物科技、红利资产、港股互联网等。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">04:53</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">15个交易日逾千亿元 半导体主题ETF“吸金”</h3>
+                    <div class="content-body">【15个交易日逾千亿元 半导体主题ETF“吸金”】财联社7月13日电，半导体板块近期成为资金进击的重点。从半导体主题ETF最新情况看，过去15个交易日合计净流入资金超过千亿元，成交额和基金份额均创历史新高。从半导体相关个股的走势看，在前期大涨之后，近期震荡明显加剧，后续行情能否持续走强，备受市场关注。 （上海证券报）</div>
+                </article>
+                
+                <article class="news-card level-b" data-topic="行业动态" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">08:21</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">颠覆性技术有望改变未来五年尖端芯片制造方式</h3>
+                    <div class="content-body">【颠覆性技术有望改变未来五年尖端芯片制造方式】财联社7月13日电，AI技术热潮翻涌，对尖端芯片的需求旺盛，但全球芯片供应仍受限于几家公司的技术和产能。美国《福布斯》双周刊网站在近期报道中指出，随着新兴技术不断崛起，全球尖端芯片制造方式有望在2030年迎来巨变。EUV光刻虽是当下主流，却并非将微小晶体管“画”在硅片上的唯一路径。一批着眼于未来的光刻新技术，正蓄势待发。它们有望替代EUV光刻，重塑尖端芯片的制造方式。原子光刻抛开“光”改用原子束在硅片上蚀刻极微小的图案。一旦成功，它能将特征尺寸在EUV光刻的基础上再缩小一至两个数量级。另一值得关注的前沿方案是X射线光刻。它依旧沿用“光”的范式，却将其推向极致：X射线在电磁波谱中比极紫外光更靠外，波长更短（可低于1纳米），能量更强，理论上能刻画更微小的晶体管。迄今无人证明X射线光刻机能以足够低的成本和足够高的产量实现商业化。另一个参与者是xLight，与Substrate的颠覆路线不同，xLight寻求与现有生态和谐共存，开发能融入而非取代ASML等公司架构的技术。来自中国的力量同样在挑战EUV的统治。上个月，华为宣布研发出一种新型半导体架构，无需极紫外光刻便可制造尖端AI芯片。 （科技日报）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:00</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">【研选•研报数据】《“十五五”碳达峰行动方案》发布，环保行业迎来提质扩容新周期；服务器PCB核心厂商，上半年业绩大超预期，积极把握算力需求激增带来的市场机遇</h3>
+                    <div class="content-body">①《“十五五”碳达峰行动方案》发布，环保行业迎来提质扩容新周期；<br>②服务器PCB核心厂商，上半年业绩大超预期，积极把握算力需求激增带来的市场机遇。</div>
+                </article>
+                
+                <article class="news-card level-b" data-topic="行业动态" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">17:22</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">国际市场</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">AI热潮太费电 燃气轮机价格3年涨了300%</h3>
+                    <div class="content-body">【AI热潮太费电 燃气轮机价格3年涨了300%】财联社7月12日电，人工智能热潮持续升温，围绕算力展开的竞争也不断向产业链上游延伸。随着大型数据中心加速建设，燃气轮机这一传统设备也迎来了新的发展机遇。几周前，微软刚刚向能源巨头GE Vernova采购了7台大型燃气轮机，来为其得州的数据中心供电。尽管单台燃气轮机的售价超过2.5亿美元，但这种复杂设备的市场需求依然远远超过供应。<br><br>根据美国投资研究机构Melius Research的估算，过去三年，燃气轮机的价格累计上涨了约300%。GE Vernova的股价也在过去六个月累计上涨了超过70%，甚至它的行业竞争对手，如卡特彼勒、西门子等，也都实现了快速增长。但也有多位专家表示，燃气轮机并不足以满足AI时代的全部能源需求，未来数据中心仍需要多种能源方案来一同支撑。从宏观层面看，如何构建一个更加稳定、高效的能源体系，也将成为AI产业发展面临的重要课题。 （央视财经）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:15</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">股市政策</span></div>
+                    </div>
+                    <h3 class="news-title">中信证券：可控回收技术突破将为商业航天领域基建投资放量奠定基础</h3>
+                    <div class="content-body">【中信证券：可控回收技术突破将为商业航天领域基建投资放量奠定基础】财联社7月13日电，中信证券研报指出，2026年7月10日，长征十号乙运载火箭首飞成功，完成全球首次火箭一子级海上网系可控回收，是我国商业航天产业化发展的关键里程碑。本次可回收发射任务的成功，有望推动我国卫星发射成本大幅下降，进而加速卫星组网进程，由此带来的资本开支料将催生巨大投资机会。后续需重点聚焦民营可回收商业火箭领域，建议关注可回收商业火箭企业的回收技术验证、卫星制造产能扩建的规模化落地进度，同时建议关注2026—2027年民营商业航天企业的IPO进程。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:40</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">公司公告</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">公募南下密集举牌创新药公司 基金经理看好行情持续性</h3>
+                    <div class="content-body">【公募南下密集举牌创新药公司 基金经理看好行情持续性】在市场叙事逻辑逐渐向硬科技靠拢的背景下，头部公募开始加大布局创新药赛道。记者注意到，近期易方达基金、富国基金、华夏基金、汇添富基金四家头部公募旗下基金纷纷南下，密集举牌港股创新药公司，叠加新版国家基本药物目录落地释放政策红利，医药赛道投资机会显著增强。多位医药基金经理表示，上半年基金抱团科技的叙事逻辑基于行业高景气、技术突破和出海逻辑，而国内创新药产业同样迈入技术爆发、出海商业化兑现周期，板块估值处于历史低位，有望承接科技赛道的流出资金。值得一提的是，在景气叙事主导当下基金业绩的背景下，多位医药基金经理认为，创新药与科技具备相似叙事逻辑，有望吸引资金向估值洼地的创新药板块转移。 （证券时报）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:27</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">公司公告</span> <span class="topic-chip">商品期货</span></div>
+                    </div>
+                    <h3 class="news-title">产能满产+订单充足 多家铝企上半年业绩倍增</h3>
+                    <div class="content-body">【产能满产+订单充足 多家铝企上半年业绩倍增】财联社7月13日电，今年上半年，在电解铝价格高位运行、成本端氧化铝价格走低的背景下，铝产业链景气度持续攀升。多家上市铝企披露的半年度业绩预告显示，行业盈利普遍大幅提升，其中天山铝业、神火股份、中孚实业、焦作万方等公司上半年业绩同比实现倍增。与此同时，上市铝企正积极向高附加值的铝箔赛道延伸，相关新能源铝箔产能布局提速推进，产业链呈现“上游高景气，中游忙扩产”的态势。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:12</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">公司公告</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">【九点特供】三星电子计划将龙仁首座芯片工厂的投产时间提前至2029年，分析师强call国内半导体设备企业将迎来海外验证与订单落地提速契机，这家公司的多种设备已经通过HBM先进封装工艺的验证并批量销售</h3>
+                    <div class="content-body">①三星电子计划将龙仁首座芯片工厂的投产时间提前至2029年，分析师强call国内半导体设备企业将迎来海外验证与订单落地提速契机，这家公司的多种设备已经通过HBM先进封装工艺的验证并批量销售；<br>②国务院原则同意《中医药振兴发展“十五五”规划》，中医药产业有望持续受益于政策红利，呈向好发展态势，这两家公司产品均跻身新版基药目录；<br>③特斯拉在X平台官方帐户上发布Model S与Model X初代组装线退役拆解视频，并表示相关产线仅用46天完成退役。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:46</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">【点金互动易】CPU+国产算力，自研本土安全可控高端处理器，AI Agent爆火拉高通用计算需求，这家公司CPU与GPU协同放量，有望加速渗透电信、金融等核心商业市场</h3>
+                    <div class="content-body">①CPU+国产算力，自研本土安全可控高端处理器，AI Agent爆火拉高通用计算需求，这家公司CPU与GPU协同放量，有望加速渗透电信、金融等核心商业市场；<br>②人形机器人+液冷，研发灵巧手腱绳与护套材料并已送样验证，同时拟收购液冷冷板核心厂商，这家公司强力切入算力服务器整机供应链。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:26</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">公司公告</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">机构：科技板块调整或已近尾声 从半年报挖掘新一轮主线线索</h3>
+                    <div class="content-body">【机构：科技板块调整或已近尾声 从半年报挖掘新一轮主线线索】财联社7月13日电，上周，A股市场波动显著加剧，市场焦点集中于AI赛道调整节奏及后续风格演绎。本周券商策略展望观点认为，近期科技股回调受资金面和海外市场情绪影响较大，当前相关板块赚钱效应收缩已趋于充分，距离本轮调整的底部或已不远。展望后市：一方面，AI算力需求扩张的长期趋势并未改变，AI产业仍有望成为领涨主线；另一方面，7月中下旬密集发布的半年度业绩将是验证行情节奏的关键变量。 （上证报）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:24</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">年内激增超过2000亿元 科技类ETF规模突破5400亿元</h3>
+                    <div class="content-body">【年内激增超过2000亿元 科技类ETF规模突破5400亿元】财联社7月13日电，据瑞银证券估算，截至2026年6月29日，全部A股行业和主题ETF的规模从2024年8月底的4694亿元提升至13075亿元。其中，聚焦科技的行业和主题ETF规模达到约5415亿元，较2025年末提升约2087亿元。此外，截至2026年一季度末，科技赛道的主动权益类公募基金的规模占所有主动权益类公募的比例达到11.4%，为历史峰值。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:04</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">公司公告</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">基本半导体：对部分产品销售价格进行适度调整 预计上调幅度最高不超过25%</h3>
+                    <div class="content-body">【基本半导体：对部分产品销售价格进行适度调整 预计上调幅度最高不超过25%】财联社7月13日电，基本半导体港交所公告，鉴于2026年以来随着全球人工智能(AI)、新能源汽车等新兴应用的快速发展，带动市场需求持续增长，行业供需关系维持紧平衡状态。经综合评估市场环境、成本变化及整体经营策略，集团将自2026年第三季度起，对部分产品销售价格进行适度调整，以支持持续研发投入，保障产品品质及供应稳定性。部分产品价格预计上调幅度最高不超过25%，具体调整方案将根据产品类别、订单规模、合作模式、市场区域及双方商业安排等因素综合确定，并与相关客户有序实施。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:18</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">公司公告</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">市场担心1.6T光模块需求延迟 中际旭创回应</h3>
+                    <div class="content-body">【市场担心1.6T光模块需求延迟 中际旭创回应】财联社7月13日电，关于“市场担心1.6T的需求延迟，目前公司看到的需求情况如何”等问题，中际旭创7月12日称，2027年整体行业的1.6T需求依然保持强劲，与此前预期的数量区间相比没有变化，客户数量也有所增加。2027年800G行业需求增长较此前预期更为显著。从整体客户需求来看，没有看到需求下降的情况。1.6T明年的需求数量与此前预期基本一致，主要变化体现在结构上。部分客户需求确实有所下调，但同时也有新增云厂商及AI大模型客户上调了1.6T需求。整体来看，1.6T需求并未下滑，仅呈现结构性调整。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:14</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">科技记者古尔曼：苹果将跳过M6 Pro/Max芯片 全力押注AI导向的M7系列</h3>
+                    <div class="content-body">【科技记者古尔曼：苹果将跳过M6 Pro/Max芯片 全力押注AI导向的M7系列】《科创板日报》13日讯，科技记者马克・古尔曼透露，苹果将推出标准版M6芯片，但不会推出定位更高端的M6 Pro和M6 Max芯片。他表示，这一打破以往产品节奏的决定，原因在于AI。苹果原本计划为M7系列带来神经网络处理能力的大幅升级，最终认为这些改进足够重要，因此决定加快下一代产品的推出，而不是完成整个M6产品线。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:05</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">中际旭创：2027年光模块价格正在确定 市场传言的降价幅度过于夸大</h3>
+                    <div class="content-body">【中际旭创：2027年光模块价格正在确定 市场传言的降价幅度过于夸大】财联社7月13日电，关于目前光模块产品价格，中际旭创7月12日称，现阶段2027年的价格正在确定，市场传言的降价幅度是过于夸大的。实际上目前能大批量交付1.6T和800G的厂商并不多，涉及到技术门槛、市场准入、良率等，客户实际拿到的交付量也并不多。2027年行业依然面临交付紧张，大规模交付能力才是最宝贵的。高端光模块并不是一个恶性竞争的行业。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:00</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">公安机关严厉打击编造传播涉汛涉灾网络谣言</h3>
+                    <div class="content-body">【公安机关严厉打击编造传播涉汛涉灾网络谣言】财联社7月13日电，公安部网安局7月13日公布25起涉汛涉灾网络谣言违法犯罪典型案例。这25起典型案例涉及广东、广西、浙江、湖北等多地，个别网民为牟取私利，恶意编造涉汛涉灾虚假内容，严重干扰防汛救灾工作，造成不良影响，公安机关网安部门迅速行动、严厉打击，共刑事拘留4人、行政处罚23人，相关账号已被平台封禁处置。<br><br>网警提示，网络不是法外之地，请广大网民规范网上言行，切勿为了博取流量、博取关注，搬运、拼接或利用AI软件等方式编造涉汛涉灾虚假内容，共同营造清朗网络空间。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:43</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">公司公告</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">韩国半导体业面临“美式招商”压力</h3>
+                    <div class="content-body">【韩国半导体业面临“美式招商”压力】财联社7月13日电，在上周美国政府公开施压，要求韩半导体企业加大在美投资后，SK海力士释放出新的信号。据韩国《京乡新闻》12日报道，SK海力士10日在美上市后，正着手评估在美投资事宜。SK集团会长崔泰源表示，公司正以电力、供水、人才和供应链等条件为前提，研究在美国建设存储芯片工厂的可行性。观察人士表示，美国现任政府此前一直利用半导体关税威胁来推动企业赴美投资，如今更是公开点名韩国三星电子和SK海力士，意在构建以美国为中心的存储芯片供应链。韩国媒体分析认为，美方此番施压迫使韩企深陷本土扩产与海外布局的两难承压困局。 （环球网）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:38</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">首款智能体手机呼之欲出 大规模商用需迈几道坎</h3>
+                    <div class="content-body">【首款智能体手机呼之欲出 大规模商用需迈几道坎】财联社7月13日电，全球首款AI智能体手机即将在2026世界人工智能大会上展出，该消息令智能体手机再度成为舆论关注焦点。接受采访的专家表示，智能体手机短期内仍将属于“高级辅助执行”阶段，无法完全跳过人机确认实现全流程自动执行，长期而言，智能体手机要实现大规模商用，仍需迈过技术验证、隐私安全、与互联网企业之间的利益分配等多道坎。 （证券时报）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:56</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">远程操控人形机器人首次完成外科手术</h3>
+                    <div class="content-body">【远程操控人形机器人首次完成外科手术】财联社7月13日电，据新一期《自然》杂志报道，美国加州大学圣迭戈分校工程团队与外科医生团队，完成了全球首例利用远程操控人形机器人进行实时临床手术的试验。研究团队介绍，此次试验中的一项手术由一台人形机器人与一名担任助手的人类外科医生组成“人机团队”，实施了胆囊切除。另一项手术则由两台人形机器人组成“机器人团队”协同完成。两项手术均在大型非灵长类哺乳动物身上实施并取得成功。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:56</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">通用生物医学AI智能体可自主执行科研任务</h3>
+                    <div class="content-body">【通用生物医学AI智能体可自主执行科研任务】财联社7月13日电，美国斯坦福研究团队近日在《科学》杂志上报告了一种名为Biomni的通用生物医学AI智能体，其能够自主执行从数据分析到实验设计的多种研究任务。团队在多个案例研究中测试了该工具，认为其性能稳定，多项任务表现接近人类专家。该成果意味着AI智能体可与人类研究人员协作，加速推进生物医学从基础研究迈向应用转化。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">20:23</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">公司公告</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">中信建投：计算机板块半年报预告陆续披露 AI算力硬件持续高景气</h3>
+                    <div class="content-body">【中信建投：计算机板块半年报预告陆续披露 AI算力硬件持续高景气】财联社7月12日电，中信建投证券研报指出，A股计算机板块半年报预告与海外模型迭代共同验证AI产业链景气度延续：一方面，AI服务器、智算基础设施等硬件链条业绩弹性突出，软件及AI应用企业也开始体现经营修复和收入落地；另一方面，OpenAI、xAI、Meta等海外模型持续强化Agent、Coding、多模态和办公入口，模型竞争从能力验证转向高频场景落地，推理侧算力消耗、基础设施投入和AI应用商业化有望继续共振。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">23:34</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">智利发生汽车撞人事件致6死7伤</h3>
+                    <div class="content-body">【智利发生汽车撞人事件致6死7伤】财联社7月12日电，智利瓦尔帕莱索大区总统代表米永内斯12日说，该大区比尼亚德尔马市当天发生一起汽车撞人事件，造成6人死亡、7人受伤。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:17</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">公司公告</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">【财联社早知道】机构称到2029年中国国内算力卡采购额将达到1.44万亿元，将诞生多家市值万亿甚至十万亿的上市企业；2026世界人工智能大会下周启幕，机构称AI应用层面Agent化加速</h3>
+                    <div class="content-body">①机构称到2029年中国国内算力卡采购额将达到1.44万亿元，将诞生多家市值万亿甚至十万亿的上市企业，分析师称相关底层算力基建仍然还在扩张期，这家国有数据中心企业深耕行业十七年，目前已成国内算力基础设施领域的核心力；<br>②2026世界人工智能大会下周启幕，机构称AI应用层面Agent化加速，这家公司通过自研技术持续迭代大模型，在AI搜索、AI短剧、AI音乐、AI游戏、AI社交等多个领域构建了全面的AI业务布局；<br>③这家公司预计上半年净利同比增长1442%-1792%，公司核心业务为AI+应用与AI+终端的全场景产品矩阵。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:38</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">国际市场</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">英国投20亿英镑建设人工智能作战实验室</h3>
+                    <div class="content-body">【英国投20亿英镑建设人工智能作战实验室】财联社7月12日电，英国国防部11日推出人工智能作战实验室建设计划，依托长期防务合同全面升级陆军训练体系，依靠智能技术重塑演习模式，以此应对不断演变的现代战场风险。该项目计划投入20亿英镑(约182亿元人民币)，由本土多家防务企业组成联合体共同承接研发与运维工作，上下游联动诸多本土配套厂商，在带动军工产业发展的同时，稳定保障一批本土技术岗位，还同步推出青年技术学徒项目，也为退役军人开辟技术就业路径。 （中新社）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:14</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">【风口研报·公司】广泛应用于逻辑芯片、DRAM、3D闪存等领域，这家公司细分半导体设备全球市场份额位居第二，干法刻蚀设备打造第二曲线；这家公司关键设备是卡位全球液冷龙头上游的“卖铲人”</h3>
+                    <div class="content-body">①广泛应用于逻辑芯片、DRAM、3D闪存等领域，这家公司细分半导体设备全球市场份额位居第二，干法刻蚀设备打造第二曲线；②这家公司关键设备是卡位全球液冷龙头上游的“卖铲人”，或可类比MLCC之于AI服务器，且子公司掌握异构计算核心技术，多轮驱动未来高成长。</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="宏观经济">
+                <h2 class="topic-heading">
+                    <span class="topic-name">宏观经济</span>
+                    <span class="topic-count">6</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-b" data-topic="宏观经济" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">21:38</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">宏观经济</span> <span class="topic-chip">货币政策</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">下周资本市场大事提醒：长鑫科技周四打新；阿斯麦与台积电公布二季报；韩国央行或时隔五年重启加息</h3>
+                    <div class="content-body">【下周资本市场大事提醒：长鑫科技周四打新；阿斯麦与台积电公布二季报；韩国央行或时隔五年重启加息】<br>1、国家统计局将于7月15日公布6月工业增加值、固定资产投资、社零等经济数据。<br>2、Wind数据显示，下周央行公开市场将有620亿元逆回购到期。此外，7月15日将有9000亿元181天期买断式逆回购到期。<br>3、Wind数据显示，下周共有41家公司限售股陆续解禁，合计解禁82.41亿股，按7月10日收盘价计算，解禁总市值为528.67亿元。解禁市值居前三位的是：华电新能（351.63亿元）、长芯博创（48.79亿元）、赛维时代（37.61亿元）。从个股的解禁量看，解禁股数居前三位的是：华电新能（75.13亿股）、赛维时代（2.08亿股）、国科恒泰（1.47亿股）。<br>4、Wind数据显示，下周将有2只新股发行，其中北交所有1只，科创板有1只。具体来看，7月13日发行的是维琪科技；7月16日发行的是长鑫科技。其中，长鑫科技是国产存储芯片巨头，公司计划募资295亿元，是今年以来A股最大IPO项目，也是科创板历史上第二大IPO。<br>5、阿斯麦将于7月15日发布二季报。华尔街分析师一致预期其Q2每股收益约7.98美元（约合7.15欧元），营收达103.3亿美元。<br>6、台积电将于7月16日披露二季度完整财报，届时市场将聚焦其AI相关收入占比、先进制程产能利用率及资本支出指引等关键指标。<br>7、谷歌Gemini 3.5 Pro据传7月17日发布，为追赶GPT-5.6与Fable 5推迟两月重新预训练。其前端与SVG视觉生成能力或大幅跃升。<br>8、2026世界人工智能大会暨人工智能全球治理高级别会议将于7月17日至20日在上海举行。<br>9、旧金山湾区规模最大的AI行业盛会之一AGI Summit SF 2026峰会将于7月18日至19日举办。OpenAI、Anthropic、Google DeepMind、英伟达将出席。<br>10、美联储新任主席凯文·沃什将于北京时间7月14日晚上10点，在国会就FOMC货币政策发表首次证词。<br>11、韩国央行预计将于7月16日启动紧缩周期。韩国央行行长申铉松7月9日明确表态，“需要在合适时机上调基准利率”。这或是自2021年8月以来的首次上调。<br>12、英国工党新任党首将在7月17日举行的工党特别代表大会上正式宣布产生。 目前英国政坛普遍认为，大曼彻斯特市前市长安迪·伯纳姆有望成新首相。<br>13、海外经济体将公布多个重要经济数据。7月14日美国6月CPI，市场预期CPI将显示整体通胀温和放缓；7月15日美国6月PPI，将提供上游价格压力的最新信号；7月17日，欧元区6月CPI、美国7月密歇根大学消费者信心指数。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="宏观经济" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:13</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">宏观经济</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">中东战事推高能源成本 欧盟拟加速电气化转型减少油气依赖</h3>
+                    <div class="content-body">【中东战事推高能源成本 欧盟拟加速电气化转型减少油气依赖】财联社7月13日电，今年以来，美以对伊朗发动战争致使高度依赖能源进口的欧洲地区油气价格暴涨。一份欧盟委员会提案草案显示，欧盟正计划推出一系列政策和融资方案，以推动欧盟减少对石油和天然气的依赖，加速欧盟经济的电气化转型。据悉，这一草案将于7月17日由欧盟委员会正式公布。根据草案，欧盟计划设定一个目标，到2040年，欧盟整体经济的能源消耗中至少要有一定比例来自电力。该草案目前仍在制定中，并未说明具体比例。加快电气化转型意味着欧盟将推动从汽油和柴油汽车过渡到电动汽车，让家庭使用电力驱动的热泵取代燃气锅炉，以及实现工业流程的电气化——例如，用电力驱动的熔炉取代化石燃料熔炉。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="宏观经济" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:37</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">宏观经济</span> <span class="topic-chip">公司公告</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">多维数据勾勒经济运行“稳新活融”新图景</h3>
+                    <div class="content-body">【多维数据勾勒经济运行“稳新活融”新图景】财联社7月13日电，“今年上半年，国内市场需求稳步回升，海外新兴市场需求保持旺盛，公司挖掘机销量实现内外双增长，整体景气度超预期。”三一重工相关负责人日前在接受中国证券报记者采访时表示。多位专家认为，今年上半年，从基建投资到科技创新，从客流物流到外贸进出口，多维度宏观数据勾勒出经济运行“稳新活融”的新图景。 （中证报）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="宏观经济" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:34</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">今年上半年全国铁路发送旅客23.48亿人次 创历史同期新高</h3>
+                    <div class="content-body">【今年上半年全国铁路发送旅客23.48亿人次 创历史同期新高】财联社7月13日电，据国铁集团消息，今年上半年，全国铁路累计发送旅客23.48亿人次、同比增长5.0%，创历史同期新高。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="宏观经济" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:28</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">宏观经济</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">中信建投：供给宽松预期压制锂价 淡季不淡有望反弹</h3>
+                    <div class="content-body">【中信建投：供给宽松预期压制锂价 淡季不淡有望反弹】财联社7月13日电，中信建投证券研报称，近一周锂价大幅下行，供给边际宽松预期给予压制，主要是江西锂矿复产及津巴布韦锂精矿到港均将在7月兑现，但精矿维持紧现实格局，部分锂盐厂因原料偏紧及检修等因素出现减量，辉石及云母产量下降，周内产量维持降势；同时库存方面依然维持去化，部分散单惜售挺价。需求侧无过多担忧，初端消费侧，下半年将有较多新产能初步建成并爬产，放大下游补库效应，带来消费的边际增量，终端需求侧，2027年新能源车补贴退坡将夯实年内抢装，推高下半年排产预期，商用车增速乐观，上半年同比增长36%，1—5月纯电动车出口183.3万辆，同比增长114.4%。三季度看，预计7月、8月排产环比均保持正增长，淡季不淡，旺季可期。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="宏观经济" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:02</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">财联社7月13日电，韩国7月1-10日出口同比增长53.9%，进口增长17.4%。</h3>
+                    <div class="content-body">财联社7月13日电，韩国7月1-10日出口同比增长53.9%，进口增长17.4%。</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="公司公告">
+                <h2 class="topic-heading">
+                    <span class="topic-name">公司公告</span>
+                    <span class="topic-count">27</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-b" data-topic="公司公告" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">07:58</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">中际旭创澄清二季度业绩严重不及预期和故意压制股价传言</h3>
+                    <div class="content-body">【中际旭创澄清二季度业绩严重不及预期和故意压制股价传言】财联社7月13日电，中际旭创7月12日称，近期市场针对公司及行业的小作文较多，主要澄清如下：1、关于二季度业绩严重不及预期的传言：该传言没有任何依据，给投资者带来恐慌。公司目前还没有发布业绩预告和半年报，但公司对2026年半年度经营情况和行业需求都非常有信心。<br><br>2、关于公司故意压制股价的传言：公司不存在故意压制股价、收入延迟等情况，也不会刻意调整业绩。公司一贯注重资本市场形象和保护投资者利益，此类传言是对公司极大误解。 （证券时报）</div>
+                </article>
+                
+                <article class="news-card level-b" data-topic="公司公告" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">21:41</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">宏观经济</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">周日A股上市公司重点业绩公告精选</h3>
+                    <div class="content-body">【周日A股上市公司重点业绩公告精选】财联社7月12日电，据财联社不完全统计，截至发稿，今日包括中国卫星、赛力斯、杉杉股份、粤海饲料、宁波富邦、神力股份、三友化工、圣诺生物、润都股份在内的多家A股上市公司发布2026年半年度业绩预告。其中，赛力斯公告，预计上半年净亏损15亿元-18亿元，核心子公司问界汽车业绩出现波动二季度预亏19亿元-21.5亿元。粤海饲料公告，预计上半年净利润同比增长966%-1303%。</div>
+                </article>
+                
+                <article class="news-card level-b" data-topic="公司公告" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">21:32</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">行业动态</span> <span class="topic-chip">商品期货</span></div>
+                    </div>
+                    <h3 class="news-title">近20家A股上市公司本周披露并购重组最新公告 拓荆科技拟收购无锡尚积半导体控股权股票复牌</h3>
+                    <div class="content-body">【近20家A股上市公司本周披露并购重组最新公告 拓荆科技拟收购无锡尚积半导体控股权股票复牌】财联社7月12日电，据财联社不完全统计，截至发稿，本周（7月6日-7月12日）包括日科化学、烽火通信、拓荆科技、陕鼓动力、浙江美大、新锐股份、民爆光电、建发致新、精测电子、天壕能源、岭南控股、正元智慧、湖南黄金、南京医药、五洲医疗、冰轮环境、彩虹股份、神州高铁在内的18家A股上市公司披露并购重组进展最新公告。其中，拓荆科技公告，拟收购无锡尚积半导体控股权，股票下周一复牌。烽火通信公告，拟5亿元收购藤仓烽火60%股权，后者主要从事光纤用预制棒等光电子产品。</div>
+                </article>
+                
+                <article class="news-card level-b" data-topic="公司公告" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">20:29</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">商品期货</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">7月12日周日《新闻联播》要闻14条</h3>
+                    <div class="content-body">【7月12日周日《新闻联播》要闻14条】财联社7月12日电，今天《新闻联播》主要内容有：<br>1、【新思想引领新征程】严守耕地红线 筑牢国家粮食安全根基； <br>2、【树立和践行正确政绩观】直面问题抓整改 推动学习教育走深走实； <br>3、台风“巴威”登陆 各地全力应对； <br>4、【党旗在基层一线高高飘扬】风雨之夜的守护； <br>5、上半年多项先行指标企稳回升； <br>6、我国新材料领域持续取得新突破； <br>7、贲德：用毕生精力铸就国防“火眼金睛”； <br>8、我国社会治安形势持续向好 群众安全感稳步提升； <br>9、我国将系统推进能源领域节能降碳； <br>10、上半年我国期货市场成交额同比增长超四成； <br>11、中国石化完成对中国航油重组； <br>12、美称对伊朗展开本周第三轮打击 伊朗称打击美在中东地区目标 伊朗宣布暂时关闭霍尔木兹海峡 与阿曼讨论海峡航运安全合作；<br>13、俄称打击乌无人机企业 乌称抵御俄攻势； <br>14、世卫称刚果（金）埃博拉疫情规模或超统计。</div>
+                </article>
+                
+                <article class="news-card level-b" data-topic="公司公告" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">16:30</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">宏观经济</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">2连板星网宇达：卫星通信业务与长征十号乙运载火箭海上回收技术突破不存在业务关联</h3>
+                    <div class="content-body">【2连板星网宇达：卫星通信业务与长征十号乙运载火箭海上回收技术突破不存在业务关联】财联社7月12日电，星网宇达(002829.SZ)公告称，截至目前，公司卫星通信业务2025年度实现营业收入占公司营业总收入的比例为12.33%，且与近期市场关注的长征十号乙运载火箭海上回收技术突破不存在业务关联，公司未参与该项目的研制或配套供应。公司不存在跨界转型、重大产业投资等情形，市场关注的低空经济、低轨互联、自动驾驶、反无人机等领域，相关业务目前尚未形成实质性收入，整体规模较小、营收占比偏低不足5%，对公司短期经营业绩不具有影响，业务拓展存在不确定性。</div>
+                </article>
+                
+                <article class="news-card level-b" data-topic="公司公告" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">17:06</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">赛力斯：预计上半年净亏损15亿元-18亿元 核心子公司问界汽车业绩出现波动</h3>
+                    <div class="content-body">【赛力斯：预计上半年净亏损15亿元-18亿元 核心子公司问界汽车业绩出现波动】财联社7月12日电，赛力斯(601127.SH)公告称，预计2026年半年度归属于上市公司股东的净利润为亏损15亿元-18亿元，同比转亏。受存储芯片、工业金属、碳酸锂等主要原材料价格上涨等因素的影响，公司生产成本随之增加；基于审慎性原则并进一步夯实整体资产质量，结合资产后续收益预期，对部分因技术迭代、车型换代导致适配性有限的存量资产调整账面价值。受上述因素影响，公司核心子公司问界汽车业绩出现波动，由盈转亏，其二季度归属于上市公司股东的净利润为-21.50亿元到-19.00亿元。小财注：公司Q2净利润预计亏损22.54亿-亏损25.54亿，Q1净利润7.54亿，据此计算，Q2净利润预计环比由盈转亏。</div>
+                </article>
+                
+                <article class="news-card level-b" data-topic="公司公告" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">16:01</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">巨力索具：收到行政处罚决定书 因误导性陈述被罚450万元</h3>
+                    <div class="content-body">【巨力索具：收到行政处罚决定书 因误导性陈述被罚450万元】财联社7月12日电，巨力索具(002342.SZ)公告称，公司收到河北证监局下发的《行政处罚决定书》，因在深交所互动易平台回复投资者提问时未准确披露商业航天领域产品应用情况、订单金额及占比等，构成误导性陈述。河北证监局决定对公司责令改正，给予警告，并处以450万元罚款；对时任董事会秘书张云给予警告，并处以300万元罚款；对时任总经理杨超给予警告，并处以200万元罚款。</div>
+                </article>
+                
+                <article class="news-card level-b" data-topic="公司公告" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">21:03</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">伊朗：霍尔木兹海峡目前无法通行</h3>
+                    <div class="content-body">【伊朗：霍尔木兹海峡目前无法通行】财联社7月12日电，伊朗波斯湾海峡管理局12日在社交媒体发布公告称，霍尔木兹海峡目前无法通行。待局势平静后，将恢复审核海峡通行申请，并按计划发放必要的许可证。 （新华社）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:24</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">中际旭创：行业算力需求和带宽需求真实存在 会反映到光模块厂商业绩上</h3>
+                    <div class="content-body">【中际旭创：行业算力需求和带宽需求真实存在 会反映到光模块厂商业绩上】财联社7月13日电，中际旭创7月12日称，2027—2028年会出现更高带宽的光连接产品，行业技术趋势仍在加速，行业的算力需求和带宽的需求都是真实存在的，会反映到光模块厂商的订单、收入和业绩上。关于近期市场对CSP客户及行业需求的怀疑，公司目前看到行业需求依然强劲，且没有看到大客户的需求指引出现下修的情况。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:46</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">【玩转ETF】龙头公司或正式迈入量产爬坡阶段，该产业有望逐步从小批量验证迈向“1-10”新阶段，7-8月相关板块催化密集；大波动背后，市场在等待什么</h3>
+                    <div class="content-body">①龙头公司或正式迈入量产爬坡阶段，该产业有望逐步从小批量验证迈向“1-10”新阶段，7-8月相关板块催化密集；②大波动背后，市场在等待什么；③当前中报业绩预告中值得关注的线索。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:25</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">货币政策</span></div>
+                    </div>
+                    <h3 class="news-title">中际旭创：二季度公司毛利率预期仍保持稳定</h3>
+                    <div class="content-body">【中际旭创：二季度公司毛利率预期仍保持稳定】财联社7月13日电，中际旭创7月12日称，二季度公司毛利率预期仍保持稳定，不会由于物料紧张、物料涨价等因素出现明显下滑。今年下半年，物料预计将出现不同程度的缓解，公司备料非常充分，下半年会有边际改善。公司有信心保持未来毛利率的稳定。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:34</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">【金牌纪要库】小核酸药物从少数病种走向降脂和抗凝，长效治疗与精准递送打开更大产业空间</h3>
+                    <div class="content-body">①小核酸药物从概念验证走向产品梯队，这家企业已用全球授权验证早期资产的商业价值；②药物研发企业的收入取决于临床推进、授权交易和产品上市，而这类平台企业会在上市前先承载大量新产品订单；③一旦研发企业完成临床推进和授权交易，材料端也会成为核心受益方向，这家企业可提供小核酸合成载体和分离纯化材料，客户覆盖国内外小核酸药企。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:16</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">行业动态</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">【公告全知道】商业航天+卫星导航+芯片+低空经济！公司深度参与国网星座和千帆星座</h3>
+                    <div class="content-body">①商业航天+卫星导航+芯片+低空经济！这家公司深度参与国网星座和千帆星座；②光纤+CPO+算力+华为昇腾+商业航天！这家公司拟定增募资至多29亿用于特种光纤项目；③存储芯片+SK海力士+算力！公司上半年净利润同比最高预增超24倍，拥有SK海力士等原厂授权。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:32</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">A股限售股解禁一览：75.93亿元市值限售股今日解禁</h3>
+                    <div class="content-body">【A股限售股解禁一览：75.93亿元市值限售股今日解禁】财联社7月13日电，Wind数据显示，周一（7月13日），共有17家公司限售股解禁，合计解禁量为5.59亿股，按最新收盘价计算，合计解禁市值为75.93亿元。从解禁量来看，赛维时代、国科恒泰、千禾味业解禁量居前，解禁股数分别为2.08亿股、1.47亿股、8112.32万股。从解禁市值来看，赛维时代、国科恒泰、均胜电子解禁市值居前，解禁市值分别为37.61亿元、12.48亿元、8.75亿元。从解禁股数占总股本比例来看，赛维时代、国科恒泰、瑞奇智造解禁比例居前，解禁比例分别为51.12%、31.21%、11.81%。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:03</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">财联社7月13日电，立邦涂料据悉将出价86亿美元收购阿克苏诺贝尔的涂料部门。</h3>
+                    <div class="content-body">财联社7月13日电，立邦涂料据悉将出价86亿美元收购阿克苏诺贝尔的涂料部门。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">21:59</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">【风口研报·洞察】特斯拉发布Model S&amp;X产线退役视频，原有区域将用于Optimus机器人生产线搭建，7月供应链SOP、8-9月特斯拉产线SOP或成为板块密集催化窗口；当前中报业绩预告中的线索</h3>
+                    <div class="content-body">①当前中报业绩预告中值得关注的线索；②特斯拉发布Model S&amp;X产线退役视频，原有区域将用于Optimus机器人生产线搭建，7月供应链SOP、8-9月特斯拉产线SOP或成为板块密集催化窗口；③今日全市场机构研报共发布283篇，海科新源、优博讯有望迎来拐点，20家公司获得首度覆盖，其中银轮股份、盛达资源获新财富分析师深度覆盖；④在个股机构关注度排行中，招商轮船首次上榜，前五名依次为燕京啤酒&gt;妙可蓝多&gt;万华化学&gt;招商轮船&gt;招商证券。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">20:20</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">宏观经济</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">【风口研报·公司】高散热液冷+半导体精密零部件，分析师强call公司手握国内头部客户并定增加码，今年业绩扭亏为盈后，明年有望增长近900%；周策略：科技股交易性波动或持续，调整已至尾声阶段</h3>
+                    <div class="content-body">①高散热液冷+半导体精密零部件，分析师强call公司手握国内头部客户并定增加码，今年业绩扭亏为盈后，明年有望增长近900%；<br>②周策略：科技股交易性波动或持续，调整已至尾声阶段。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:57</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">【电报解读】上半年中国创新药对外授权规模接近去年全年，机构看好出海高景气有望延续下，板块正由“估值驱动”转向“业绩+全球化兑现驱动”，这家公司拥有丰富的长效多肽类创新药的开发经验</h3>
+                    <div class="content-body">上半年中国创新药对外授权规模接近去年全年，机构看好出海高景气有望延续下，板块正由“估值驱动”转向“业绩+全球化兑现驱动”，这家公司拥有丰富的长效多肽类创新药的开发经验，另一家用于治疗晚期实体瘤的在研产品临床试验申请获得美国食品药品监督管理局批准。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:32</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">行业动态</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">【风口研报·公司】半导体扩产或催生“超纯水树脂”6-8倍需求增长，这家公司是唯一国产供应商、已成功切入长鑫、长存等巨头供应链；受益超越摩尔定律+高算力需求双轮驱动，这家先进封装龙头业绩增长具备支撑</h3>
+                    <div class="content-body">①半导体扩产或催生“超纯水树脂”6-8倍需求增长，这家公司是唯一国产供应商、已成功切入长鑫科技、长江存储等半导体巨头供应链；②*受益超越摩尔定律+高算力需求双轮驱动，公司作为全球前十的先进封装龙头，已在增长最快的细分领域实现量产且规模领先，业绩增长具备支撑。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:17</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">圣诺生物：预计2026年半年度净利润同比增长43.23%-64.79%</h3>
+                    <div class="content-body">【圣诺生物：预计2026年半年度净利润同比增长43.23%-64.79%】财联社7月12日电，圣诺生物(688117.SH)公告称，预计2026年半年度归属于母公司所有者的净利润为1.27亿元-1.47亿元，同比增长43.23%-64.79%。业绩变动主要系公司多肽原料药业务持续增长，新建产能逐步释放，规模化生产效应与工艺优化提升整体盈利能力。小财注：公司Q2净利润预计0.61亿-0.8亿，Q1净利润0.66亿，据此计算，Q2净利润预计环比变动-8%-20%。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:15</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">星星科技：子公司广西立马受台风影响生产经营活动临时暂停</h3>
+                    <div class="content-body">【星星科技：子公司广西立马受台风影响生产经营活动临时暂停】财联社7月12日电，星星科技(300256.SZ)公告称，受超强台风“美莎克”带来的极端强降雨影响，广西壮族自治区多地出现洪涝灾害。公司全资子公司广西立马电动车科技有限公司（简称“广西立马”）位于广西壮族自治区贵港市的生产厂区受此次暴雨引发的洪水影响，厂区内生产车间、部分仓储库房及办公区域出现进水受淹情况。截至目前，广西立马生产经营活动临时暂停，具体财产损失金额及对公司2026年度经营业绩的影响，最终以会计师事务所年度审计确认为准。2025年，广西立马营业收入占公司合并报表营业收入比例的20.79%。公司其余生产基地运营均正常，整体生产经营体系稳定，本次灾害预计不会对公司长期发展战略及整体经营造成重大不利影响。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">00:55</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">科威特称边境哨所及钻井平台遭袭</h3>
+                    <div class="content-body">【科威特称边境哨所及钻井平台遭袭】财联社7月13日电，科威特国防部当地时间7月12日晚通报当天遭袭情况。通告显示，科威特北部三个陆地边境哨所遭袭，部分设施受损；科威特国家石油公司的一处海上钻井平台遭无人机袭击，一名工人受伤，并有设施受损。科威特军方在通告中并未提及美军基地或设施遭袭的相关情况。伊朗军方此前发表声明称，当天早些时候出动攻击型无人机，对美军位于科威特的“爱国者”导弹防御系统、弹药库和雷达站发动报复性袭击。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">23:59</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">财联社7月12日电，麦格理分析师阿希什·贾恩将塔塔汽车乘用车有限公司的投资评级从“中性”上调至‌跑赢大盘‌，设定目标价为381卢比，较最新股价有13%的上涨空间。</h3>
+                    <div class="content-body">财联社7月12日电，麦格理分析师阿希什·贾恩将塔塔汽车乘用车有限公司的投资评级从“中性”上调至‌跑赢大盘‌，设定目标价为381卢比，较最新股价有13%的上涨空间。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:49</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">特朗普称美军“猛烈打击”伊朗 霍尔木兹海峡“仍然开放”</h3>
+                    <div class="content-body">【特朗普称美军“猛烈打击”伊朗 霍尔木兹海峡“仍然开放”】财联社7月12日电，美国总统特朗普当地时间12日表示，美国前一晚对伊朗实施了“猛烈打击”。特朗普当天在接受采访时称，美伊双方前一天曾达成协议，伊朗“原本准备放弃一切”，但数小时后，一艘船只遭无人机袭击。美国军方则表示，在霍尔木兹海峡一艘商船遇袭后，美军对伊朗约140个军事目标发动了新一轮打击。这是美国一周内第三次对伊朗发动打击。对于霍尔木兹海峡的通航状况，各方表态存在分歧。伊朗波斯湾海峡管理局12日在社交媒体发布公告称，霍尔木兹海峡目前无法通行。特朗普则表示，“就美国而言，霍尔木兹海峡仍然开放”。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:39</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">俄称扎波罗热核电站卫星城遭袭 造成4死4伤</h3>
+                    <div class="content-body">【俄称扎波罗热核电站卫星城遭袭 造成4死4伤】财联社7月12日电，俄罗斯国家原子能公司首席执行官利哈乔夫12日表示，扎波罗热核电站卫星城市埃涅尔戈达尔市遭乌军袭击，共有4人死亡、4人受伤。另据俄方任命的埃涅尔戈达尔市市长普霍夫通报，当天清晨，乌军无人机袭击了市内一座公交站，造成1人死亡、4人受伤。俄罗斯方面消息称，自4月27日以来，乌军袭击已造成该市11人死亡、数十人受伤。乌克兰方面对此暂无回应。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">20:19</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">报道称孟加拉国正与英中企业商讨采购小型反应堆</h3>
+                    <div class="content-body">【报道称孟加拉国正与英中企业商讨采购小型反应堆】财联社7月12日电，孟加拉国电力、能源与矿产资源部长伊克巴尔·哈桑·马哈茂德称，孟加拉国正在就可能采购小型模块化反应堆（SMR）一事进行谈判，潜在供应商包括英国罗尔斯·罗伊斯控股公司及中国制造商。马哈茂德表示，政府正在考虑建设发电能力为300至400兆瓦的电站，这类电站规模较小，可沿河岸建造，且部署速度快于传统反应堆”。他指出，孟加拉国不会再建设大型核电站，因为“存在巨大的负债”。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:25</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">传艺科技：拟向特定对象发行A股股票募资不超8.71亿元</h3>
+                    <div class="content-body">【传艺科技：拟向特定对象发行A股股票募资不超8.71亿元】财联社7月12日电，传艺科技(002866.SZ)公告称，公司拟向不超过35名特定投资者发行不超过8685.67万股股票，募集资金总额不超过8.71亿元，扣除发行费用后用于高邮智能化生产线改扩建项目、重庆智能制造中心扩产项目及补充流动资金。</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="股市政策">
+                <h2 class="topic-heading">
+                    <span class="topic-name">股市政策</span>
+                    <span class="topic-count">2</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-b" data-topic="股市政策" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">07:45</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">股市政策</span> <span class="topic-chip">债券固收</span> <span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">投资日历：周一资本市场大事提醒</h3>
+                    <div class="content-body">【投资日历：周一资本市场大事提醒】<br>①今日共有1只新股申购，为维琪科技（920176）。<br>②阶跃终端品牌暨新一代智能体战略发布会将于7月13日举办。<br>③台积电：月度销售业绩公布。<br>④芝加哥期权交易所拟于7月13日推出部分期权的盘前和盘后交易。<br>⑤圣泉集团将于7月13日起上调PPO等低聚物产品价格，涨幅15%-20%。<br>⑥欧佩克公布月度原油市场报告。<br>⑦今日有70亿元7天期逆回购到期。<br>⑧今日将公布德国5月未季调经常帐等数据。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="股市政策" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:02</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">股市政策</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">独家｜多家券商正按监管要求稳步出清经纪人 一年半减员近1.2万</h3>
+                    <div class="content-body">【独家｜多家券商正按监管要求稳步出清经纪人 一年半减员近1.2万】证券经纪人的出清或有开快之势。记者从行业了解到，对于经纪人清退，行业执行力度有所差别。有地方局强调规范清退流程，但无统一时间表，后续监管层会对清退过程规范性进行核查。数据显示，2025年以来券商行业经纪人已减少近1.2万。监管层早在2024年已传达券商应顺应财富管理转型方向、逐步实现经纪人清零，目前部分头部券商基本完成清零，中小券商仍存较大规模经纪人。有券商表示，将结合头部实践、监管导向及行业趋势，加快清退步伐，但采用平稳方式推进，如合同到期不续约、考核淘汰等，并同步调整传统佣金依赖模式，匹配财富管理转型，清退过程中，符合条件的经纪人可转为财富经理、投顾等正式岗位。对于可能出现的客户流失，业内人士认为行业整体处于经纪人出清阶段的背景下，客户流失的整体影响不大，仅局部区域或受小幅冲击。 （财联社记者 王晨）</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="货币政策">
+                <h2 class="topic-heading">
+                    <span class="topic-name">货币政策</span>
+                    <span class="topic-count">1</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-c" data-topic="货币政策" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">04:58</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">货币政策</span> <span class="topic-chip">公司公告</span> <span class="topic-chip">股市政策</span></div>
+                    </div>
+                    <h3 class="news-title">合规风暴下的助贷“生死劫” 24%利率红线锁利 “套娃式”获客模式终结</h3>
+                    <div class="content-body">【合规风暴下的助贷“生死劫” 24%利率红线锁利 “套娃式”获客模式终结】财联社7月13日电，近期，多位业内人士透露，多地针对属地中小银行及持牌消费金融公司出台窗口指导意见，对助贷渠道贷款规模增速以及业务边界提出明确量化指标，同时重申融担类业务占比不得超过25%。此举旨在推动持牌机构回归自营，压实自主风控责任，并降低对外部平台的依赖。这一导向延续了2025年以来金融监管部门密集出台的政策脉络。其中，央行等八部门联合印发的《金融产品网络营销管理办法》（下称《办法》）从营销端收紧了助贷行业的生存空间，意味着助贷平台过去靠API直连包办一切的模式宣告终结。《办法》将于9月30日实施，整改窗口期已不足3个月。另一道监管铁闸——《个人贷款业务明示综合融资成本规定》将于8月1日率先落地，要求产品息费透明化，使得24%的贷款利率成为刚性红线。一场“合规风暴”正以超预期力度席卷消费金融生态，助贷行业或迎来空前的深度洗牌。 （上海证券报）</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="其他">
+                <h2 class="topic-heading">
+                    <span class="topic-name">其他</span>
+                    <span class="topic-count">52</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-b" data-topic="其他" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">08:41</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">财联社7月13日电，韩国KOSPI指数跌超2%，SK海力士跌近7%，三星电子跌1.58%。</h3>
+                    <div class="content-body">财联社7月13日电，韩国KOSPI指数跌超2%，SK海力士跌近7%，三星电子跌1.58%。</div>
+                </article>
+                
+                <article class="news-card level-b" data-topic="其他" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">05:26</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">美中央司令部：已对伊朗发动新一轮打击</h3>
+                    <div class="content-body">【美中央司令部：已对伊朗发动新一轮打击】财联社7月13日电，美军中央司令部称，美国东部时间12日17时，美军开始对伊朗发动新一轮打击，“旨在继续削弱其攻击在霍尔木兹海峡自由通行船只的能力”。这是美军本周内第四次对伊朗发动打击。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-b" data-topic="其他" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">01:49</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">伊朗霍尔木兹甘省多地遭美袭击 致1死2伤</h3>
+                    <div class="content-body">【伊朗霍尔木兹甘省多地遭美袭击 致1死2伤】财联社7月13日电，据伊朗霍尔木兹甘省政府知情人士消息，美国当天对该省部分地区发动新一轮袭击，包括格什姆岛在内的多个地点遭袭，当地传出数次爆炸声。另有消息称，霍尔木兹甘省首府阿巴斯港也传出爆炸声。知情人士称，袭击造成1人死亡、2人受伤。目前伤者正在接受治疗。据美国方面消息，美军当天“对伊朗导弹及防空系统实施了数次打击”，美军还在霍尔木兹海峡周边的数个地点“针对伊朗伊斯兰革命卫队的小型船只采取了行动”。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">23:03</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">电影《功夫女足》票房破5亿</h3>
+                    <div class="content-body">【电影《功夫女足》票房破5亿】财联社7月12日电，据网络平台数据显示，截至7月12日22时44分，影片《功夫女足》票房突破5亿。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:47</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">两市融资余额减少113.39亿元</h3>
+                    <div class="content-body">【两市融资余额减少113.39亿元】财联社7月13日电，截至7月10日，上交所融资余额报14712.72亿元，较前一交易日减少79.75亿元；深交所融资余额报14424.97亿元，较前一交易日减少33.64亿元；两市合计29137.69亿元，较前一交易日减少113.39亿元。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:10</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">福建省防指启动防汛Ⅳ级应急响应</h3>
+                    <div class="content-body">【福建省防指启动防汛Ⅳ级应急响应】财联社7月13日电，据“福建发布”消息，受台风“巴威”残余环流影响，福建省南平、三明部分县（市）出现暴雨、局部大暴雨，省气象台7月13日2时30分将“暴雨预警”提升为Ⅲ级。根据《福建省防汛抗旱防台风应急预案》，福建省防指于7月13日2时30分启动防汛Ⅳ级应急响应。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:04</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">财联社7月13日电，韩国KOSPI指数快速拉升转涨，此前跌超1%。</h3>
+                    <div class="content-body">财联社7月13日电，韩国KOSPI指数快速拉升转涨，此前跌超1%。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:55</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">西部涨幅明显 消费旺季带动6月份电商物流指数继续回升</h3>
+                    <div class="content-body">【西部涨幅明显 消费旺季带动6月份电商物流指数继续回升】财联社7月13日电，中国物流与采购联合会今天（13日）公布6月份中国电商物流指数。消费旺季带动电商物流指数进一步回升，供给端相关指数全面回升。从地区看，西部地区涨幅最为明显。6月份，中国电商物流指数为111.4点，较上月上升0.4点。9个分项指数与上月相比，均有不同程度的回升。具体来看，电商物流总业务量指数持续回升。6月份，电商物流总业务量指数为128.6点，较上月上升0.3点。分地区来看，中部地区受高温暴雨影响较大，环比回落0.3点，其他地区电商物流总业务量指数均有所回升，其中，西部地区环比回升1.3点，涨幅最为明显。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:54</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">长江下游支流水阳江发生2026年第2号洪水</h3>
+                    <div class="content-body">【长江下游支流水阳江发生2026年第2号洪水】财联社7月13日电，受降雨影响，长江下游支流水阳江新河庄水文站7月13日1时20分水位涨至警戒水位（11.50米），依据主要江河洪水编号规定，此次洪水编号为“水阳江2026年第2号洪水”。目前，水利部工作组正在安徽省洪水防御一线协助指导。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:44</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">今日申购指南及新股定位分析</h3>
+                    <div class="content-body">【今日申购指南及新股定位分析】财联社7月13日电，今日有1只新股申购，为北交所的维琪科技；无新股上市。维琪科技专注于皮肤活性多肽为主的化妆品原料研发、生产与销售。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:37</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">沈阳全市防汛应急响应提升至二级</h3>
+                    <div class="content-body">【沈阳全市防汛应急响应提升至二级】财联社7月13日电，据“沈阳发布”消息，根据沈阳市气象部门降雨预报，结合沈阳市雨情、水情、工情实际，经会商研判，按照《沈阳市防汛抗旱应急预案》有关规定，沈阳市防汛抗旱指挥部决定于7月13日6时发布全市防汛橙色预警，提升全市防汛应急响应级别至二级。沈阳市防汛抗旱指挥部办公室通告：全市中小学校、幼儿园、校外培训机构停止授课；全市户外各类集体性活动、大型群众性活动停止举办；全市在建工地一律停工；全市涉山涉水景区景点、早夜市停止营业。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:33</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">财联社7月13日电，中国地震台网正式测定：07月13日07时27分在四川宜宾市高县（北纬28.52度，东经104.67度）发生3.8级地震，震源深度5千米。</h3>
+                    <div class="content-body">财联社7月13日电，中国地震台网正式测定：07月13日07时27分在四川宜宾市高县（北纬28.52度，东经104.67度）发生3.8级地震，震源深度5千米。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:29</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">美官员：过去一天约20艘商船经协调通过霍尔木兹海峡</h3>
+                    <div class="content-body">【美官员：过去一天约20艘商船经协调通过霍尔木兹海峡】财联社7月13日电，记者当地时间12日获悉，一名美国官员表示，过去24小时，大约有20艘商船在美国军方的协调下通过霍尔木兹海峡，此外还有几艘船只在未获美国协调的情况下通过。伊朗伊斯兰革命卫队海军当地时间12日凌晨宣布，鉴于外国势力非法干预造成不安全局面，霍尔木兹海峡即日起关闭，直至另行通知以及美国停止干涉这一地区为止。美军中央司令部于美国东部时间12日上午在社交媒体上发文称，霍尔木兹海峡的“通行仍在继续”。伊朗并不控制该海峡。美国总统特朗普12日在接受采访时坚称霍尔木兹海峡“是畅通的”。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:29</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">首次关键跨越 甲醇输送搭上成品油管道“顺风车”</h3>
+                    <div class="content-body">【首次关键跨越 甲醇输送搭上成品油管道“顺风车”】财联社7月13日电，从国家管网集团获悉，国内首次成品油长输管道顺序输送燃料甲醇现场试验在陕西咸阳顺利完成，这标志着我国成品油管道顺序输送甲醇技术从理论探索到工程验证的关键跨越。国内首次成品油长输管道顺序输送甲醇现场试验在甘肃和陕西省内开展。经系统开展管道适应性评价和两座站场安全改造后，分两次共计1000立方米燃料甲醇通过在役成品油管道从甘肃省安全输送至陕西省内油库，全程实现密闭可控运行。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:18</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">伊朗称胡齐斯坦省遭美方袭击</h3>
+                    <div class="content-body">【伊朗称胡齐斯坦省遭美方袭击】财联社7月13日电，据伊朗方面13日消息称，伊朗西南部的胡齐斯坦省副省长表示，当天凌晨1时35分，胡齐斯坦省首府阿瓦士周边两个地点遭到美国发射的炮弹袭击。此外，该省多个市县也成为美军袭击目标。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:58</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">中央气象台7月13日06时继续发布台风蓝色预警</h3>
+                    <div class="content-body">【中央气象台7月13日06时继续发布台风蓝色预警】财联社7月13日电，中央气象台7月13日06时继续发布台风蓝色预警:今年第9号台风“巴威”(热带风暴级)的中心今天(13日)早晨5点钟位于安徽省滁州市凤阳县境内，就是北纬33.0度、东经117.8度，外围最大风力有8级(20米秒)，中心最低气压为990百帕。预计，“巴威”将以每小时10-15公里的速度向北偏东转东北方向移14日白天将经山东半岛移入黄海北部海面，15日以动，强度缓慢减弱，后逐渐变性为温带气旋。<br>大风预报：13日08时至14日08时，黄海大部、东海大部及钓鱼岛附近海域、台湾海峡、台湾以东洋面、台湾岛沿海、浙江沿海、上海沿海、杭州湾、长江口区、江苏东部及沿海、山东半岛沿海、辽宁沿海将有6~8级大风，部分沿海和海区阵风可达9~10级。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:43</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">稀土龙头下调三季度报价 终结七个季度连涨行情</h3>
+                    <div class="content-body">【稀土龙头下调三季度报价 终结七个季度连涨行情】财联社7月13日电，近日，包钢股份、北方稀土双双下调三季度报价，三季度稀土精矿交易价格调整为3.86万元/吨，环比下降0.62%。在此之前，北方稀土、包钢股份稀土精矿交易价格已经连续七个季度调升。业内人士表示，此次微降可在一定程度上缓解中游磁材厂商的原材料成本压力。虽然终结了七连涨，但核心供需格局未变，稀土价格大概率将在高位维持震荡。 （中证报）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:10</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">中央气象台7月13日06时继续发布强对流天气蓝色预警</h3>
+                    <div class="content-body">【中央气象台7月13日06时继续发布强对流天气蓝色预警】财联社7月13日电，中央气象台7月13日06时继续发布强对流天气蓝色预警:预计7月13日08时至14日08时，东北地区中南部、黄部中部、江淮中部等地的部分地区将有8级以上雷暴大风或冰雹天气;东北地区中南部、西北地区东北部、西南地区南部、黄淮、江淮、江南北部、华南南部等地的部分地区将有小时雨量大于20毫米的短时强降水天气，其中，辽宁中北部等地的部分地区小时雨量大于50毫米，最大可达80毫米以上。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:03</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">叙利亚人民议会举行过渡时期首次会议 选出议长</h3>
+                    <div class="content-body">【叙利亚人民议会举行过渡时期首次会议 选出议长】财联社7月13日电，叙利亚人民议会12日举行自2024年叙政局剧变以来的首次会议，选举产生议长、两名副议长和一名秘书。在本次会议上，议员们在叙过渡政府总统艾哈迈德·沙拉面前集体宣誓就职，随后投票选举阿卜杜勒·哈米德·阿瓦克为议长。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:00</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">中央气象台7月13日06时继续发布暴雨橙色预警</h3>
+                    <div class="content-body">【中央气象台7月13日06时继续发布暴雨橙色预警】财联社7月13日电，中央气象台7月13日06时继续发布暴雨橙色预警:预计，7月13日08时至14日08时，辽宁大部、吉林中东部、山东北部和南部、江苏中北部、安徽中部和南部、江西东北部及青海东部、甘肃东部、宁夏中西部、广东东南部沿海、海南岛南部等地部分地区有大到暴雨，其中，辽宁中北部和南部、吉林中南部等地部分地区有大暴雨，辽宁东北部、吉林中南部等地局地特大暴雨(250~300毫米)。上述部分地区伴有短时强降水(最大小时降雨量20~50毫米，局地可超过80毫米)，局地有雷暴大风等强对流天气。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">05:33</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">伊朗多地再次传出爆炸声</h3>
+                    <div class="content-body">【伊朗多地再次传出爆炸声】财联社7月13日电，当天凌晨0时30分左右，伊朗南部阿巴斯港和锡里克地区传出超过10次爆炸声。此外，伊朗南部贾斯克传出5次爆炸声，格什姆岛也响起多声爆炸声。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">05:05</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">财联社7月13日电，中国地震台网自动测定：07月13日05时02分在四川宜宾市高县附近（北纬28.54度，东经104.69度）发生3.8级左右地震，最终结果以正式速报为准。</h3>
+                    <div class="content-body">财联社7月13日电，中国地震台网自动测定：07月13日05时02分在四川宜宾市高县附近（北纬28.54度，东经104.69度）发生3.8级左右地震，最终结果以正式速报为准。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">04:54</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">财联社7月13日电，因与华纳兄弟产生矛盾分歧，派拉蒙据称正考虑迁出加州。</h3>
+                    <div class="content-body">财联社7月13日电，因与华纳兄弟产生矛盾分歧，派拉蒙据称正考虑迁出加州。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">03:31</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">泰国曼谷一酒吧发生火灾 已致20余人死亡</h3>
+                    <div class="content-body">【泰国曼谷一酒吧发生火灾 已致20余人死亡】财联社7月13日电，泰国曼谷一家酒吧7月12日深夜发生严重火灾，已造成20余人死亡。初步调查显示，大多数遇难者因吸入浓烟窒息。火灾原因仍在调查中。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">03:25</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">委内瑞拉强震遇难人数上升至4490人</h3>
+                    <div class="content-body">【委内瑞拉强震遇难人数上升至4490人】财联社7月13日电，委内瑞拉全国代表大会主席豪尔赫·罗德里格斯当地时间12日通过社交媒体通报，该国日前发生的强震造成的遇难人数上升至4490人，受伤人数累计为16740人。此外，120794个家庭被救助，强震过后发生余震1222次。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">03:12</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">日本民众举行集会 反对政府扩军修宪</h3>
+                    <div class="content-body">【日本民众举行集会 反对政府扩军修宪】财联社7月13日电，日本民众当地时间12日自发在东京涩谷街头举行集会，反对日本政府扩军修宪。参加者表示，日本政府不断扩大军备、推动修改和平宪法，背离战后和平发展道路，令人感到担忧。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">01:37</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">欧盟再次未就第21轮对俄制裁方案达成一致</h3>
+                    <div class="content-body">【欧盟再次未就第21轮对俄制裁方案达成一致】财联社7月13日电，欧盟再次未就对俄罗斯第21轮制裁方案达成一致。据了解，在7月10日欧盟成员国大使会议未能就第21轮对俄制裁达成一致后，欧盟轮值主席国仍在与各成员国密集磋商。经过12日一天的谈判，最终无果而终。欧盟委员会主席冯德莱恩6月9日说，已向各成员国提交第21轮对俄罗斯制裁措施，主要涉及能源、金融、渔业等领域。根据欧盟相关程序，新一轮制裁措施须经27个成员国一致同意后方可生效。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">01:36</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">以色列宣布将于10月27日举行大选</h3>
+                    <div class="content-body">【以色列宣布将于10月27日举行大选】财联社7月13日电，以色列执政联盟当地时间12日宣布，以色列第26届议会选举将于10月27日举行。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">01:05</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">财联社7月13日电，中国地震台网自动测定：07月13日01时03分在四川阿坝州小金县附近（北纬31.50度，东经102.42度）发生3.8级左右地震，最终结果以正式速报为准。</h3>
+                    <div class="content-body">财联社7月13日电，中国地震台网自动测定：07月13日01时03分在四川阿坝州小金县附近（北纬31.50度，东经102.42度）发生3.8级左右地震，最终结果以正式速报为准。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">01:04</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">财联社7月13日电，Claude宣布将把Claude Fable 5在所有付费套餐中的开放使用期限延长至7月19日，同时继续将Claude Code 的每周使用额度提高50%，这一政策也将持续至7月19日。</h3>
+                    <div class="content-body">财联社7月13日电，Claude宣布将把Claude Fable 5在所有付费套餐中的开放使用期限延长至7月19日，同时继续将Claude Code 的每周使用额度提高50%，这一政策也将持续至7月19日。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">00:54</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">伊朗官员：格什姆岛军事目标遭袭</h3>
+                    <div class="content-body">【伊朗官员：格什姆岛军事目标遭袭】财联社7月13日电，伊朗格什姆岛相关负责人表示，自当天下午以来，格什姆岛遭到敌方多枚发射物袭击。该官员表示，所有遭袭目标均为军事目标，袭击未造成人员伤亡。另据美国方面消息，美军“对（伊朗）导弹及防空系统实施了数次打击”，美军还在霍尔木兹海峡周边的数个地点“针对伊朗伊斯兰革命卫队的小型船只采取了行动”。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:53</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">滦河流域潘家口水库出现二次洪峰 已闭闸拦洪削峰</h3>
+                    <div class="content-body">【滦河流域潘家口水库出现二次洪峰 已闭闸拦洪削峰】财联社7月12日电，从水利部海河水利委员会获悉，受上游来水和持续强降雨影响，滦河流域潘家口水库水位持续上涨。根据水情监测数据显示，7月11日19时潘家口水库出现第一次洪峰流量2250立方米每秒，水位216.21米。短暂回落后，7月12日16时，迎来第二次洪峰流量3460立方米每秒，水位218.98米。当前，第二次洪峰已入库，为减轻滦河下游防洪压力，潘家口水库已于12日13时30分起由前期下泄250立方米每秒左右调整为完全闭闸、停止下泄，全力发挥大型骨干水库拦洪削峰错峰效益。预计将于13日上午6点恢复到250立方米每秒。海委将密切监视来水情况，筑牢防汛安全防线。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:49</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">明日国内机场计划取消航班约100架次</h3>
+                    <div class="content-body">【明日国内机场计划取消航班约100架次】财联社7月12日电，航旅纵横大数据显示，截至7月12日21点，国内机场各航司计划临时取消13日进出港航班约100架次，多个受台风影响的机场逐步恢复正常航班运行。合肥新桥机场、南京禄口机场、北京首都机场、上海浦东机场、上海虹桥机场临时取消航班量位列国内前五。特别提醒出行旅客，实时留意气象预警与航班动态，灵活调整出行规划。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:47</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">《功夫女足》预测票房已超25亿元</h3>
+                    <div class="content-body">【《功夫女足》预测票房已超25亿元】财联社7月12日电，据网络平台数据，7月12日，电影《功夫女足》 预测票房上调，预测总票房25.05亿元。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:18</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">印尼中苏拉威西省发生5.4级地震</h3>
+                    <div class="content-body">【印尼中苏拉威西省发生5.4级地震】财联社7月12日电，据印度尼西亚气象、气候和地球物理局发布的报告，当地时间7月12日20时46分，印尼中苏拉威西省布奥尔市东北37公里处发生5.4级地震。震源深度10公里，暂无海啸风险。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:07</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">郭涵煜组合获得温网女双冠军</h3>
+                    <div class="content-body">【郭涵煜组合获得温网女双冠军】财联社7月12日电，在刚刚结束的2026温网女双决赛中，10号种子、中国选手郭涵煜与法国选手姆拉德诺维奇的组合以2:0击败2号种子达布劳斯基/史蒂芬妮，夺得冠军。这也是郭涵煜职业生涯首个大满贯女双冠军。 （北京日报）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">20:36</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">美官员否认约旦境内美军基地遭严重破坏</h3>
+                    <div class="content-body">【美官员否认约旦境内美军基地遭严重破坏】财联社7月12日电，一名美国官员否认了伊朗方面关于约旦境内美军基地设施遭受损毁的说法。这名美国官员表示，美军没有人员伤亡，伊朗发射的绝大多数导弹和无人机均被拦截或击落，目前也没有关于美军设施遭受重大损毁的报告。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:58</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">国家防总向天津、安徽调拨中央防汛物资</h3>
+                    <div class="content-body">【国家防总向天津、安徽调拨中央防汛物资】财联社7月12日电，应天津市、安徽省防汛抗旱指挥部请求，国家防总办公室会同国家粮食和储备局调拨编织袋、复膜编织布、橡皮舟、排涝设备、发电机等7500余件中央防汛物资，支持两省份做好防汛抢险工作。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:28</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">上海终止中心城区及多区防汛防台Ⅲ级响应 台风预警降为蓝色</h3>
+                    <div class="content-body">【上海终止中心城区及多区防汛防台Ⅲ级响应 台风预警降为蓝色】财联社7月12日电，鉴于中心城区、闵行区、松江区、青浦区、嘉定区风力较小，上海市防汛指挥部决定于18时30分终止上述区域防汛防台Ⅲ级响应行动；同时将浦东新区、金山区、奉贤区、宝山区、崇明区的防汛防台Ⅲ级响应行动同步更新为防汛防台Ⅳ级响应行动。<br><br>上海市气象台7月12日18时30分更新上海市台风黄色预警信号为台风蓝色预警信号，今年第9号台风“巴威”18时已进入安徽省和县境内，预计今天夜里到明天白天，上海大部地区仍会出现7~8级偏南大风，沿江沿海地区和高层建筑阵风可达8~9级，台风黄色预警信号更新为台风蓝色预警信号，请注意防范台风对高空作业、交通出行、农业生产等的不利影响。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:27</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">上海地铁所有线路均恢复常态运营</h3>
+                    <div class="content-body">【上海地铁所有线路均恢复常态运营】财联社7月12日电，根据市气象部门预测研判，7月12日傍晚台风“巴威”风雨影响逐渐减弱，上海轨道交通地面、高架限速段解除限速，所有线路均恢复常态运营。同时，明天（7月13日）上海地铁全网络列车按常态方式运行。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:15</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">“巴威”减弱为热带风暴级</h3>
+                    <div class="content-body">【“巴威”减弱为热带风暴级】财联社7月12日电，目前台风“巴威”的强度已减弱为热带风暴级。今天15时，位于安徽省芜湖市湾沚区境内。预计“巴威”将以每小时10至15公里的速度向北偏西方向移动，强度缓慢减弱。预计于明天（13日）在安徽东部转向东北方向移动，14日由山东半岛移入黄海北部海面，并逐渐变性为温带气旋。 （央视财经）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:41</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">一名伊朗海军军官在美军袭击中身亡</h3>
+                    <div class="content-body">【一名伊朗海军军官在美军袭击中身亡】财联社7月12日电，据伊朗方面12日消息，一名伊朗海军军官在当天上午的美军袭击中身亡。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:35</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">美军称霍尔木兹海峡南部航道仍“开放”</h3>
+                    <div class="content-body">【美军称霍尔木兹海峡南部航道仍“开放”】财联社7月12日电，由美国主导的联合海上信息中心12日发布通报称，尽管伊朗声称霍尔木兹海峡已关闭，但靠近阿曼一侧的南部航道仍可使用，并已可双向通行。通报说，霍尔木兹海峡海上安全威胁等级目前仍维持“严重”。 （新华社）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:20</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">财联社7月12日电，伊拉克政府发言人表示，伊拉克总理在访问华盛顿期间将签署多项石油和天然气谅解备忘录。</h3>
+                    <div class="content-body">财联社7月12日电，伊拉克政府发言人表示，伊拉克总理在访问华盛顿期间将签署多项石油和天然气谅解备忘录。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:49</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">福建省防指终止防台风应急响应</h3>
+                    <div class="content-body">【福建省防指终止防台风应急响应】财联社7月12日电，今年第9号台风“巴威”中心已离开福建省台风警戒区，省气象台7月12日16时解除“台风预警Ⅳ级”，继续发布“暴雨预警Ⅳ级”。根据《福建省防汛抗旱防台风应急预案》，省防指决定于12日16时终止防台风应急响应。 （厦门日报）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:31</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">财联社7月12日电，卡塔尔方面表示，持续袭击构成严重升级，地区紧张局势调解难度加大。</h3>
+                    <div class="content-body">财联社7月12日电，卡塔尔方面表示，持续袭击构成严重升级，地区紧张局势调解难度加大。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:57</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">霍尔木兹海峡商业航运流量大幅下降</h3>
+                    <div class="content-body">【霍尔木兹海峡商业航运流量大幅下降】财联社7月12日电，在伊朗宣布再次关闭霍尔木兹海峡后，该海峡的商业航运流量大幅下降。伊朗方面援引的商业航运追踪数据显示，过去24小时内，仅有11艘商业船舶通过霍尔木兹海峡，包括8艘油轮和3艘货船。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:54</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">财联社7月12日电，乌克兰方面称，炮火击中了俄罗斯的瑟兹兰炼油厂和亚速海油轮。</h3>
+                    <div class="content-body">财联社7月12日电，乌克兰方面称，炮火击中了俄罗斯的瑟兹兰炼油厂和亚速海油轮。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:18</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">国家发展改革委追加安排1亿元中央预算内投资支持广西进一步做好台风灾害灾后应急恢复</h3>
+                    <div class="content-body">【国家发展改革委追加安排1亿元中央预算内投资支持广西进一步做好台风灾害灾后应急恢复】财联社7月12日电，近期，受今年第10号台风“美莎克”影响，广西多地发生严重暴雨、洪涝灾害。为贯彻落实习近平总书记关于防汛救灾工作的重要指示精神，根据《国家自然灾害救助应急预案》和广西灾害损失情况，国家发展改革委在7月6日紧急安排中央预算内投资1亿元基础上，追加安排1亿元，支持广西进一步做好灾区灾后应急恢复，推动尽快恢复正常生产生活秩序。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:18</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">国家发展改革委紧急安排1亿元中央预算内投资支持浙江台风灾害灾后应急恢复</h3>
+                    <div class="content-body">【国家发展改革委紧急安排1亿元中央预算内投资支持浙江台风灾害灾后应急恢复】7月11日夜间和12日凌晨，今年第9号台风“巴威”先后在浙江台州玉环市、温州乐清市两次登陆，浙江省多地出现暴风、强降雨等灾害，对当地生产生活造成严重影响。7月12日，国家防灾减灾救灾委员会启动国家四级救灾应急响应。国家发展改革委紧急安排中央预算内投资1亿元，支持浙江省做好台风灾害灾后应急恢复，重点用于灾区受损道路、水利等基础设施和学校、医院等公共服务设施灾后应急恢复建设，推动尽快恢复正常生产生活秩序。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:13</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">电影《功夫女足》总票房破4亿</h3>
+                    <div class="content-body">【电影《功夫女足》总票房破4亿】财联社7月12日电，据票务平台数据，电影《功夫女足》上映2天，总票房破4亿。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:13</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">国家防总加派工作组赴冀辽吉指导防汛工作</h3>
+                    <div class="content-body">【国家防总加派工作组赴冀辽吉指导防汛工作】7月12日上午，国家防总办公室、应急管理部继续组织中国气象局、水利部、自然资源部、住房城乡建设部、工业和信息化部、交通运输部等部门联合会商，研判台风“巴威”和强降雨发展趋势，部署重点地区防汛防台风工作。国家防总于7月12日启动针对山东的国家防总防汛四级应急响应，适时调整针对浙江、福建、北京、天津、广西的防汛防台风应急响应，并加派三个工作组分赴河北、辽宁和吉林协助指导地方防汛工作。 （央视新闻）</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="国际市场">
+                <h2 class="topic-heading">
+                    <span class="topic-name">国际市场</span>
+                    <span class="topic-count">22</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:08</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span> <span class="topic-chip">公司公告</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">华泰证券港股策略：持有前期高沽空、具有分散价值及盈利改善品种</h3>
+                    <div class="content-body">【华泰证券港股策略：持有前期高沽空、具有分散价值及盈利改善品种】财联社7月13日电，华泰证券研报认为，现阶段，港股的反弹更多来自资金面的全球风格再平衡需求驱动空头回补。因此，继续建议重点关注前期沽空压力较大、与AI硬件超额收益负相关，组合层面具有一定分散风险价值的超跌品种（创新药等）以及高股息防御品种（银行等）。其中创新药整体景气边际走弱，因此建议重点关注业绩指引积极的CXO以及BD潜力大的龙头。对于AI硬件链，重点关注国产链代工龙头等，回调可能提供吸筹机会。海外映射环节的下一个关键窗口在7月美股财报季，建议根据浮盈程度对应调整配置敞口。AI软件方面更多是模型领先的个股Alpha机会。中期视角，建议均衡配置景气加速上行与低估反转的思路不变。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:16</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span> <span class="topic-chip">货币政策</span></div>
+                    </div>
+                    <h3 class="news-title">财联社7月12日电，埃及央行数据显示，本财年前三季经常账户赤字扩至146亿美元，同比扩大14亿美元。</h3>
+                    <div class="content-body">财联社7月12日电，埃及央行数据显示，本财年前三季经常账户赤字扩至146亿美元，同比扩大14亿美元。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:21</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">中信证券：仍看好美股科技主线 目前更偏好海外算力链中下游环节</h3>
+                    <div class="content-body">【中信证券：仍看好美股科技主线 目前更偏好海外算力链中下游环节】财联社7月13日电，中信证券研报称，在AI普及化过程中，终端用户并非总会选择最耗算力、性能最好的模型，而往往面临Token预算的财务约束。今年二季度算力硬件的强劲表现主要由涨价而非放量驱动，当市场焦点从稀缺程度转向可持续性，近日以韩股为代表的海外市场也就随之面临调整。算力并非过剩，而议价权的演进愈发关键。中信证券注意到美国企业的AI采用率正在提高，整体企业部门的科技投资强度符合长期趋势，相信市场竞争机制将推动更多企业用AI提升工作效率，这将带来全新的算力服务、AI模型与应用的需求。中信证券仍看好美股的科技主线，目前更偏好海外算力链的中下游环节，且看好美股相较于日韩股市的吸引力。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:04</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">财联社7月13日电，现货白银从日内低点反弹至59美元/盎司，日内下跌1.3%。</h3>
+                    <div class="content-body">财联社7月13日电，现货白银从日内低点反弹至59美元/盎司，日内下跌1.3%。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:01</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">财联社7月13日电，韩国KOSPI指数开盘下跌0.9%至7412.03点；日经225指数低开0.21%报68410.63点。</h3>
+                    <div class="content-body">财联社7月13日电，韩国KOSPI指数开盘下跌0.9%至7412.03点；日经225指数低开0.21%报68410.63点。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:57</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">新型器件实现热辐射“可编程”</h3>
+                    <div class="content-body">【新型器件实现热辐射“可编程”】财联社7月13日电，据新一期《自然·通讯》杂志报道，日本大阪市立大学领衔的国际研究团队开发出一种新型热辐射器件，能够像计算机芯片存储和控制数据一样让热辐射“可编程”，实现了热辐射的方向调控、工作模式切换，并在断电后保持设定状态。这项创新有望催生更智能的红外传感器、更先进的能源技术，以及利用光和热而非电荷的存储设备。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:48</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">财联社7月13日电，现货白银日内跌幅扩大至2%，报58.63美元/盎司。</h3>
+                    <div class="content-body">财联社7月13日电，现货白银日内跌幅扩大至2%，报58.63美元/盎司。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:47</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span> <span class="topic-chip">商品期货</span></div>
+                    </div>
+                    <h3 class="news-title">财联社7月13日电，现货黄金日内跌幅扩大至1%，报4077.81美元/盎司。</h3>
+                    <div class="content-body">财联社7月13日电，现货黄金日内跌幅扩大至1%，报4077.81美元/盎司。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:18</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">财联社7月13日电，美元兑日元站上162，日内涨0.18%。</h3>
+                    <div class="content-body">财联社7月13日电，美元兑日元站上162，日内涨0.18%。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:03</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span> <span class="topic-chip">商品期货</span></div>
+                    </div>
+                    <h3 class="news-title">财联社7月13日电，现货黄金向下跌破4100美元，日内下跌0.47%。</h3>
+                    <div class="content-body">财联社7月13日电，现货黄金向下跌破4100美元，日内下跌0.47%。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">05:58</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">伊朗外交部谴责美军袭击 称将坚定抵御军事侵略</h3>
+                    <div class="content-body">【伊朗外交部谴责美军袭击 称将坚定抵御军事侵略】财联社7月13日电，伊朗外交部当地时间13日发表声明，强烈谴责过去24小时内美国针对伊朗发动的袭击。声明称，这些袭击不仅严重违反《联合国宪章》基本原则，尤其是第2条第4款规定，同时也对国际和平与安全构成严重威胁，并使近期为缓解紧张局势、实现地区和平稳定所作出的全部努力作废。伊朗强调，将坚定捍卫伊朗的主权和领土完整，抵御美国及任何其他侵略者的军事侵略。同时，伊朗对任何参与或配合侵略方行动的行为发出警告，任何针对伊朗发动袭击的来源地，都将成为伊朗武装力量实施防御性打击的合法目标。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">03:54</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">斯洛伐克总统：不会参与新一轮对乌军援</h3>
+                    <div class="content-body">【斯洛伐克总统：不会参与新一轮对乌军援】财联社7月13日电，斯洛伐克总统佩列格里尼当地时间7月12日表示，斯洛伐克不会参与总额700亿欧元的新一轮对乌克兰援助计划，也不会向乌克兰提供武器或为其进一步武装提供资金。据佩列格里尼透露，匈牙利、捷克等部分北约成员国也持类似立场。他强调，参与对乌援助并非所有北约成员国的强制义务，各国应根据自身经济实力和国防能力自主决定。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">03:17</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">财联社7月13日电，西班牙据称批准80亿美元住房计划，未来四年公共住房投资将提高三倍。</h3>
+                    <div class="content-body">财联社7月13日电，西班牙据称批准80亿美元住房计划，未来四年公共住房投资将提高三倍。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">00:38</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">伊朗最大岛遭美军袭击</h3>
+                    <div class="content-body">【伊朗最大岛遭美军袭击】财联社7月13日电，据伊朗官方通讯社伊通社报道，当地时间7月12日下午以来，伊朗最大岛屿格什姆岛“遭到敌方至少十枚发射物袭击”。据称所有遭袭目标均为军事目标，袭击未造成人员伤亡。另据美国“阿克西奥斯新闻网（Axios）”报道，美军于约一个小时前“对伊朗导弹及防空系统实施了数次打击”，美军还在霍尔木兹海峡周边的数个地点“针对伊朗伊斯兰革命卫队的小型船只采取了行动”。 （CCTV国际时讯）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">00:02</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">伊朗南部多地爆炸声</h3>
+                    <div class="content-body">【伊朗南部多地爆炸声】财联社7月13日电，据伊朗法尔斯通讯社报道，当地时间7月12日晚，伊朗南部阿巴斯港以东及格什姆岛沿海地区传出多次爆炸声，原因不明。 （CCTV国际时讯）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:25</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">外交部亚洲司负责人：中方将坚决有力回击日方挑衅</h3>
+                    <div class="content-body">【外交部亚洲司负责人：中方将坚决有力回击日方挑衅】今天，外交部亚洲司负责人就日本外相炒作“南海仲裁案裁决”出台十年发表谈话、日伙同他国发表所谓联合声明紧急约见日驻华使馆首席公使，提出严正交涉、表达强烈不满和抗议。<br><br>中方指出，日本在南海问题上负有历史罪责且并未清算，没有任何资格说三道四。日方恶劣言行挑战战后国际秩序和国际法治，奉行双重标准，搬弄是非，破坏南海和平稳定，违背地区国家共同利益和意愿，引起包括中国在内国际社会对日本近代以来侵略殖民暴行的历史警觉和强烈愤慨。中方将坚决有力回击日方挑衅，坚定捍卫自身领土主权和海洋权益。<br><br>中方还就台湾问题、日遗化武、日国会议员妄议中国民族政策以及日方军事安全系列负面动向等提出严厉交涉。 （人民日报）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">20:50</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">泽连斯基提议乌克兰现任总理斯维里坚科卸任</h3>
+                    <div class="content-body">【泽连斯基提议乌克兰现任总理斯维里坚科卸任】财联社7月12日电，当地时间7月12日，乌克兰总统泽连斯基宣布，为对接国家全新政治战略、推动各项改革措施落地实施，乌克兰将启动内阁改组更新。泽连斯基提出人事调整提议，建议现任乌克兰总理斯维里坚科卸任总理职务，将其调任全新设立的重要岗位，专职负责乌克兰与核心国际伙伴的合作工作。泽连斯基对斯维里坚科在任期间稳健高效的工作表现以及其长期为乌克兰政府团队发展作出的贡献予以肯定。据悉，在斯维里坚科递交总理辞呈后，乌克兰本届内阁将随之整体解散。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">20:24</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">美军称霍尔木兹海峡仍对通航船只开放</h3>
+                    <div class="content-body">【美军称霍尔木兹海峡仍对通航船只开放】财联社7月12日电，当地时间7月12日，美军中央司令部在社交媒体平台X发文称，霍尔木兹海峡仍对所有依法通过这一国际水道的船只开放。美军中央司令部表示，美军已完成部署并做好准备，以确保航行自由持续得到保障。美军中央司令部称，伊朗并不控制霍尔木兹海峡，目前海峡航运仍在正常进行。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:04</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">中信证券：港股扰动趋缓卖空料将收敛 短期推荐创新药、航空、机器人及工业金属</h3>
+                    <div class="content-body">【中信证券：港股扰动趋缓卖空料将收敛 短期推荐创新药、航空、机器人及工业金属】财联社7月12日电，中信证券最新研报指出，目前港股未平仓卖空占市值比例虽已从6月中旬的高点小幅回落至2.43%，但仍接近历史均值三倍标准差以上的水平，内外部扰动因素逐步缓和下，预计未来将有较大的回落空间。但近期港股也有较为明显的pair trading迹象，短期我们仍建议关注基本面确定性较高和有事件催化的方向，包括：创新药、航空、机器人和强工业属性金属。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:14</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">中华人民共和国外交部关于有关国家炒作“南海仲裁案裁决”出台十年的声明</h3>
+                    <div class="content-body">【中华人民共和国外交部关于有关国家炒作“南海仲裁案裁决”出台十年的声明】关于美国、菲律宾、澳大利亚、加拿大、爱沙尼亚、德国、意大利、日本、拉脱维亚、立陶宛、新西兰、罗马尼亚、斯洛文尼亚、英国等国于2026年7月12日发表所谓“纪念南海仲裁案裁决”十年联合声明，中华人民共和国外交部郑重声明如下：<br><br>一、中国对南海诸岛，包括东沙群岛、西沙群岛、中沙群岛和南沙群岛拥有主权；中国南海诸岛拥有内水、领海、毗连区、专属经济区和大陆架；中国在南海拥有历史性权利。中国对南海诸岛的主权和在南海的相关权益，是在漫长的历史过程中确立的。早在公元前2世纪的西汉时期，中国人民就在南海航行，并在长期实践中发现了南海诸岛。中国最早并持续、和平、有效地对南海诸岛及相关海域行使主权和管辖。南海诸岛属于中国早已成为国际社会的普遍共识。<br><br>二、南海是世界上最安全的海上通道之一，南海的航行和飞越自由从来不存在任何问题。中国坚定维护在南海的领土主权和海洋权益，坚定维护南海的和平稳定。针对有关国家在南海的侵权挑衅，中国采取坚定措施捍卫自身权益，合理合法，专业克制。美国等域外国家持续在南海强化军力部署，横冲直撞、煽风点火，此种军事化、胁迫性行径才是当前南海局势面临的主要挑战。<br><br>三、陆地领土问题不属于《联合国海洋法公约》调整范围。海洋划界争议已被中国2006年根据《联合国海洋法公约》第298条作出的声明排除出《联合国海洋法公约》强制争端解决程序。在领土问题和海洋划界争议上，中国不接受任何强加于中国的争端解决方案。中国将继续遵循联合国宪章确认的国际法基本原则和国际关系基本准则，包括尊重国家主权和领土完整以及和平解决争端原则，坚持与直接有关当事国在尊重历史事实的基础上，根据国际法，通过谈判协商解决南海有关争议，维护南海和平稳定。<br><br>四、中国在“南海仲裁案”问题上的立场是明确的、一贯的、坚定的。“南海仲裁案”违反“国家同意”“约定必须遵守”等国际法基本原则，违反《联合国海洋法公约》本身，更违背南海基本事实。所谓“裁决”是一张非法无效没有拘束力的废纸。中国不接受、不承认该“裁决”，反对且不接受任何基于该“裁决”的主张和行动。中国在南海的领土主权和海洋权益任何情况下不受该“裁决”影响。<br><br>五、“裁决”出台十年来，不但没有解决中菲涉海问题，反而成为菲律宾扩张领土海洋声索的工具，激化了地区矛盾，并为域外势力介入南海问题、搅动南海局势提供了借口，已成为影响中菲关系和南海和平稳定的“绊脚石”。如果按照“裁决”的标准，很多国家的岛礁将失去主张海洋权益的依据。试问，个别支持“裁决”的国家是否已自愿放弃本国相应岛礁的海洋权益？有关国家持续炒作非法“裁决”，与地区和平稳定的大势不符，同地区国家和人民谋求发展繁荣的愿景相悖，其企图注定不会得逞。我们敦促有关国家切实尊重中国在南海的领土主权和海洋权益，停止在南海问题上挑事生非，停止破坏南海和平稳定。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:00</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">世界杯考虑扩至64支球队 FIFA‌主席因凡蒂诺：每个国家都应该有机会参加世界杯</h3>
+                    <div class="content-body">【世界杯考虑扩至64支球队 FIFA‌主席因凡蒂诺：每个国家都应该有机会参加世界杯】财联社7月12日电，北京时间7月12日，国际足联主席因凡蒂诺‌在接受采访时确认，国际足联将在2026美加墨世界杯结束后，正式研究讨论世界杯进一步扩军至64支球队的议题。<br><br>“是的，（扩军）百分之百正确！佛得角这样看似小的球队已经证明，世界杯并没有被稀释。48支球队参赛的模式取得了巨大成功。每支球队都踢出了高水平。”谈及美加墨世界杯扩军至48支参赛队的效果，因凡蒂诺直言：“来自各大洲的球队都取得了进球，且至少拿到了1个积分。非洲球队中有9支闯入了淘汰赛。上届世界杯，非洲仅有5支球队参赛。这恰恰证明了吸纳所有球队参赛的重要性——给他们参与世界杯的机会。”</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:51</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span> <span class="topic-chip">商品期货</span></div>
+                    </div>
+                    <h3 class="news-title">委内瑞拉要求解冻海外被扣押资产用于灾后重建</h3>
+                    <div class="content-body">【委内瑞拉要求解冻海外被扣押资产用于灾后重建】财联社7月12日电，委内瑞拉全国代表大会主席豪尔赫·罗德里格斯7月11日在委首都加拉加斯举行的新闻发布会上说，该国6月24日发生的两次强震已造成4333人死亡、16740人受伤。豪尔赫·罗德里格斯表示，灾后重建工作耗资巨大，仅待修缮的房屋就有约2.5万栋。委内瑞拉代总统德尔西·罗德里格斯正争取解冻该国在海外被扣押的资产，其中包括被冻结在英格兰银行的委内瑞拉黄金储备，以便用于灾后重建。 （央视新闻）</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="商品期货">
+                <h2 class="topic-heading">
+                    <span class="topic-name">商品期货</span>
+                    <span class="topic-count">3</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-c" data-topic="商品期货" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:43</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">商品期货</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">布伦特原油期货涨幅扩大至4%</h3>
+                    <div class="content-body">【布伦特原油期货涨幅扩大至4%】财联社7月13日电，布伦特原油期货涨幅扩大至4%，报79.076美元/桶。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="商品期货" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:47</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">商品期货</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">财联社7月13日电，日经225指数期货在早盘交易中下跌0.13%。</h3>
+                    <div class="content-body">财联社7月13日电，日经225指数期货在早盘交易中下跌0.13%。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="商品期货" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:01</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">商品期货</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">财联社7月13日电，WTI原油期货周一盘初高开涨2.5%，报73.37美元/桶。</h3>
+                    <div class="content-body">财联社7月13日电，WTI原油期货周一盘初高开涨2.5%，报73.37美元/桶。</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="债券固收">
+                <h2 class="topic-heading">
+                    <span class="topic-name">债券固收</span>
+                    <span class="topic-count">3</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-c" data-topic="债券固收" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:42</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">债券固收</span></div>
+                    </div>
+                    <h3 class="news-title">财联社7月13日电，2年期美国国债收益率升至2025年2月以来的最高水平。</h3>
+                    <div class="content-body">财联社7月13日电，2年期美国国债收益率升至2025年2月以来的最高水平。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="债券固收" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:16</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">债券固收</span></div>
+                    </div>
+                    <h3 class="news-title">财联社7月13日电，日本20年期国债收益率下降4个基点至3.71%。</h3>
+                    <div class="content-body">财联社7月13日电，日本20年期国债收益率下降4个基点至3.71%。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="债券固收" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:52</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">债券固收</span></div>
+                    </div>
+                    <h3 class="news-title">财联社7月13日电，日本10年期国债收益率下跌2.5个基点，至2.735%。</h3>
+                    <div class="content-body">财联社7月13日电，日本10年期国债收益率下跌2.5个基点，至2.735%。</div>
+                </article>
+                
+                </div>
+            </section>
+            
+    </main>
+</div>
+<script>
+    const searchInput = document.getElementById('search');
+    const topicPills = document.querySelectorAll('.topic-pill');
+    const sections = document.querySelectorAll('.topic-section');
+    let activeTopic = 'all';
+
+    function updateFilter() {
+        const query = (searchInput.value || '').toLowerCase();
+        sections.forEach(section => {
+            const topic = section.dataset.topic;
+            const visibleByTopic = activeTopic === 'all' || activeTopic === topic;
+            let hasVisibleCard = false;
+            section.querySelectorAll('.news-card').forEach(card => {
+                const text = card.innerText.toLowerCase();
+                const visible = visibleByTopic && text.includes(query);
+                card.style.display = visible ? '' : 'none';
+                if (visible) hasVisibleCard = true;
+            });
+            section.style.display = visibleByTopic && hasVisibleCard ? '' : 'none';
+        });
+    }
+
+    searchInput.addEventListener('input', updateFilter);
+
+    topicPills.forEach(pill => {
+        pill.addEventListener('click', () => {
+            const topic = pill.dataset.topic;
+            if (activeTopic === topic) {
+                activeTopic = 'all';
+                topicPills.forEach(p => p.classList.remove('active'));
+            } else {
+                activeTopic = topic;
+                topicPills.forEach(p => p.classList.toggle('active', p.dataset.topic === topic));
+            }
+            updateFilter();
+        });
+    });
+
+    document.querySelectorAll('.toggle-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const content = btn.closest('.topic-heading').nextElementSibling;
+            const expanded = btn.getAttribute('aria-expanded') === 'true';
+            content.style.display = expanded ? 'none' : 'block';
+            btn.setAttribute('aria-expanded', String(!expanded));
+            btn.textContent = expanded ? '展开' : '折叠';
+        });
+    });
+    </script>
+</body>
+</html>
