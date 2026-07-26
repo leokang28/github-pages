@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>财联社电报 - 2026-07-25</title>
+<style>
+    :root {
+        --color-b: #dc2626;
+        --color-c: #2563eb;
+        --color-other: #6b7280;
+        --bg: #f8fafc;
+        --card-bg: #ffffff;
+        --text: #1f2937;
+        --text-secondary: #64748b;
+        --border: #e2e8f0;
+        --radius: 12px;
+        --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    }
+    * { box-sizing: border-box; }
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+    }
+    .container { max-width: 900px; margin: 0 auto; padding: 24px 16px 64px; }
+    header { text-align: center; margin-bottom: 24px; }
+    header h1 { margin: 0 0 8px; font-size: 28px; }
+    header p { margin: 0; color: var(--text-secondary); }
+    .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+    .stat-card {
+        background: var(--card-bg);
+        border-radius: var(--radius);
+        padding: 16px;
+        box-shadow: var(--shadow);
+        text-align: center;
+        border-top: 4px solid var(--color-other);
+    }
+    .stat-card.stat-b { border-top-color: var(--color-b); }
+    .stat-card.stat-c { border-top-color: var(--color-c); }
+    .stat-value { font-size: 24px; font-weight: 700; }
+    .stat-label { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+    .filters {
+        position: sticky;
+        top: 0;
+        background: rgba(248, 250, 252, 0.96);
+        backdrop-filter: blur(8px);
+        padding: 12px 0;
+        margin-bottom: 16px;
+        border-bottom: 1px solid var(--border);
+        z-index: 10;
+    }
+    .search-box {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1px solid var(--border);
+        border-radius: 9999px;
+        font-size: 14px;
+        margin-bottom: 10px;
+        outline: none;
+    }
+    .search-box:focus { border-color: var(--color-c); }
+    .topic-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+    .topic-pill {
+        border: 1px solid var(--border);
+        background: var(--card-bg);
+        border-radius: 9999px;
+        padding: 6px 12px;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+    .topic-pill:hover, .topic-pill.active {
+        background: #eff6ff;
+        border-color: var(--color-c);
+        color: var(--color-c);
+    }
+    .topic-section { margin-bottom: 24px; }
+    .topic-heading {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 18px;
+        margin: 0 0 12px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid var(--border);
+    }
+    .topic-count {
+        background: var(--border);
+        color: var(--text-secondary);
+        font-size: 12px;
+        padding: 2px 8px;
+        border-radius: 9999px;
+    }
+    .toggle-btn {
+        margin-left: auto;
+        background: transparent;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 12px;
+        cursor: pointer;
+        color: var(--text-secondary);
+    }
+    .news-card {
+        background: var(--card-bg);
+        border-radius: var(--radius);
+        padding: 14px 16px;
+        margin-bottom: 10px;
+        box-shadow: var(--shadow);
+        border-left: 4px solid var(--color-other);
+        transition: transform 0.1s;
+    }
+    .news-card:hover { transform: translateY(-1px); }
+    .news-card.level-b { border-left-color: var(--color-b); }
+    .news-card.level-c { border-left-color: var(--color-c); }
+    .card-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+        flex-wrap: wrap;
+    }
+    .time-badge { font-size: 12px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+    .level-badge {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 2px 6px;
+        border-radius: 4px;
+        color: white;
+    }
+    .level-badge.level-b { background: var(--color-b); }
+    .level-badge.level-c { background: var(--color-c); }
+    .level-badge.level-other { background: var(--color-other); }
+    .topic-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+    .topic-chip {
+        font-size: 11px;
+        background: #f1f5f9;
+        color: var(--text-secondary);
+        padding: 2px 8px;
+        border-radius: 9999px;
+    }
+    .news-title { margin: 0 0 8px; font-size: 15px; line-height: 1.5; }
+    .content-body {
+        font-size: 14px;
+        color: var(--text-secondary);
+        white-space: pre-wrap;
+    }
+    .empty-state { text-align: center; color: var(--text-secondary); padding: 40px; }
+    @media (max-width: 640px) {
+        .stats { grid-template-columns: repeat(2, 1fr); }
+        header h1 { font-size: 22px; }
+    }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>📰 财联社电报</h1>
+        <p>2026-07-25 16:00 起 · 共 65 条</p>
+    </header>
+    <div class="stats">
+        
+        <div class="stat-card stat-total">
+            <div class="stat-value">65</div>
+            <div class="stat-label">总计</div>
+        </div>
+        
+
+        <div class="stat-card stat-b">
+            <div class="stat-value">4</div>
+            <div class="stat-label">Level B</div>
+        </div>
+        
+
+        <div class="stat-card stat-c">
+            <div class="stat-value">61</div>
+            <div class="stat-label">Level C</div>
+        </div>
+        
+
+        <div class="stat-card stat-other">
+            <div class="stat-value">0</div>
+            <div class="stat-label">其他</div>
+        </div>
+        
+    </div>
+    <div class="filters">
+        <input class="search-box" id="search" type="text" placeholder="搜索标题 / 内容 / 主题...">
+        <div class="topic-pills">
+            <button class="topic-pill" data-topic="其他">其他 (43)</button>
+<button class="topic-pill" data-topic="公司公告">公司公告 (6)</button>
+<button class="topic-pill" data-topic="行业动态">行业动态 (6)</button>
+<button class="topic-pill" data-topic="国际市场">国际市场 (6)</button>
+<button class="topic-pill" data-topic="宏观经济">宏观经济 (4)</button>
+        </div>
+    </div>
+    <main id="news-list">
+        
+            <section class="topic-section" data-topic="公司公告">
+                <h2 class="topic-heading">
+                    <span class="topic-name">公司公告</span>
+                    <span class="topic-count">6</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:55</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">【电报解读】厂商限量供货，VC价格一个多月涨幅超40%！机构称VC在新产能投产不及预期下进入新一轮供需错配，看好板块业绩超预期的投资机会，这家公司现有VC产能达13000吨/年</h3>
+                    <div class="content-body">厂商限量供货，VC价格一个多月涨幅超40%！机构称VC在新产能投产不及预期下进入新一轮供需错配，看好板块业绩超预期的投资机会，这家公司现有VC产能达13000吨/年，另一家在湖北建设1.27万吨电解液添加剂及配套项目。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:51</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">台风对深圳机场运行影响较大 各航司将调减明日午前航班计划</h3>
+                    <div class="content-body">【台风对深圳机场运行影响较大 各航司将调减明日午前航班计划】财联社7月25日电，根据台风“红霞”影响评估，预计7月26日凌晨至上午为台风对机场运行影响较强时段。为确保运行安全，深圳机场计划于7月25日晚24时前完成当日进出港航班执行，7月26日上午至中午时段的航班计划，各航司将根据天气影响进行集中调减，具体航班调整情况，请联系购票航空公司查询了解。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">21:55</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">股市政策</span></div>
+                    </div>
+                    <h3 class="news-title">国家数据局党组书记、局长刘烈宏赴上海市调研数据要素市场化配置改革工作</h3>
+                    <div class="content-body">【国家数据局党组书记、局长刘烈宏赴上海市调研数据要素市场化配置改革工作】财联社7月25日电，7月16日—18日，国家数据局党组书记、局长刘烈宏带队赴上海市，实地调研上海数据集团、上海数据交易所、上海申康医院发展中心、智元创新（上海）、它石智航、零数科技、无问芯穹、优咔网络、灵犀云、垣信卫星、国泰海通证券、松鼠云上技术等公司，围绕数据基础设施建设、数据资源开发利用、数据流通交易、具身智能、脑机接口等，深入了解数据要素市场化配置改革工作推进情况。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">21:16</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">商品期货</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">中信建投：看好电力设备产业投资前景</h3>
+                    <div class="content-body">【中信建投：看好电力设备产业投资前景】财联社7月25日电，中信建投研报表示，中国电力设备出海迎来黄金发展期。分市场来看，美欧市场对变压器需求规模全球领先，需求持续高景气而供需偏紧，中国企业北美出海保持高增长，有望持续提升市场渗透率。我们预计，欧美市场需求持续高景气；中东等非美市场需求增加+欧美虹吸全球产能的背景下，中国企业将大有可为。出口头部公司持续兑现基本面，强预期持续照进现实。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">20:29</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">特朗普威胁对欧盟加征报复性关税</h3>
+                    <div class="content-body">【特朗普威胁对欧盟加征报复性关税】财联社7月25日电，美国总统特朗普24日称，美国政府将对欧盟启动贸易调查，并威胁要对欧盟加征关税，以报复欧盟对美国科技公司处以巨额罚款的做法。特朗普24日在社交媒体平台“真实社交”上发文，指责欧盟日前决定对谷歌公司罚款是在“抢掠”美国企业及美国纳税人。他警告，欧盟将为其行为付出“沉重”代价，“我们预计将尽快对其（欧盟）施加高额关税”。特朗普称，美方将立即依据《1974年贸易法》第301条对欧盟启动调查。该条款授权美国政府对其认定为对美国企业造成不公平负担的行为进行调查，并采取关税报复措施。欧盟委员会23日宣布，谷歌在网络搜索和应用商店业务中违反欧盟《数字市场法》，决定对其处以共计8.9亿欧元罚款。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">20:06</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">胡塞武装称一天内两次打击沙特</h3>
+                    <div class="content-body">【胡塞武装称一天内两次打击沙特】财联社7月25日电，也门胡塞武装今天（7月25日）发表声明称，为回应沙特此前对荷台达市、荷台达港及卡马兰岛实施空袭，胡塞武装力量当天开展两次军事行动。声明称，第一次行动使用数十枚弹道导弹和无人机，打击位于沙特吉赞的沙特阿美公司“敏感目标”；第二次行动使用弹道导弹、巡航导弹和无人机，打击位于延布的沙特阿美公司“敏感目标”。声明称，两次行动均“成功实现预定目标”，并造成“精确、直接命中”。声明指责沙特持续对也门实施封锁并侵犯也门主权，称胡塞武装将继续采取行动予以回应，并表示针对沙特的海上封锁措施仍将持续，不排除根据未来数小时和数天局势发展进一步扩大行动和升级措施。 （CCTV国际时讯）</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="宏观经济">
+                <h2 class="topic-heading">
+                    <span class="topic-name">宏观经济</span>
+                    <span class="topic-count">4</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-b" data-topic="宏观经济" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">20:07</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">宏观经济</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">7月25日周六《新闻联播》要闻18条</h3>
+                    <div class="content-body">【7月25日周六《新闻联播》要闻18条】财联社7月25日电，今天《新闻联播》主要内容有：<br>1、【“义乌发展经验”启示】在全面小康的道路上不落下一个；<br>2、电视专题片《世界义乌——习近平关心引领义乌发展》今晚播出第三集；<br>3、【树立和践行正确政绩观】办好群众身边事 学习教育见实效；<br>4、今年以来消费品以旧换新销售额超万亿元；<br>5、【在希望的田野上】全国秋粮田管有序推进；<br>6、【活力中国调研行】瞄准科学“无人区” 原始创新如何突破；<br>7、各地各部门积极部署应对台风“红霞”；<br>8、“景德镇手工瓷业遗存”成功列入《世界遗产名录》；<br>9、APEC人工智能高级别论坛达成多项成果；<br>10、2030年我国中医药服务体系将更加健全；<br>11、上半年国家电网完成固定资产投资同比增长12.6%；<br>12、西部陆海新通道上半年进出口超5000亿元；<br>13、西康高铁全线拉通试验正式启动；<br>14、伊朗打击中东多国美军目标回应美袭击 美称仍在与伊朗对话并威胁升级打击力度；<br>15、沙特主导的多国联军空袭也门荷台达 胡塞武装称局势升级；<br>16、约旦河西岸爆发冲突 巴谴责以暴力袭击；<br>17、俄打击乌无人机演示场 乌称打击俄军企；<br>18、法西两国林火蔓延 大量居民疏散。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="宏观经济" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:12</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">宏观经济</span> <span class="topic-chip">股市政策</span></div>
+                    </div>
+                    <h3 class="news-title">今年上半年新疆霍尔果斯口岸进出口货运量创新高</h3>
+                    <div class="content-body">【今年上半年新疆霍尔果斯口岸进出口货运量创新高】财联社7月25日电，今年上半年，新疆霍尔果斯口岸依托公铁联运枢纽优势，进出口货运量持续增长，据霍尔果斯海关统计，今年1—6月，新疆霍尔果斯口岸实际监管进出口货运量2295.4万吨，同比增长3.1%，创历史新高。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="宏观经济" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">21:56</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">宏观经济</span> <span class="topic-chip">股市政策</span></div>
+                    </div>
+                    <h3 class="news-title">中国工商银行董事长廖林会见巴拿马银行监管总署署长米尔顿·阿永</h3>
+                    <div class="content-body">【中国工商银行董事长廖林会见巴拿马银行监管总署署长米尔顿·阿永】财联社7月25日电，中国工商银行董事长廖林近日会见巴拿马银行监管总署署长米尔顿·阿永，就宏观经济形势、中巴两国经贸金融合作、中国工商银行在巴经营等话题进行深入交流。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="宏观经济" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">21:03</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">今年上半年义乌圣诞用品出口达21.4亿元</h3>
+                    <div class="content-body">【今年上半年义乌圣诞用品出口达21.4亿元】财联社7月25日电，据义乌海关统计，今年上半年义乌圣诞用品出口达21.4亿元，同比增长20.4%。 （央视财经）</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="其他">
+                <h2 class="topic-heading">
+                    <span class="topic-name">其他</span>
+                    <span class="topic-count">43</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-b" data-topic="其他" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">04:06</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">台风“红霞”在广东惠州登陆 中心附近最大风力14级</h3>
+                    <div class="content-body">【台风“红霞”在广东惠州登陆 中心附近最大风力14级】财联社7月26日电，中央气象台消息，今年第12号台风“红霞”（强台风级）的中心已于26日03时50分前后在广东省惠州市惠东县平海镇登陆，登陆时中心附近最大风力有14级（45米/秒），中心最低气压955百帕。</div>
+                </article>
+                
+                <article class="news-card level-b" data-topic="其他" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">02:08</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">特朗普下令暂停空袭伊朗</h3>
+                    <div class="content-body">【特朗普下令暂停空袭伊朗】财联社7月26日电，当地时间7月25日，美国总统特朗普下令美军当天不要对伊朗发动新的空袭，结束了此前连续近两周、持续13天的每日打击行动。<br><br>据悉，特朗普此前每天都会批准军方提交的对伊朗打击方案，但25日收到新的作战计划后，并未批准执行，而是直接下令当天暂停空袭。目前尚不清楚这一决定只是一天的临时安排，还是意味着军事行动将进入暂停阶段。<br><br>两名知情人士表示，特朗普此举一方面是为了给外交谈判留出更多空间，另一方面是认为在不重新展开大规模军事行动的情况下，目前的空袭已基本达到其效果上限。不过，美军仍在制定恢复大规模军事行动的预案，一旦特朗普下令，仍可在短时间内恢复打击。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:49</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">应急管理部针对江西湖南启动国家地质灾害四级应急响应</h3>
+                    <div class="content-body">【应急管理部针对江西湖南启动国家地质灾害四级应急响应】财联社7月25日电，受今年第12号台风“红霞”以及外围环流影响，7月25日至27日，江西南部、湖南东部等地有大暴雨，局地有特大暴雨。经与自然资源部联合会商研判，江西西南部、湖南东南部发生地质灾害的风险高。根据《国家突发地质灾害应急预案》及有关规定，应急管理部于7月25日针对江西、湖南启动国家地质灾害四级应急响应。应急管理部要求，受台风“红霞”影响的相关地区要切实做好地质灾害防范应对工作，压实地方防范应对主体责任，加强部门协同联动工作机制，密切监视雨情汛情和地质灾害灾情险情，加强会商研判和预警响应联动，预置前置救援力量、物资、装备，强化巡查排查和监测预警，坚决果断组织转移避险，确保应转尽转、应转早转，最大限度避免人员伤亡。应急管理部同时维持针对广东、福建的国家地质灾害四级应急响应。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:27</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">美军称对伊海上封锁已使两艘船只失去航行能力</h3>
+                    <div class="content-body">【美军称对伊海上封锁已使两艘船只失去航行能力】财联社7月26日电，当地时间7月25日，美国中央司令部表示，美国针对伊朗的海上封锁仍全面生效。截至当天，美军已拦截并改道12艘试图突破封锁的商船，使2艘拒不配合的船只失去航行能力，并登船检查2艘船舶。美国中央司令部称，美军当天在阿拉伯海完成对悬挂科摩罗国旗的油轮登船核查，该船随后继续航行。7月24日，美军还在阿曼湾使悬挂莫桑比克国旗的油轮失去航行能力，称该船多次试图突破封锁并无视警告，目前已不再驶往伊朗。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:42</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">台风“红霞”成为今年以来登陆我国最强台风</h3>
+                    <div class="content-body">【台风“红霞”成为今年以来登陆我国最强台风】财联社7月26日电，根据中央气象台、广东省气象台消息，今年第12号台风“红霞”的中心已于今天（26日）3时50分前后在广东省惠州市惠东县平海镇登陆，登陆时强度为强台风级，中心附近最大风力14级，台风“红霞”是近十年以来登陆珠江口以东的最强台风，风雨浪潮叠加影响大。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:01</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">水利部专题部署台风“红霞”暴雨洪水防御工作</h3>
+                    <div class="content-body">【水利部专题部署台风“红霞”暴雨洪水防御工作】财联社7月26日电，从水利部了解到，受台风“红霞”影响，预计7月25日至30日，珠江、长江、淮河、黄河、海河等流域部分主要河流将出现明显涨水过程，珠江流域东江可能发生编号洪水；台风影响范围内前期降雨多、土壤饱和，山洪灾害风险高，中小河流洪水多发；受风、雨、潮共同影响，粤东闽南沿海部分潮位站将超警。水利部要求要提前发布预警直达基层防御一线，确保大江大河大湖防洪安全，严防山洪灾害风险，强化水库运行监测预警和堤防巡查防守，严防城市内涝风险，全力做好暴雨洪水防御。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:21</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">2026暑期档电影票房破55亿</h3>
+                    <div class="content-body">【2026暑期档电影票房破55亿】财联社7月25日电，据网络平台数据，截至目前，2026年暑期档电影总票房（含预售）突破55亿元。2026年度电影总票房（含预售）突破212亿元。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:37</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">以军空袭加沙多地 致6死20余伤</h3>
+                    <div class="content-body">【以军空袭加沙多地 致6死20余伤】财联社7月26日电，以色列军队当地时间25日对加沙地带的汗尤尼斯及加沙城等多地发动空袭，据巴勒斯坦卫生部门及医疗机构消息，当天的袭击总计造成6名巴勒斯坦人死亡，20多人受伤。另据以色列方面消息，巴勒斯坦伊斯兰抵抗运动（哈马斯）在加沙地带北部的警察部门负责人也在以军空袭中死亡。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:12</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">高温黄色预警持续 新疆等地局地可达40℃以上</h3>
+                    <div class="content-body">【高温黄色预警持续 新疆等地局地可达40℃以上】财联社7月26日电，中央气象台7月26日06时继续发布高温黄色预警：预计7月26日白天，新疆、内蒙古中西部、甘肃中西部、四川盆地、重庆中西部、陕西南部以及河南东南部、安徽中北部、江苏大部、上海、浙江中北部、湖北中东部、湖南大部、广西、广东西南部、贵州东部、海南岛中北部等地有35℃以上高温天气，其中，新疆东部和南疆盆地、内蒙古西部、甘肃西北部、四川盆地、重庆西部、浙江北部、河南东南部、安徽北部、湖北东部、湖南北部、广西大部等地部分地区最高气温37～39℃，新疆东部和南疆盆地、内蒙古西部、重庆西部、四川东部等地局地可达40℃以上。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:27</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">乌克兰基辅传出连续爆炸声</h3>
+                    <div class="content-body">【乌克兰基辅传出连续爆炸声】财联社7月26日电，当地时间26日，乌克兰基辅市内传出连续爆炸声。此前基辅拉响防空警报。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">05:32</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">以总理计划向特朗普递交伊朗情报</h3>
+                    <div class="content-body">【以总理计划向特朗普递交伊朗情报】财联社7月26日电，以总理内塔尼亚胡及其访美团队计划于7月28日在白宫会晤美国总统特朗普时，向美方递交一份有关伊朗军事与核计划的最新情报。以色列消息人士称，以方在情报中指责伊朗正在加速推进核武器研发计划。据悉，有以色列高级官员称，美国与伊朗之间达成协议的可能性“微乎其微”，冲突升级“不可避免”。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">04:37</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">伊朗伊斯兰革命卫队称15天内摧毁多架美军战机</h3>
+                    <div class="content-body">【伊朗伊斯兰革命卫队称15天内摧毁多架美军战机】财联社7月26日电，当地时间25日，伊朗伊斯兰革命卫队发言人穆赫比表示，伊朗伊斯兰革命卫队在15天内摧毁了11架停放在美军基地的美军战斗机和直升机，还摧毁了17架军用无人机，一架停放在机库内的F-15战斗机，一架P-8反潜巡逻机，一架C-17运输机和8架空中加油机。目前，上述说法尚未得到美国军方证实。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">03:34</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">卡塔尔宣布将恢复海上航行</h3>
+                    <div class="content-body">【卡塔尔宣布将恢复海上航行】财联社7月26日电，卡塔尔7月25日宣布，自26日起，全面恢复各类船舶的海上航行活动。此前，卡塔尔曾于7月12日建议公民暂停所有海上活动。海事部门在声明中表示，所有船员和运营方须严格遵守国家海事法规。出航前及航行期间，务必全面检查并配齐安全与安保设备，保障海上航行安全。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">01:07</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">台风“红霞”逼近 广东已累计转移人员超71万人</h3>
+                    <div class="content-body">【台风“红霞”逼近 广东已累计转移人员超71万人】财联社7月26日电，今年第12号台风“红霞”已于25日22时由台风级加强为强台风级，其中心位于惠州惠东县东南方向大约100公里的近海海面上。预计，“红霞”将以每小时20公里的速度向西北方向移动，将于26日凌晨在广东深圳到海丰一带沿海登陆，登陆后转向北偏西方向移动，强度逐渐减弱。截至7月26日0时，广东省累计转移人员715351人。目前，潮州、汕头、揭阳、汕尾、河源、梅州、深圳、珠海、江门、广州、东莞、惠州等12个地市已采取“五停”或部分“五停”措施。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">01:03</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">深圳市发布台风红色预警信号</h3>
+                    <div class="content-body">【深圳市发布台风红色预警信号】财联社7月26日电，台风“红霞”（强台风级）将给深圳带来严重风雨影响，深圳东部将进入12级风圈，深圳市气象台7月26日0时30分将盐田区、坪山区、大鹏新区、大鹏湾、大亚湾和龙岗区（坪地、龙城、龙岗、宝龙、园山街道）台风橙色预警信号升级为红色；同时将罗湖区、南山区、福田区、宝安区、光明区、龙华区、珠江口、深圳湾和龙岗区（平湖、南湾、坂田、横岗、吉华街道）台风黄色预警信号升级为橙色。请做好防风防雨工作。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">23:55</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">广东省将防风应急响应提升为Ⅰ级</h3>
+                    <div class="content-body">【广东省将防风应急响应提升为Ⅰ级】财联社7月25日电，鉴于今年第12号台风“红霞”近岸加强，即将以强台风级登陆广东省，造成严重风雨影响。根据《广东省防汛防旱防风防冻应急预案》和省防总有关规定，广东省防总已于7月25日23时将防风Ⅱ级应急响应提升为防风Ⅰ级应急响应。（央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:34</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">福建启动防汛四级应急响应 维持防台风三级应急响应</h3>
+                    <div class="content-body">【福建启动防汛四级应急响应 维持防台风三级应急响应】财联社7月25日电，记者从福建省防汛抗旱指挥部了解到，受台风“红霞”影响，预计今天夜间至26日白天，漳州和厦门两市大部、龙岩（永定、上杭、武平、新罗）、泉州（安溪、南安）有暴雨或大暴雨，其余地区局部暴雨，24小时累计雨量50—100毫米，局部200毫米；最大小时雨量80毫米。福建省防指于25日20时启动防汛四级应急响应并维持防台风三级应急响应。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:33</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">以军在约旦河西岸展开大规模搜捕 扣押70多名巴勒斯坦人</h3>
+                    <div class="content-body">【以军在约旦河西岸展开大规模搜捕 扣押70多名巴勒斯坦人】财联社7月25日电，以色列国防军当地时间25日发表声明，以色列军队、国家安全局（辛贝特）和边防警察过去24小时在约旦河西岸展开大规模联合搜捕行动。声明称，以军在军事行动中搜查了300多个地点，共扣押了70多名巴勒斯坦人，另有约130人遭到现场盘查。以方称，被扣押人员已被移交审查，其中包括以方认定的巴勒斯坦伊斯兰抵抗运动（哈马斯）成员，以及涉嫌参与枪击、策动袭击和贩运武器的武装人员。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:29</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">广东省减灾委员会启动Ⅳ级救灾应急响应</h3>
+                    <div class="content-body">【广东省减灾委员会启动Ⅳ级救灾应急响应】财联社7月25日电，针对今年第12号台风“红霞”带来的风雨浪潮及次生灾害影响，根据《广东省自然灾害救助应急预案》规定，广东省减灾委员会已于7月25日20时启动省Ⅳ级救灾应急响应。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:18</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">财联社7月25日电，香港发布8号台风信号。</h3>
+                    <div class="content-body">财联社7月25日电，香港发布8号台风信号。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:07</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">“红霞”已加强为强台风 中央气象台发布今年首个台风红色预警</h3>
+                    <div class="content-body">【“红霞”已加强为强台风 中央气象台发布今年首个台风红色预警】财联社7月25日电，今年第12号台风“红霞”已于今天晚上10时由台风级加强为强台风级，中央气象台发布今年首个台风红色预警。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">21:54</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">财联社7月25日电，卡塔尔交通运输部表示，自7月26日起，各类海运业务和船舶的海上航行活动将全面恢复。</h3>
+                    <div class="content-body">财联社7月25日电，卡塔尔交通运输部表示，自7月26日起，各类海运业务和船舶的海上航行活动将全面恢复。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">21:49</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">伊朗官员：镐山设施“目前是空的”</h3>
+                    <div class="content-body">【伊朗官员：镐山设施“目前是空的”】财联社7月25日电，据伊朗方面25日消息，一名伊朗消息人士称，伊朗的镐山设施不仅坚固，而且“是空的”，美国袭击镐山的行动注定失败，伊朗的回应不会仅限于大规模军事行动。一名伊朗高级安全官员说：“（美国总统）特朗普想通过袭击伊朗镐山来为自己创造政绩，但众所周知，袭击一个空置的仓库只有利于制造虚假信息，对现实毫无益处。”他强调，任何对镐山的袭击都注定失败，因为该设施的防御工事极为坚固，“更重要的是，该设施目前是空的”。这名官员还表示，伊朗会以不同的方式回应这一行动，“不会仅限于大规模军事行动”。据以色列方面22日消息，美国已经通知以色列，其计划在未来数日加大对伊朗的打击力度，包括自今年美国和以色列对伊朗采取军事行动以来首次使用重型轰炸机。重型轰炸机预计将用于打击伊朗镐山地下核设施。特朗普过去一周曾多次威胁称，“可能很快”打击该地区。镐山位于伊朗中部伊斯法罕省纳坦兹核设施附近，被认为是伊朗最坚固的地下核设施之一。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">21:41</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">胡塞武装多个军事目标遭空袭</h3>
+                    <div class="content-body">【胡塞武装多个军事目标遭空袭】财联社7月25日电，据也门方面25日消息，也门胡塞武装控制的北部地区多个军事目标当天遭到空袭。据悉，空袭目标包括胡塞武装在也门东北部的马里卜省和焦夫省多个地区的“导弹发射平台、火箭弹发射阵地和武器库”，袭击造成“包括导弹技术人员在内的多名胡塞武装人员死亡”。一名不愿透露姓名的当地军方官员证实，位于马里卜省南部的胡塞武装阵地和焦夫省东部的若干处胡塞武装控制地点遭空袭。当地居民也表示，目标区域传出连续爆炸声。截至目前，尚无关于袭击所致损失的独立评估报告。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">21:04</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">“红霞”即将登陆 港珠澳大桥桥梁航道交通管制再升级</h3>
+                    <div class="content-body">【“红霞”即将登陆 港珠澳大桥桥梁航道交通管制再升级】财联社7月25日电，受“红霞”台前飑线影响，港珠澳大桥水域出现10~11级阵风。为保障通航安全，港珠澳大桥海事局于25日18时起升级港珠澳大桥桥梁航道临时交通管制措施，管制期间禁止所有船舶通过港珠澳大桥桥梁航道。目前，港珠澳大桥海事局已进入防台应急状态，持续跟踪辖区天气及水文变化，及时发布安全预警信息，并将根据风力情况动态调整管制措施。港珠澳大桥海事局提醒有关航运企业及船舶全面落实各项防台措施，确保人民生命财产安全。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">20:16</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">财联社7月25日电，美国和英国讨论下周召开霍尔木兹海峡危机相关会议的计划。</h3>
+                    <div class="content-body">财联社7月25日电，美国和英国讨论下周召开霍尔木兹海峡危机相关会议的计划。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">20:12</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">下周将有46只个股解禁</h3>
+                    <div class="content-body">【下周将有46只个股解禁】财联社7月25日电，据统计，下周（7月27日至31日）将有46只个股解禁，按照最新收盘价计算，合计解禁市值337.23亿元。上海机场下周将有4.34亿股上市流通，主要为定向增发机构配售股份，解禁市值达102.84亿元。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:59</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">“红霞”即将登陆 交通运输部启动强降雨一级防御响应</h3>
+                    <div class="content-body">【“红霞”即将登陆 交通运输部启动强降雨一级防御响应】财联社7月25日电，中央气象台7月25日18时发布暴雨红色预警、继续发布台风橙色预警，交通运输部启动强降雨一级防御响应、维持台风二级防御响应。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:02</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">约旦谴责以色列定居者在约旦河西岸发动袭击</h3>
+                    <div class="content-body">【约旦谴责以色列定居者在约旦河西岸发动袭击】财联社7月25日电，约旦外交与侨务部当地时间25日发表声明，谴责以色列定居者针对约旦河西岸巴勒斯坦人的暴力行为不断升级。声明称，最新一轮袭击波及多个巴勒斯坦村庄，定居者纵火焚烧民宅、农田和车辆，大量砍伐树木，并对当地巴勒斯坦居民实施袭击。约旦外交与侨务部表示，约旦坚决谴责以色列定居者实施的上述暴力行径，认为这些行为是以色列极右翼政府政策及其在约旦河西岸采取非法措施的延续，助长了针对巴勒斯坦人民的极端主义和暴力，破坏了以“两国方案”为基础实现和平的前景。约旦方面强调，以色列应对上述袭击事件承担全部责任。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:00</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">香港将改发八号风球</h3>
+                    <div class="content-body">【香港将改发八号风球】财联社7月25日电，受台风“红霞”影响，香港天文台将于今晚（7月25日）10时10分改发八号烈风或暴风信号。 （大湾区之声）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:56</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">台风“红霞”逼近 广东珠海启动防台二级应急响应</h3>
+                    <div class="content-body">【台风“红霞”逼近 广东珠海启动防台二级应急响应】财联社7月25日电，今年第12号台风“红霞”正逐步逼近广东沿海，目前“红霞”正以每小时15~20公里的速度向西偏北方向快速移动，强度逐渐加强，预计今天夜间至26日早晨在香港到广东陆丰一带沿海登陆（12~14级，台风级或强台风级），登陆后转向偏北方向移动，强度逐渐减弱。为应对台风影响，广东珠海海事局已于25日17时启动防台二级应急响应。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:47</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">台风“红霞”致广东多机场大面积取消或延误</h3>
+                    <div class="content-body">【台风“红霞”致广东多机场大面积取消或延误】财联社7月25日电，受台风“红霞”及其外围环流影响，7月25日，广东、福建、湖南、湖北、四川、重庆等多地机场发布雷雨天气预警。其中，广东多个机场出现不同程度的航班延误和取消情况。平台大数据显示，截至25日18:15，深圳宝安机场、珠海金湾机场大面积延误，最高延误比例达93%；惠州平潭机场大面积取消，揭阳潮汕机场小面积取消。 （第一财经）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:23</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">受台风“红霞”影响 澳门发出三号风球</h3>
+                    <div class="content-body">【受台风“红霞”影响 澳门发出三号风球】财联社7月25日电，受台风“红霞”影响，澳门特区政府地球物理气象局25日18时发出三号风球。按照现时预测路径，台风“红霞”大致向西北方向移动，趋向广东东部沿岸，预计26日凌晨至早上将会在澳门以东约170公里登陆。天气方面，预计澳门25日晚间雷雨增多并伴随强烈阵风，强对流天气风险较高，26日有大骤雨及雷暴，需提防因强降雨而可能出现的水浸。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:21</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">自然资源部与中国气象局联合发布橙色地质灾害气象风险预警</h3>
+                    <div class="content-body">【自然资源部与中国气象局联合发布橙色地质灾害气象风险预警】财联社7月25日电，自然资源部与中国气象局7月25日18时联合发布橙色地质灾害气象风险预警：预计，7月25日20时至26日20时，黑龙江南部、江西南部、河南中部、广东中东部、贵州西南部、甘肃东部等地部分地区发生地质灾害的气象风险较高（黄色预警），其中，广东中东部局部地区发生地质灾害的气象风险高（橙色预警）。各级政府及有关部门按照应急预案做好地质灾害防御工作。请社会公众及时关注地质灾害气象风险预警信息，谨慎前往地质灾害预警区域。橙色预警区内高风险隐患点和风险区受威胁人员请根据当地防灾部门组织立即撤离前往附近避险安置点，临坡临崖临沟临水人员根据撤离信号及时撤离前往附近避险安置点；黄色预警区内人员，请随时关注预警信息变化，注意附近警示标志，避免在沟谷、斜坡、陡崖（坎）等高风险地带逗留。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:57</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">水利部针对7省区启动洪水防御Ⅳ级应急响应</h3>
+                    <div class="content-body">【水利部针对7省区启动洪水防御Ⅳ级应急响应】财联社7月25日电，据预报，受今年第12号台风“红霞”带来的强降雨影响，7月25日至7月30日，珠江流域北江、东江、韩江、粤东沿海榕江，长江流域中游支流汉江、洞庭湖水系湘江资水沅江澧水、鄱阳湖水系赣江，淮河流域上中游干流及支流沙颍河、洪汝河等主要河流将出现明显涨水过程，其中珠江流域东江可能发生编号洪水；暴雨区内部分中小河流可能发生超警以上洪水，山丘区山洪灾害风险较高。依据《水利部水旱灾害防御应急响应工作规程》，水利部于7月25日16时针对福建、江西、河南、湖北、湖南、广东、广西等省（自治区）启动洪水防御Ⅳ级应急响应，要求地方水利部门和相关流域管理机构密切监视天气变化，加密雨水情监测预报，及时发布预警信息，强化会商研判和值班值守，科学精细调度防洪工程，突出抓好水库安全度汛、中小河流洪水和山洪灾害防御等工作，及时提请地方政府提前转移受威胁群众和危险区人员，确保人民群众生命财产安全。目前，5个水利部工作组、专家组正在广东、福建等地台风暴雨洪水防御一线协助指导。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:39</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">巴林、科威特被曝曾秘密空袭伊朗 科方否认</h3>
+                    <div class="content-body">【巴林、科威特被曝曾秘密空袭伊朗 科方否认】财联社7月25日电，美国方面7月24日援引消息人士的话称，科威特和巴林于本月早些时候秘密派出战机袭击伊朗境内目标，目标包括无人机和导弹仓库。阿联酋为巴林和科威特提供了目标情报和空中掩护。据悉，科威特驻美国大使否认科威特参与任何针对伊朗的军事行动，科威特也从未允许其领土被用于对任何邻国发动进攻。巴林政府暂未对此事作出回应。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:33</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">航行警告 渤海海峡黄海北部执行军事任务</h3>
+                    <div class="content-body">【航行警告 渤海海峡黄海北部执行军事任务】财联社7月25日电，据中国海事局网站消息，大连海事局发布航行警告，7月26日16时至8月2日16时，渤海海峡黄海北部部分海域执行军事任务，禁止驶入。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:16</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">深圳市部分区域升级发布台风橙色预警信号</h3>
+                    <div class="content-body">【深圳市部分区域升级发布台风橙色预警信号】财联社7月25日电，深圳市气象台7月25日16时将大鹏、盐田、坪山、龙岗东部和东部海区的台风预警信号升级为台风橙色预警，同时将台风黄色预警信号扩展到深圳全市。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:03</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">泽连斯基称俄对乌多地发动大规模空袭</h3>
+                    <div class="content-body">【泽连斯基称俄对乌多地发动大规模空袭】财联社7月25日电，乌克兰总统泽连斯基当地时间25日通报称，俄军于当日凌晨对乌克兰多地发动大规模空袭，使用2枚导弹、近160架无人机实施打击。本次袭击已造成至少6人死亡、10人受伤，多处民用建筑与设施受损。俄罗斯方面对此暂无回应。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:00</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">2026年质量督察第一督察组进驻广东省开展质量督察</h3>
+                    <div class="content-body">【2026年质量督察第一督察组进驻广东省开展质量督察】财联社7月25日电，记者今天了解到，国家质量强国建设协调推进领导小组办公室会同有关成员单位组成质量督察组，近日进驻广东省开展质量督察。质量督察组将坚持问题导向、源头治理，对“内卷式”竞争突出领域、社会关切和群众反映强烈的重点领域存在的突出质量问题开展抽查核查，切实推动质量治理能力提升。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:56</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">国家海洋预报台发布海浪红色警报</h3>
+                    <div class="content-body">【国家海洋预报台发布海浪红色警报】财联社7月25日电，记者从自然资源部获悉，国家海洋预报台7月25日16时发布海浪红色警报。预计7月25日下午到26日下午，南海东北部将出现6到9米的狂浪到狂涛区，近海海域海浪预警级别为橙色；广东东部近岸海域将出现4.5到6.5米的巨浪到狂浪，该近岸海域海浪预警级别为红色，福建南部近岸海域将出现3到4米的大浪到巨浪，该近岸海域海浪预警级别为黄色。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:44</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">“红霞”将以台风级或强台风级登陆香港至陆丰沿海</h3>
+                    <div class="content-body">【“红霞”将以台风级或强台风级登陆香港至陆丰沿海】财联社7月25日电，中央气象台最新消息，今年第12号台风“红霞”已于7月25日早晨加强为台风级，15时中心位于广东省汕尾市东南方向约200公里的洋面上，中心附近最大风力12级（台风级，33米/秒），将于25日夜间至26日早晨在香港到广东陆丰一带沿海登陆（35～42米/秒，台风级或强台风级）。受其影响，25日至26日，南海东北部部分海域、广东东部沿海、珠江口风力有9～11级、阵风12～13级，台风中心经过的海域或地区风力有12～13级，阵风14～16级。25日至27日，广东、福建、江西、湖南、四川等地部分地区累计降雨量150～300毫米，广东北部和东部局地降雨具有极端性，累计雨量400～500毫米，单点最大600毫米左右。“红霞”深入内陆、滞留时间长、累计雨量大、途经地区地形复杂、致灾风险高，提醒上述地区的公众需提前做好防台风准备工作。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:13</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">国家防总提升针对广东的应急响应至Ⅲ级</h3>
+                    <div class="content-body">【国家防总提升针对广东的应急响应至Ⅲ级】财联社7月25日电，今年第12号台风“红霞”已于7月25日早晨加强为台风级。预计，“红霞”将于25日夜间至26日早晨在香港到广东陆丰一带沿海登陆（台风级或强台风级，12～14级，35～42米每秒）。受其影响，南海东北部部分海域、广东东部沿海、珠江口风力可达9～11级、阵风12～13级，台风中心经过的海域或地区风力有12～13级、阵风14～16级。25日至27日，广东、江西、湖南等地有强降雨，广东东部、江西南部、湖南南部等地部分地区累计降雨量150～300毫米，局地400～500毫米，单点最大600毫米左右。中央气象台25日10时发布台风、暴雨橙色预警。根据《国家防汛抗旱应急预案》及有关规定，国家防总决定于7月25日16时将针对广东的防汛防台风应急响应提升至Ⅲ级，并同步针对江西、湖南启动防汛Ⅳ级应急响应。 （央视新闻）</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="行业动态">
+                <h2 class="topic-heading">
+                    <span class="topic-name">行业动态</span>
+                    <span class="topic-count">6</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-b" data-topic="行业动态" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">16:33</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">《2026能源产业生态报告》发布 风电光伏装机超越火电</h3>
+                    <div class="content-body">【《2026能源产业生态报告》发布 风电光伏装机超越火电】财联社7月25日电，记者今天（25日）从中国企业改革与发展研究会获悉，《2026能源产业生态报告》正式发布。报告显示，“十四五”时期，我国风电光伏装机历史性超越火电，核能、生物质能领域领跑全球。“十四五”期间，我国能源产业实现安全保供与绿色低碳转型双向协同发展。2025年全国能源重点项目投资额首超3.5万亿元，同比增长近11%。新能源产业实现跨越式发展，2020至2025年风电光伏装机从5.3亿千瓦增至18.4亿千瓦。核电运行装机总量稳居全球第一，生物质能发电装机连续7年规模全球第一。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">20:46</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">公司公告</span> <span class="topic-chip">股市政策</span></div>
+                    </div>
+                    <h3 class="news-title">【电报解读】头部机器人公司竞逐IPO，智元创新启动赴港上市流程，人形机器人产业正进入&quot;规模制造提速、场景持续拓展、具身智能升级&quot;三重驱动阶段，这家公司已向智元批量交付灵犀X1人形机器人整机产品</h3>
+                    <div class="content-body">头部机器人公司竞逐IPO，智元创新启动赴港上市流程，人形机器人产业正进入&quot;规模制造提速、场景持续拓展、具身智能升级&quot;三重驱动阶段，这家公司已向智元批量交付灵犀X1人形机器人整机产品，另一家与国内多家知名的客户合作了多种形态的机器人产品。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:08</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">全球首个“零碳机场”在内蒙古鄂尔多斯建成</h3>
+                    <div class="content-body">【全球首个“零碳机场”在内蒙古鄂尔多斯建成】财联社7月25日电，全球首个零碳机场技术成果发布会7月25日在内蒙古鄂尔多斯举行。经中国质量认证中心、中国交通运输协会审定鉴定表明，鄂尔多斯伊金霍洛国际机场实现整体净碳排放量达到了“零碳机场”标准，标志着全球首个零碳机场正式建成，技术成果总体达到国际领先水平。目前，机场清洁能源占比达90%以上，年消纳风光发电量超2100万度，供暖制冷系统年运行能耗减少60%，年运行成本降低50%，年节省天然气260万立方米。实现零化石燃料、零氟利昂、零冷却水供能。全球首创的基于二氧化碳冷热一体化的“风-光-储-冷-热-电”零碳能源系统技术路线颠覆了传统化石能源供能体系，具备在民航机场、产业园区、算力中心、制造工厂等场景产业化应用和规模化推广的条件，对节能降碳具有重要意义。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:18</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">公司公告</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">【电报解读】三星电子、SK集团与美企签下9500亿美元半导体大单！分析师看好半导体材料行业正同时获得“景气上行、先进工艺通胀、份额提升、国产替代”四重驱动，这家公司全面切入多家主流晶圆制造企业供应链</h3>
+                    <div class="content-body">三星电子、SK集团与美企签下9500亿美元半导体大单！分析师看好半导体材料行业正同时获得“景气上行、先进工艺通胀、份额提升、国产替代”四重驱动，这家公司全面切入国内多家主流晶圆制造企业供应链，另一家已完成在长鑫存储等国内头部集成电路制造企业在内的大部分产线端验证。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">20:08</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">宏观经济</span> <span class="topic-chip">股市政策</span></div>
+                    </div>
+                    <h3 class="news-title">第八届民营企业合作大会在宜宾召开</h3>
+                    <div class="content-body">【第八届民营企业合作大会在宜宾召开】财联社7月25日电，第八届民营企业合作大会7月25日在四川省宜宾市召开。市场监管总局党组成员、副局长，中国个体劳动者协会会长束为出席大会并作主旨演讲，四川省人民政府党组成员、副省长任京东出席大会并致辞。本届大会以“立上游，开新局”为主题，全国300余家民营企业代表，以及专家学者、行业代表汇聚宜宾，共话发展新机遇、共探合作新路径、共绘产业新蓝图。大会立足新时代民营经济发展大局，紧扣新质生产力培育、数实深度融合、产业链协同融通发展主线，设置主题大会、民营企业数智化转型促进活动、企业专项对接会、宜宾市城市宣传推广活动、民营企业品牌形象展示等系列活动，内容覆盖数字经济、人工智能、生物医药、现代农业、先进制造等重点领域，推出多个优质产业项目，为区域产业建圈强链、民营企业提质升级注入强劲动能。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:54</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">公司公告</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">中国贸促会副会长刘健男赴莫桑比克出席2026年中国与葡语国家企业经贸合作洽谈会</h3>
+                    <div class="content-body">【中国贸促会副会长刘健男赴莫桑比克出席2026年中国与葡语国家企业经贸合作洽谈会】财联社7月25日电，7月22日至25日，中国贸促会副会长刘健男赴莫桑比克出席2026年中国与葡语国家企业经贸合作洽谈会。本届洽谈会由中国贸促会、莫桑比克投资出口促进局和澳门特别行政区招商投资促进局共同倡议，11家中国和葡语国家贸易投资促进机构主办，以“投资物流基建 驱动发展引擎”为主题，吸引了来自中国内地、澳门及各葡语国家超350位政商界代表参会。其中，来自基建工程、机械制造、农林产业、金融商贸、物流交通、法律服务等领域共40余名中国内地企业代表参加洽谈会及有关活动。刘健男表示，中国与葡语国家在发展战略、资源禀赋、产业结构等方面经济互补性强、利益契合点多，既有现实需求，也有天然优势，更有内在动力。中国愿与葡语国家继续扩大贸易往来、深化投资合作、促进产业合作，推动产业链供应链融合发展，把互利共赢蛋糕越做越大，切实惠及各国人民。出访期间，刘健男分别会见莫桑比克经济部贸易国务秘书格里斯普斯、莫桑比克投资出口促进局局长马沙瓦，就加强高质量共建“一带一路”合作、共享贸易投资合作优质平台、深化中葡论坛机制下合作等议题进行交流探讨。刘健男还调研了中国石油莫桑比克公司、中国路桥莫桑比克办事处和马普托—卡滕贝大桥及连接线项目。</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="国际市场">
+                <h2 class="topic-heading">
+                    <span class="topic-name">国际市场</span>
+                    <span class="topic-count">6</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">20:01</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">今年洋山口岸国际航行船舶进出港数量突破6000艘次</h3>
+                    <div class="content-body">【今年洋山口岸国际航行船舶进出港数量突破6000艘次】财联社7月25日电，从上海洋山边检站获悉，2026年7月25日18时30分，利比里亚籍“雄心”轮顺利靠泊洋山港冠东码头，该轮在港期间将装卸1.1万个标箱。至此，今年以来进出洋山口岸的国际航行船舶总量突破6000艘次。作为上海对外开放和外贸进出口的核心枢纽，高密度的大船流量，充分彰显上海外贸经济强劲韧性，有力支撑区域外向型经济稳进提质。除船量到达新节点外，据上海边检总站洋山边检站统计，今年以来该站累计查验入出境（港）人员14.6万余人次，为8500多名远洋船员高效办理登离轮换班手续，口岸航运活跃度、船舶周转效率持续处于全球港口领先地位。 （澎湃新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">21:33</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">第二艘国产18万方超大型LNG运输船今天交付</h3>
+                    <div class="content-body">【第二艘国产18万方超大型LNG运输船今天交付】财联社7月25日电，在江苏南通招商重工码头，我国自主设计建造的第二艘18万立方米超大型LNG运输船“果阿”轮顺利交付。LNG运输船是专门用于运输零下163℃低温液化天然气的特种船舶，因设计与建造工艺难度极高，被誉为“造船业皇冠上的明珠”。本次交付的“果阿”轮总长298.8米，型宽48米，兼具低蒸发损耗、绿色低碳、节能环保等突出性能，技术指标达到国际先进水平。据统计，2026年以来南通地区已有50多艘新造船舶完成出口交付。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">20:49</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">叙利亚过渡政府总统与联合国秘书长在大马士革举行会晤</h3>
+                    <div class="content-body">【叙利亚过渡政府总统与联合国秘书长在大马士革举行会晤】财联社7月25日电，叙利亚过渡政府总统沙拉当地时间7月25日在首都大马士革会见了联合国秘书长古特雷斯及其代表团。叙利亚过渡政府外交部长希巴尼及其他几位官员出席会见。会晤期间，双方探讨了如何加强叙利亚与联合国在人道主义和发展领域的合作，支持重建工作，并重申尊重叙利亚的主权、统一和领土完整。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:23</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">法国山火过火面积创纪录</h3>
+                    <div class="content-body">【法国山火过火面积创纪录】财联社7月25日电，法国内政部长洛朗·努涅斯今天（7月25日）在跨部门危机管理中心通报全国山火形势时表示，今年法国山火累计过火面积已接近9.8万公顷，创历史最高纪录。其中，仅吉伦特省的过火面积就已超过4万公顷。目前，吉伦特省、朗德省和瓦尔省仍有多处火情尚未得到控制。努涅斯呼吁民众避免前往吉伦特省火灾区域，为消防救援工作创造条件。他表示，消防员和军方正集中力量防守火场边缘，并已做好应对下午风向变化的准备，以防火势进一步蔓延。 （CCTV国际时讯）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:17</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span> <span class="topic-chip">宏观经济</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">吉尔吉斯斯坦总统扎帕罗夫会见王毅</h3>
+                    <div class="content-body">【吉尔吉斯斯坦总统扎帕罗夫会见王毅】财联社7月25日电，吉尔吉斯斯坦总统扎帕罗夫24日会见在吉访问的中共中央政治局委员、外交部长王毅。扎帕罗夫请王毅转达对习近平主席的亲切问候，热烈祝贺中国共产党成立105周年，表示在中国共产党领导下，中国人民在社会主义现代化建设中取得辉煌成就，吉方对此由衷钦佩。好邻居，金不换。对华关系是吉方对外政策优先方向。吉中两国是发展繁荣的同路人，更是天然合作伙伴。吉方珍视双方相互尊重、平等互利、睦邻友好的战略伙伴关系，愿学习借鉴中国治国理政经验，加强经贸、投资、农业、人文等领域互利合作，大力推进中吉乌铁路等重点项目，为在吉中国企业提供良好营商环境，维护企业合法权益。吉方坚定支持中方维护自身核心利益。吉方加入了世界人工智能合作组织、国际调解院，以实际行动支持中方提出的四大全球倡议，愿进一步加强在联合国、中国—中亚机制等多边框架内的沟通协调，携手促进地区和世界和平发展。<br><br>王毅转达习近平主席对扎帕罗夫的良好祝愿，表示扎帕罗夫总统执政以来，锐意进取、革故鼎新，吉方经济快速增长，民生福祉持续改善，国家面貌焕然一新。相信在总统先生领导下，“新吉尔吉斯斯坦”建设必将取得新的更大成就。作为友好邻邦和亲密伙伴，中方将一如既往坚定支持吉方的独立、主权和领土完整，坚定支持吉方走符合本国国情的发展道路。<br><br>王毅表示，中国刚刚隆重庆祝中国共产党成立105周年。中国共产党致力于中华民族的千秋伟业，百年恰是风华正茂。习近平总书记发表重要讲话，全面回顾中国共产党带领全国各族人民走过的光辉历程，深刻揭示中国共产党之所以能够不断铸就辉煌的优秀特质。当前，中国共产党正带领全国人民全面推进“十五五”规划落地实施，以中国式现代化全面推进强国建设、民族复兴伟业。吉方也在积极实施“2030年前国家发展纲要”。中方愿同吉方加强发展战略对接，将两国元首重要共识转化为更多可视化成果，提升互利合作水平，扩大人文交流，夯实中吉命运共同体根基。中方祝贺吉方高票当选联合国安理会非常任理事国，期待同吉方加强联合国事务协调配合，将支持吉方办好上海合作组织比什凯克峰会，为促进世界和平发展繁荣作出更大贡献。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:48</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">财联社7月25日电，据报道，花旗等多家金融机构参与融资，支持日本5500亿美元对美投资计划。</h3>
+                    <div class="content-body">财联社7月25日电，据报道，花旗等多家金融机构参与融资，支持日本5500亿美元对美投资计划。</div>
+                </article>
+                
+                </div>
+            </section>
+            
+    </main>
+</div>
+<script>
+    const searchInput = document.getElementById('search');
+    const topicPills = document.querySelectorAll('.topic-pill');
+    const sections = document.querySelectorAll('.topic-section');
+    let activeTopic = 'all';
+
+    function updateFilter() {
+        const query = (searchInput.value || '').toLowerCase();
+        sections.forEach(section => {
+            const topic = section.dataset.topic;
+            const visibleByTopic = activeTopic === 'all' || activeTopic === topic;
+            let hasVisibleCard = false;
+            section.querySelectorAll('.news-card').forEach(card => {
+                const text = card.innerText.toLowerCase();
+                const visible = visibleByTopic && text.includes(query);
+                card.style.display = visible ? '' : 'none';
+                if (visible) hasVisibleCard = true;
+            });
+            section.style.display = visibleByTopic && hasVisibleCard ? '' : 'none';
+        });
+    }
+
+    searchInput.addEventListener('input', updateFilter);
+
+    topicPills.forEach(pill => {
+        pill.addEventListener('click', () => {
+            const topic = pill.dataset.topic;
+            if (activeTopic === topic) {
+                activeTopic = 'all';
+                topicPills.forEach(p => p.classList.remove('active'));
+            } else {
+                activeTopic = topic;
+                topicPills.forEach(p => p.classList.toggle('active', p.dataset.topic === topic));
+            }
+            updateFilter();
+        });
+    });
+
+    document.querySelectorAll('.toggle-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const content = btn.closest('.topic-heading').nextElementSibling;
+            const expanded = btn.getAttribute('aria-expanded') === 'true';
+            content.style.display = expanded ? 'none' : 'block';
+            btn.setAttribute('aria-expanded', String(!expanded));
+            btn.textContent = expanded ? '展开' : '折叠';
+        });
+    });
+    </script>
+</body>
+</html>
