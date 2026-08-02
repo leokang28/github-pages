@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>财联社电报 - 2026-08-01</title>
+<style>
+    :root {
+        --color-b: #dc2626;
+        --color-c: #2563eb;
+        --color-other: #6b7280;
+        --bg: #f8fafc;
+        --card-bg: #ffffff;
+        --text: #1f2937;
+        --text-secondary: #64748b;
+        --border: #e2e8f0;
+        --radius: 12px;
+        --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    }
+    * { box-sizing: border-box; }
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+    }
+    .container { max-width: 900px; margin: 0 auto; padding: 24px 16px 64px; }
+    header { text-align: center; margin-bottom: 24px; }
+    header h1 { margin: 0 0 8px; font-size: 28px; }
+    header p { margin: 0; color: var(--text-secondary); }
+    .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+    .stat-card {
+        background: var(--card-bg);
+        border-radius: var(--radius);
+        padding: 16px;
+        box-shadow: var(--shadow);
+        text-align: center;
+        border-top: 4px solid var(--color-other);
+    }
+    .stat-card.stat-b { border-top-color: var(--color-b); }
+    .stat-card.stat-c { border-top-color: var(--color-c); }
+    .stat-value { font-size: 24px; font-weight: 700; }
+    .stat-label { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+    .filters {
+        position: sticky;
+        top: 0;
+        background: rgba(248, 250, 252, 0.96);
+        backdrop-filter: blur(8px);
+        padding: 12px 0;
+        margin-bottom: 16px;
+        border-bottom: 1px solid var(--border);
+        z-index: 10;
+    }
+    .search-box {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1px solid var(--border);
+        border-radius: 9999px;
+        font-size: 14px;
+        margin-bottom: 10px;
+        outline: none;
+    }
+    .search-box:focus { border-color: var(--color-c); }
+    .topic-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+    .topic-pill {
+        border: 1px solid var(--border);
+        background: var(--card-bg);
+        border-radius: 9999px;
+        padding: 6px 12px;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+    .topic-pill:hover, .topic-pill.active {
+        background: #eff6ff;
+        border-color: var(--color-c);
+        color: var(--color-c);
+    }
+    .topic-section { margin-bottom: 24px; }
+    .topic-heading {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 18px;
+        margin: 0 0 12px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid var(--border);
+    }
+    .topic-count {
+        background: var(--border);
+        color: var(--text-secondary);
+        font-size: 12px;
+        padding: 2px 8px;
+        border-radius: 9999px;
+    }
+    .toggle-btn {
+        margin-left: auto;
+        background: transparent;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 12px;
+        cursor: pointer;
+        color: var(--text-secondary);
+    }
+    .news-card {
+        background: var(--card-bg);
+        border-radius: var(--radius);
+        padding: 14px 16px;
+        margin-bottom: 10px;
+        box-shadow: var(--shadow);
+        border-left: 4px solid var(--color-other);
+        transition: transform 0.1s;
+    }
+    .news-card:hover { transform: translateY(-1px); }
+    .news-card.level-b { border-left-color: var(--color-b); }
+    .news-card.level-c { border-left-color: var(--color-c); }
+    .card-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+        flex-wrap: wrap;
+    }
+    .time-badge { font-size: 12px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+    .level-badge {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 2px 6px;
+        border-radius: 4px;
+        color: white;
+    }
+    .level-badge.level-b { background: var(--color-b); }
+    .level-badge.level-c { background: var(--color-c); }
+    .level-badge.level-other { background: var(--color-other); }
+    .topic-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+    .topic-chip {
+        font-size: 11px;
+        background: #f1f5f9;
+        color: var(--text-secondary);
+        padding: 2px 8px;
+        border-radius: 9999px;
+    }
+    .news-title { margin: 0 0 8px; font-size: 15px; line-height: 1.5; }
+    .content-body {
+        font-size: 14px;
+        color: var(--text-secondary);
+        white-space: pre-wrap;
+    }
+    .empty-state { text-align: center; color: var(--text-secondary); padding: 40px; }
+    @media (max-width: 640px) {
+        .stats { grid-template-columns: repeat(2, 1fr); }
+        header h1 { font-size: 22px; }
+    }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>📰 财联社电报</h1>
+        <p>2026-08-01 16:00 起 · 共 69 条</p>
+    </header>
+    <div class="stats">
+        
+        <div class="stat-card stat-total">
+            <div class="stat-value">69</div>
+            <div class="stat-label">总计</div>
+        </div>
+        
+
+        <div class="stat-card stat-b">
+            <div class="stat-value">3</div>
+            <div class="stat-label">Level B</div>
+        </div>
+        
+
+        <div class="stat-card stat-c">
+            <div class="stat-value">66</div>
+            <div class="stat-label">Level C</div>
+        </div>
+        
+
+        <div class="stat-card stat-other">
+            <div class="stat-value">0</div>
+            <div class="stat-label">其他</div>
+        </div>
+        
+    </div>
+    <div class="filters">
+        <input class="search-box" id="search" type="text" placeholder="搜索标题 / 内容 / 主题...">
+        <div class="topic-pills">
+            <button class="topic-pill" data-topic="其他">其他 (38)</button>
+<button class="topic-pill" data-topic="公司公告">公司公告 (16)</button>
+<button class="topic-pill" data-topic="行业动态">行业动态 (7)</button>
+<button class="topic-pill" data-topic="国际市场">国际市场 (5)</button>
+<button class="topic-pill" data-topic="宏观经济">宏观经济 (3)</button>
+        </div>
+    </div>
+    <main id="news-list">
+        
+            <section class="topic-section" data-topic="公司公告">
+                <h2 class="topic-heading">
+                    <span class="topic-name">公司公告</span>
+                    <span class="topic-count">16</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-b" data-topic="公司公告" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">00:03</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">美政府建议中东地区美国公民做好撤离准备</h3>
+                    <div class="content-body">【美政府建议中东地区美国公民做好撤离准备】财联社8月2日电，当地时间8月1日，美国国务院向身处中东地区的美国公民发出广泛安全警告，建议他们“考虑离开当地，或做好在局势升级时迅速撤离的准备”。<br><br>据此前消息，美国官员透露，华盛顿正考虑最快于本周末对伊朗发动新一轮军事打击。与此同时，伊朗方面也称，将进一步打击那些允许美军驻扎军事基地的国家。<br><br>美国国务院再次提醒，身处中东地区的人员应保持谨慎并提高警惕，同时做好应对航班取消、临时关闭领空以及其他旅行中断的准备。<br><br>公告还强调，计划前往中东地区的美国公民应认真重新考虑自己的出行计划。（央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:08</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">行业动态</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">金富科技：公司液冷产能和订单销量实现同比、环比稳步攀升</h3>
+                    <div class="content-body">【金富科技：公司液冷产能和订单销量实现同比、环比稳步攀升】财联社8月2日电，金富科技近日在机构调研时表示，液冷行业需求持续爆发、行业整体处于高景气扩产周期，市场供货需求旺盛。公司紧抓行业发展机遇，结合简易程序定增募投项目及自有资金扩产项目，快速推动液冷产线建设、设备采购、新增厂区装修等，液冷板块扩产工作全力加速推进。依托分批次产线投产落地，公司液冷产能和订单销量实现同比、环比稳步攀升，持续匹配下游客户不断增长的订单需求。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:34</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">商品期货</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">土耳其与伊拉克签署原油运输协议</h3>
+                    <div class="content-body">【土耳其与伊拉克签署原油运输协议】财联社8月2日电，土耳其能源和自然资源部当地时间8月1日宣布，土耳其国家石油管道公司（BOTAŞ）与伊拉克两家石油公司正式签署为期一年的原油运输协议。根据协议，土伊双方将高效利用原油管道，其中每日75万桶的输送能力将分配给伊拉克方。土耳其方面表示，该输油管道总设计日产能达150万桶。此前，伊拉克总理扎伊迪在访问土耳其期间曾表示，将每天向土耳其提供100万桶石油。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">00:52</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">商品期货</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">土耳其与伊拉克签署原油运输协议</h3>
+                    <div class="content-body">【土耳其与伊拉克签署原油运输协议】财联社8月2日电，当地时间8月1日，土耳其能源和自然资源部宣布，土耳其国家石油管道公司（BOTAŞ）与伊拉克两家石油公司正式签署为期一年的原油运输协议。根据协议，土伊双方将高效利用原油管道，其中每日75万桶的输送能力将分配给伊拉克方。土耳其方面表示，该输油管道总设计日产能达150万桶。<br><br>此前，伊拉克总理扎伊迪在访问土耳其期间曾表示，将每天向土耳其提供100万桶石油。（央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">23:45</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">知名登山家尼马尔·普尔亚遭遇雪崩身亡</h3>
+                    <div class="content-body">【知名登山家尼马尔·普尔亚遭遇雪崩身亡】财联社8月1日电，知名登山家尼马尔·普尔亚（Nirmal Purja）本周带领一支10人小队攀登海拔超8000米高峰布洛阿特峰时遭遇雪崩。普尔亚创办的登山公司Elite Exped周六（8月1日）在社交媒体发布声明，证实普尔亚不幸身亡。声明同时表示，登山小队的其他成员也不幸未能生还，但未透露具体细节。<br><br>尼马尔·普尔亚上周刚度过43岁生日。他曾于2019年仅用6个月完成攀登全球14座海拔超8000米高峰的壮举，过程被拍成Netflix纪录片《勇闯世界14高峰：挑战不可能》。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">23:16</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">乌克兰一电商仓库遭袭 造成1死7伤</h3>
+                    <div class="content-body">【乌克兰一电商仓库遭袭 造成1死7伤】财联社8月1日电，当地时间8月1日，乌克兰方面称，俄军使用“见证者”无人机，袭击了乌克兰一知名电商平台的一处仓库。事发时仓库内共有270名工作人员在岗。<br><br>据称，本次袭击造成该公司1名员工身亡，另有7人受伤入院，其中1人伤势严重。目前，俄罗斯方面对此暂无回应。（央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">23:09</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">意大利那不勒斯附近地震造成26人受伤</h3>
+                    <div class="content-body">【意大利那不勒斯附近地震造成26人受伤】财联社8月1日电，意大利民防部门1日发布公告说，截至目前，意大利南部那不勒斯附近7月31日晚发生的地震已造成26人受伤。<br><br>当地时间7月31日19时46分，那不勒斯附近的弗莱格雷营区域发生4.7级地震。此后至8月1日清晨，地震持续不断，共发生170余次地震。（央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:02</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">葡萄牙航空一客机起飞后因紧急情况返航</h3>
+                    <div class="content-body">【葡萄牙航空一客机起飞后因紧急情况返航】财联社8月1日电，葡萄牙航空公司一架从里斯本飞往巴西库里蒂巴的空客A330客机，在起飞后通报机上发生紧急情况，决定返航里斯本机场。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">20:24</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">高至2万美元 美签证保证金将涨价并长期化</h3>
+                    <div class="content-body">【高至2万美元 美签证保证金将涨价并长期化】财联社8月1日电，美国国务院将把面向部分国家公民的签证保证金制度长期化，50个国家的公民面临高达2万美元保证金。公告说，这项规定适用于以商务或旅游为目的申请美国B1、B2类签证的人员。领事官员可根据具体情况，将缴纳保证金作为发放签证的条件。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">20:16</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">尹志尧：中微公司5年内产能将超700亿元</h3>
+                    <div class="content-body">【 尹志尧：中微公司5年内产能将超700亿元】《科创板日报》1日讯，科创板企业中微公司今日在上海临港举行总部大楼落成暨22周年庆典，公司在临港的研发加生产格局正式形成。中微公司董事长尹志尧现场透露，公司已在上海临港、金桥，南昌及在建的成都、广州布局五大研发生产基地，当前整体建筑面积达60万平方米，预计未来5年左右增至90万平方米，届时整体生产能力将超过700亿元。 （科创板日报记者 郭辉）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:23</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">美驻以大使馆发布安全警告 敦促在中东美国公民考虑撤离</h3>
+                    <div class="content-body">【美驻以大使馆发布安全警告 敦促在中东美国公民考虑撤离】财联社8月1日电，美国驻以色列大使馆发布安全警告说，鉴于当前中东地区局势持续紧张，该地区安全环境依旧复杂，存在不可预测的升级风险。警告说，目前在中东地区的美国公民应当保持谨慎，提高警惕。同时，美国公民应为可能出现的航班取消、领空关闭以及潜在的旅行受阻做好准备。目前该地区部分航空公司已推迟恢复先前的航班计划，另有部分航线已被取消。美国大使馆强调，在中东地区的美国公民应当考虑撤离，或做好局势升级后随时撤离的准备。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:02</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">一艘LNG运输船通过霍尔木兹海峡时遭投射物击中</h3>
+                    <div class="content-body">【一艘LNG运输船通过霍尔木兹海峡时遭投射物击中】财联社8月1日电，根据安全情报公司和船舶追踪数据显示，一艘载有卡塔尔货物的液化天然气运输船在通过霍尔木兹海峡时遭到投射物击中。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:28</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">日本北海道航空系统一客机起落架舱门发生故障 将紧急降落</h3>
+                    <div class="content-body">【日本北海道航空系统一客机起落架舱门发生故障 将紧急降落】财联社8月1日电，据日本北海道航空系统公司8月1日发布的消息称，该公司一架原计划从札幌丘珠机场飞往利尻机场的客机（航班号：JAL2787）发生故障，目前正在空中盘旋。据介绍，该飞机于当地时间当天15时从丘珠机场起飞，随后确认到机体右侧起落架舱门（用于收纳轮胎的舱门）出现松动。北海道航空系统公司因此决定取消该航班飞往利尻机场的航程。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:00</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月1日电，印度煤炭公司7月份产量为5040万吨，同比增长8.6%；7月销量6370万吨，同比增长18%。</h3>
+                    <div class="content-body">财联社8月1日电，印度煤炭公司7月份产量为5040万吨，同比增长8.6%；7月销量6370万吨，同比增长18%。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:41</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">乌克兰谋求使用“星链”的更大权限</h3>
+                    <div class="content-body">【乌克兰谋求使用“星链”的更大权限】财联社8月1日电，日前访问美国期间，乌克兰总统泽连斯基要求美国总统特朗普等美方官员劝说太空探索技术公司（SpaceX）创始人埃隆·马斯克，希望马斯克允许乌军利用SpaceX旗下卫星互联网系统“星链”打击俄罗斯境内弹道导弹发射装置。当下，俄方已开始部署一套类似“星链”的低轨道卫星系统。另据美国方面消息称，特朗普称会考虑泽连斯基的要求，但未明确允诺。此外，马斯克拒绝了泽连斯基此次访美期间提出的会面请求。目前，白宫、乌克兰驻美国大使馆以及SpaceX均未置评上述消息。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:14</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">海南矿业：星之海7月份锂盐总产量达1869吨 创月度产量新高</h3>
+                    <div class="content-body">【海南矿业：星之海7月份锂盐总产量达1869吨 创月度产量新高】财联社8月1日电，据海南矿业消息，海南星之海新材料有限公司（简称“星之海”）7月份锂盐总产量达1869吨，创月度产量新高。</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="行业动态">
+                <h2 class="topic-heading">
+                    <span class="topic-name">行业动态</span>
+                    <span class="topic-count">7</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-b" data-topic="行业动态" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">20:13</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">债券固收</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">8月1日周六《新闻联播》要闻26条</h3>
+                    <div class="content-body">【8月1日周六《新闻联播》要闻26条】财联社8月1日电，今天《新闻联播》主要内容有：<br>1、《求是》杂志发表习近平总书记重要文章《加快建设健康中国》；<br>2、新思想引领新征程：在党的旗帜下书写强军兴军新荣光；<br>3、我国现代化水网建设提速；<br>4、邮政行业寄递业务量2030年将达2900亿件；<br>5、第十二批国家组织药品集采开标 药品可及性持续提升；<br>6、超长期特别国债资金精准发力 加快补齐民生短板；<br>7、铁路暑运过半 消夏旅游列车激发消费活力；<br>8、水利部发布《中国节约用水报告2025》；<br>9、《退役军人就业创业促进条例》今起正式实施；<br>10、《黄岩岛国家级自然保护区管理办法》印发；<br>11、中东部高温天气持续 东北局地防汛救灾加紧进行；<br>12、中国—乌兹别克斯坦“经认证的经营者”（AEO）互认安排正式实施；<br>13、穗深城际全线贯通 广深两大机场轨道直连；<br>14、雄商高铁河北段今天进入运行试验阶段；<br>15、海南首个“华龙一号”核电机组并网发电；<br>16、百吨级纯电双向行驶无人驾驶矿用自卸车成功投运；<br>17、第三批中国专家组赴刚果（金）支援埃博拉疫情防控； <br>18、2026中国西藏第七届跨喜马拉雅国际公路自行车极限赛开幕；<br>19、美媒披露美以欲猛烈轰炸伊朗能源设施 伊朗称已制定全面应对计划；<br>20、西班牙飞地移民危机死亡人数升至67人 意大利暂停与西班牙的申根自由通行机制 法德称加强边境管控；<br>21、法国东南部林火再度蔓延 罗马尼亚全国因干旱缺电进入警报状态 世界气象组织称厄尔尼诺持续增强；<br>22、美称向乌转让导弹生产技术须非常谨慎；<br>23、哈马斯称移交武器前提是以军撤离加沙；<br>24、人工智能发展推升一季度全球商品贸易；<br>25、美军一架F-35隐形战机在加州坠毁；<br>26、遭强烈反对 国际足联放弃新商业提案。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:23</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">公司公告</span> <span class="topic-chip">商品期货</span></div>
+                    </div>
+                    <h3 class="news-title">耀鸿电子超50亿元人工智能硬件材料研发生产基地项目在无锡落地</h3>
+                    <div class="content-body">【耀鸿电子超50亿元人工智能硬件材料研发生产基地项目在无锡落地】财联社8月1日电，据“无锡发布”消息，7月31日，耀鸿电子AI智算高速主板核心材料研发生产基地项目在锡签约落地，项目总投资超50亿元。该项目主要生产面向AI服务器、光模块、高端芯片等领域的高端覆铜板，并配套建设研发总部与重点实验室，重点攻关M10高速覆铜板等前沿技术，加快推动高端电子封装基材的国产化替代进程。项目预计今年年内开工，达产后将年产3000万平方米的AI高速封装载板超薄覆铜板和6000万米的超薄粘结片。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:50</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">伊利集团董事长潘刚：联合英伟达、腾讯等启动乳业数纽中心建设</h3>
+                    <div class="content-body">【伊利集团董事长潘刚：联合英伟达、腾讯等启动乳业数纽中心建设】财联社8月1日电，在2026世界奶业大会开幕式上，伊利集团董事长、总裁潘刚在发言中宣布，伊利联合英伟达、腾讯等启动乳业数纽中心建设，首创“数据+平台+标准+人才”四位一体模式，填补行业垂直领域云数据空白。 （澎湃新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">20:36</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">我国茶产业链规模已迈入万亿元</h3>
+                    <div class="content-body">【我国茶产业链规模已迈入万亿元】财联社8月1日电，我国茶产业链规模去年已迈入万亿元。今年上半年，我国茶叶出口量微降2.5%，但出口额逆势增长5.65%，均价上涨8.4%。 （光明日报）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">20:15</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">华虹宏力白鹏：将与中微长期深度协同 深化联合研发加速国产设备规模化应用</h3>
+                    <div class="content-body">【华虹宏力白鹏：将与中微长期深度协同 深化联合研发加速国产设备规模化应用】《科创板日报》1日讯，华虹宏力董事长兼总裁白鹏今日在中微公司成立22周年庆典致辞表示，长期以来，华虹与中微，双方在晶圆制造与核心设备上下游紧密联动，共同推进国产装备在制造线落地应用。“当下半导体行业机遇与挑战并存，构建自主可控、安全稳健的产业链，是共同的使命。面向未来，将继续深化与中微的战略合作，深化联合研发，加速国产设备的迭代及规模化应用。” （科创板日报记者 郭辉）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:54</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">股市政策</span></div>
+                    </div>
+                    <h3 class="news-title">国家医保局召开全国深化医保基金管理突出问题专项整治工作中期推进会</h3>
+                    <div class="content-body">【国家医保局召开全国深化医保基金管理突出问题专项整治工作中期推进会】财联社8月1日电，国家医保局会同最高人民法院、最高人民检察院、公安部、财政部、国家卫生健康委、税务总局、市场监管总局、国家中医药局、国家药监局，10部门联合召开全国深化医保基金管理突出问题专项整治工作中期推进会。会议强调，各级各部门要提高政治站位，坚决贯彻落实中央纪委国家监委集中整治工作调度会精神，压实责任、细化举措、强化工作落实。要突出整治重点，认真做好下阶段工作。以飞检为抓手、线索为指向，持续严查严处；以自查自纠、事前提醒、警示教育等创新手段为载体，促进行业自律；以精细化管理为路径，推动系统治理；以健全长效机制为支撑，强化标本兼治；以整治为民为目标，增进民生福祉；以部门协同为重点，凝聚监管合力。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:11</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月1日电，法国汽车行业协会数据显示，7月份法国新车注册量同比增长9%，达到126,808辆。特斯拉7月法国销量增长86%，达2429辆。</h3>
+                    <div class="content-body">财联社8月1日电，法国汽车行业协会数据显示，7月份法国新车注册量同比增长9%，达到126,808辆。特斯拉7月法国销量增长86%，达2429辆。</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="其他">
+                <h2 class="topic-heading">
+                    <span class="topic-name">其他</span>
+                    <span class="topic-count">38</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-b" data-topic="其他" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">19:28</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">美国驻约旦使馆：中东局势可能进一步升级</h3>
+                    <div class="content-body">【美国驻约旦使馆：中东局势可能进一步升级】财联社8月1日电，美国驻约旦大使馆8月1日发布安全警告说，中东地区安全形势依旧复杂，地区局势可能进一步升级。美驻约旦使馆建议目前身处中东地区的美国公民保持高度警惕，并为可能的航班取消、空域阶段性关闭及旅行中断做好准备。身处中东以外地区的美国公民应重新考虑前往或途经该地区的行程。该使馆还建议美国公民避免前往约旦境内美军基地，以及“有大量警力部署的危险区域”。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">05:18</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">新一轮热浪袭击克罗地亚 多地发生野火</h3>
+                    <div class="content-body">【新一轮热浪袭击克罗地亚 多地发生野火】财联社8月2日电，克罗地亚近日遭受新一轮热浪袭击，红色高温预警1日覆盖亚得里亚海沿岸和首都萨格勒布等地，普拉等地当天发生多起野火。<br><br>克国家水文气象局网站上的信息显示，亚得里亚海沿岸和萨格勒布等多地处于红色高温预警状态，另有一些地区处于次一级的橙色高温预警中。根据气象预测，高温天气要持续到下周。<br><br>据悉，该国普拉和拉宾地区当天发生多起野火火灾。<br><br>克罗地亚6月下旬遭遇今夏首波热浪，沿海城市斯普利特气温创历史新高。高温天气不仅使野火频发，也令一些河流水位降至历史低值。（央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:49</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">美国华盛顿州山火蔓延 多地发布最高级别疏散令</h3>
+                    <div class="content-body">【美国华盛顿州山火蔓延 多地发布最高级别疏散令】当地时间8月1日，受极端天气影响，美国华盛顿州斯波坎县一场山火迅速蔓延，迫使当地居民撤离。消防人员正在全力控制火势。当地应急管理部门表示，斯波坎地区多地已发布最高级别的三级疏散令，敦促居民立即撤离，以躲避危及生命的危险情况。当地一所社区学院已设立临时避难所，接收撤离居民。据华盛顿州消防局称，斯波坎地区的大火于当天中午左右燃起，起火原因正在调查中。州长办公室表示，华盛顿州全州共有12起大火正在燃烧，过火面积超800平方公里。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:40</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">金风科技参建Ummbila Emoyeni一期风电项目实现商业运营</h3>
+                    <div class="content-body">【金风科技参建Ummbila Emoyeni一期风电项目实现商业运营】财联社8月2日电，据金风科技消息，近日，由南非Seriti Green开发的Ummbila Emoyeni项目群一期风电项目正式投入商业运营。该项目装机容量达155MW，年发电量4.8亿度，预计可满足约50万户家庭的用电需求，每年减少碳排放约40万吨。配置25台金风科技GWH182-6.2MW智能风电机组，叶轮直径达183.5米，是截至目前南非叶轮直径最大的在运风电项目。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:16</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">古巴多省发生断电</h3>
+                    <div class="content-body">【古巴多省发生断电】财联社8月2日电，古巴电力联盟8月1日通报，当地时间18时7分，该国马坦萨斯省至比那尔德里奥省一带电力系统发生断电。古巴电力联盟在社交媒体上表示，断电是线路跳闸所致。受美国制裁影响，古巴长期以来难以进口燃料及发电厂设备，发电厂设备老旧难更新，全国电力供应紧张。2024年10月以来，因电力设施故障、飓风侵袭等原因，古巴曾多次全国大停电。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:51</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">中央气象台8月2日06时继续发布暴雨橙色预警</h3>
+                    <div class="content-body">【中央气象台8月2日06时继续发布暴雨橙色预警】财联社8月2日电，中央气象台8月2日06时继续发布暴雨橙色预警：预计，8月2日08时至3日08时，内蒙古中东部、吉林东部、辽宁东部、陕西东部和南部、山西西部和北部、河北北部、北京西部和北部、四川中东部和南部、重庆中西部、贵州西部、云南中北部和南部、广西南部沿海、广东中南部等地部分地区有大到暴雨，其中，陕西南部、四川盆地东北部、重庆中部、贵州西部、云南北部、广西南部沿海、广东南部沿海等地部分地区有大暴雨，四川盆地东北部、广东东南部沿海等地局地特大暴雨（250～320毫米）。上述部分地区伴有短时强降水（最大小时降雨量20～50毫米，局地可超过80毫米），局地有雷暴大风或冰雹等强对流天气。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:20</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">美计划本周末发动“猛烈轰炸” 伊朗：全面反击方案已就绪</h3>
+                    <div class="content-body">【美计划本周末发动“猛烈轰炸” 伊朗：全面反击方案已就绪】财联社8月2日电，美国国务院8月1日向中东地区美国公民发出广泛安全警告，建议其考虑撤离或做好迅速撤离准备。据美方消息，美以正计划对伊朗能源设施发动“迄今最猛烈的轰炸”，行动或持续整个周末。不过，美总统特朗普尚未下达最终行动命令。另据伊朗方面1日凌晨消息，一名伊朗高级安全官员透露，伊方已经制定了一套全面的反击方案，反击目标包括以色列的关键基础设施和中东地区的美国能源设施，随时可以启动这项方案。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:50</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">多瑙河水位持续下降 匈牙利保克什核电站将完全关闭</h3>
+                    <div class="content-body">【多瑙河水位持续下降 匈牙利保克什核电站将完全关闭】财联社8月2日电，当地时间8月2日凌晨，匈牙利总理毛焦尔表示，由于多瑙河水位进一步下降，保克什核电站最后两台发电机组中的一台将于当天凌晨1时30分关闭，该核电站的发电量将降至240兆瓦。此外，据毛焦尔的说法，该核电站还将面临44年来的首次完全关闭。<br><br>保克什核电站共有4台机组，先后建成于1982年至1987年，总装机容量约2000兆瓦，其发电量约占匈牙利总发电量的一半。保克什核电站利用多瑙河水进行冷却，当夏季水温较高时，从反应堆排出的冷却水温度可能过高，从而损害河流生态系统。<br><br>匈牙利水务部门数据显示，截至当地时间1日23时，多瑙河布达佩斯段水位已降至16厘米。自5月以来，受多轮热浪、降雨减少等因素影响，多瑙河部分河段的水位降至历史低位。（央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">04:38</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">莫斯科餐厅爆炸已致3死21伤 俄称系自制炸弹袭击</h3>
+                    <div class="content-body">【莫斯科餐厅爆炸已致3死21伤 俄称系自制炸弹袭击】财联社8月2日电，当地时间8月1日，俄罗斯国家反恐委员会表示，莫斯科市中心一家餐厅发生的事故系自制爆炸装置爆炸所致。<br><br>通报称，一名女子企图携带自制爆炸装置闯入餐厅，被餐厅保安阻拦，随后爆炸装置启动，该女子和保安当场死亡。此外，事故还造成一名顾客死亡。截至目前，事故已造成3人死亡、21人受伤。<br><br>俄罗斯莫斯科市中心一家餐饮店8月1日发生爆炸。据悉，发生爆炸的餐厅位于俄罗斯著名地标建筑库德林广场大楼。（央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">04:05</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">秘鲁一架小型飞机坠毁 机上十余人遇难</h3>
+                    <div class="content-body">【秘鲁一架小型飞机坠毁 机上十余人遇难】财联社8月2日电，当地时间8月1日，一架载有十余人的小型观光飞机在秘鲁伊卡大区纳斯卡省坠毁。据悉，这架飞机从皮斯科机场起飞，执行纳斯卡线条观光飞行任务，在起飞数分钟后与控制塔失去联系。<br><br>初步报告显示，机上人员全部遇难，但官方尚未发布正式声明。目前，秘鲁有关部门已展开调查，遇难者身份及事故原因仍在进一步确认中。（央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">04:05</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">美国纽约州罗切斯特发生枪击事件 1人死亡</h3>
+                    <div class="content-body">【美国纽约州罗切斯特发生枪击事件 1人死亡】财联社8月2日电，当地时间8月1日凌晨，美国纽约州罗切斯特发生一起枪击事件，造成1名女子死亡、3人受伤。<br><br>警方表示目前仍在调查案件线索，寻找嫌疑人。（央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:49</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">2026暑期档电影票房破70亿</h3>
+                    <div class="content-body">【2026暑期档电影票房破70亿】财联社8月1日电，据网络平台数据，截至目前2026年暑期档电影总票房（含预售）突破70亿元。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">02:19</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">以官员称美接近批准对伊军事打击 以方保持高度警惕</h3>
+                    <div class="content-body">【以官员称美接近批准对伊军事打击 以方保持高度警惕】财联社8月2日电，当地时间8月1日，据一名以色列官员透露，以色列方面评估认为，美国总统特朗普目前比以往任何时候都更接近批准对伊朗发动重大军事袭击，但相关计划尚未最终确定。<br><br>根据该官员披露的预案细节，美方考虑对伊朗的特定能源设施进行精准且受限的打击。评估显示，美方目前倾向于不让以色列参与第一阶段的最初袭击。但以色列方面认为，美国一旦对伊朗发动重大袭击，很可能会直接引发伊朗对以色列的军事报复，而以色列届时或将被迫卷入冲突并加入战局。目前，以色列国防机构因此保持高度警惕。（央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">02:16</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">俄罗斯莫斯科市中心一餐饮店发生爆炸 造成人员伤亡</h3>
+                    <div class="content-body">【俄罗斯莫斯科市中心一餐饮店发生爆炸 造成人员伤亡】财联社8月2日电，当地时间8月1日，俄罗斯莫斯科市中心一间餐饮店发生爆炸，多辆消防车和救护车驶往事故发生地。初步消息显示爆炸由燃气泄漏引起。<br><br>莫斯科警方称，事故已造成3人死亡、15人受伤。（央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">02:16</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">欧盟宣布将召开紧急会议讨论休达移民危机</h3>
+                    <div class="content-body">【欧盟宣布将召开紧急会议讨论休达移民危机】财联社8月2日电，当地时间8月1日，欧盟宣布将于4日以视频会议形式召开欧盟成员国内政部长紧急会议，讨论西班牙飞地休达移民危机及欧盟应对措施。此次会议由西班牙提议召开。<br><br>西班牙首相桑切斯此前已致信欧盟理事会轮值主席国爱尔兰、欧盟委员会主席冯德莱恩和欧洲理事会主席科斯塔，呼吁欧盟协调应对当前移民危机。（央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">23:59</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">美军称已部署一架重型运输直升机至中东地区</h3>
+                    <div class="content-body">【美军称已部署一架重型运输直升机至中东地区】财联社8月1日电，当地时间8月1日，美国中央司令部表示，一架美国陆军CH-47“支奴干”运输直升机准备在中东地区降落。<br><br>据悉，CH-47“支奴干”是一款重型运输直升机，可在各种作战和复杂环境中执行运输人员、装备及物资的任务。（央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">23:23</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">伊朗动用“新武器”</h3>
+                    <div class="content-body">【伊朗动用“新武器”】财联社8月1日电，据伊朗媒体1日报道，伊朗陆军发言人称伊朗近期使用了新型无人机，具体细节将在未来几天内公布。（环球时报）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">23:14</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">美前官员：武器库存不足令美政府承压</h3>
+                    <div class="content-body">【美前官员：武器库存不足令美政府承压】财联社8月1日电，7月31日，前美国国家安全委员会官员查尔斯·库普钱在采访中表示，美国对伊朗的战事已变成消耗战，美国使用并给盟友提供了大量“爱国者”和“战斧”导弹以及精确制导武器，导致其库存储备快速消耗。<br><br>查尔斯·库普钱还表示，武器库存不足让美国承压，特朗普政府或将被迫寻求用外交手段来解决当前问题。（央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:44</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">国家防总、应急管理部针对重庆启动防汛四级应急响应</h3>
+                    <div class="content-body">【国家防总、应急管理部针对重庆启动防汛四级应急响应】财联社8月1日电，据气象部门预报，8月1日至3日，重庆部分地区有大到暴雨、局地大暴雨，山洪和地质灾害、中小河流洪水等灾害风险较高。根据《国家防汛抗旱应急预案》及有关规定，国家防总、应急管理部决定于8月1日22时针对重庆启动防汛四级应急响应。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:19</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月1日电，伊拉克埃尔比勒西南部炼油厂火灾已被扑灭，已开始逐步恢复生产。</h3>
+                    <div class="content-body">财联社8月1日电，伊拉克埃尔比勒西南部炼油厂火灾已被扑灭，已开始逐步恢复生产。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">21:41</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">冲绳要求美军撤走海马斯</h3>
+                    <div class="content-body">【冲绳要求美军撤走海马斯】财联社8月1日电，冲绳县政府表示，驻冲绳美军第12海军陆战队濒海作战团在最新型反舰导弹系统“海军/海军陆战队远征舰艇拦截系统”（NMESIS）和用于短程防空的“海上防空综合系统”（MADIS）正式部署后，仍继续运用高机动性火箭炮系统（“海马斯”）和榴弹炮，与最初的方针不符，因此冲绳县已向日本防卫省冲绳防卫局提出要求，将其撤走。 （参考消息）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">21:17</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">日本熊本地区发生4.7级地震</h3>
+                    <div class="content-body">【日本熊本地区发生4.7级地震】财联社8月1日电，据日本气象厅消息，当地时间8月1日21时47分左右，熊本地区发生4.7级地震，最大震感为震度5弱，震源深度10公里。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">20:58</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">泽连斯基：乌军击沉一艘俄罗斯10万吨集装箱船</h3>
+                    <div class="content-body">【泽连斯基：乌军击沉一艘俄罗斯10万吨集装箱船】财联社8月1日电，乌克兰总统泽连斯基在社交平台发文称，乌军于夜间发起打击行动，对黑海、亚速海水域海上目标及俄罗斯境内腹地设施实施多轮打击。一艘悬挂俄罗斯国旗的集装箱船“亚尼纳”号被乌方击中并沉没，该船载重吨位超10万吨。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">20:55</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">宁德时代与平陆运河集团签署战略合作协议</h3>
+                    <div class="content-body">【宁德时代与平陆运河集团签署战略合作协议】财联社8月1日电，宁德时代与平陆运河集团签署战略合作协议。9月正式投运后，平陆运河将全面推行电动船舶通航管理。首批试运营的电船将搭载宁德时代船用动力电池系统。此外，宁德时代还将与平陆运河集团共同运营“电池银行”租电服务，以切实降低船东的持船与运营成本。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:48</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">海南将增设7家岛内居民日用消费品免税店 2家今日开业</h3>
+                    <div class="content-body">【海南将增设7家岛内居民日用消费品免税店 2家今日开业】财联社8月1日电，在今年2月开设首批5家岛内居民日用消费品免税店的基础上，海南计划第二批开设7家岛内居民日用消费品免税店，其中三亚旺豪日用消费品免税店、文昌旺豪日用消费品免税店8月1日开业。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:24</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">山东发布高温橙色预警 最高气温超40℃</h3>
+                    <div class="content-body">【山东发布高温橙色预警 最高气温超40℃】财联社8月1日电，山东省气象台8月1日16时升级高温黄色预警为高温橙色预警：1日，山东省内陆大部地区已出现35℃以上的高温天气，潍坊青州谭坊和烟台芝罘港务局最高气温40.8℃。预计2日至5日，德州、滨州、东营、济南北部、淄博北部、潍坊中北部、青岛北部和烟台北部最高气温37～39℃，局部地区可达40℃以上，其他地区34～36℃。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:11</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月1日电，泽连斯基表示，乌克兰国家安全局袭击了巴什科尔托斯坦地区三座俄罗斯炼油厂。</h3>
+                    <div class="content-body">财联社8月1日电，泽连斯基表示，乌克兰国家安全局袭击了巴什科尔托斯坦地区三座俄罗斯炼油厂。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:07</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">我国首台掘爆机“翔龙号”在武汉下线</h3>
+                    <div class="content-body">【我国首台掘爆机“翔龙号”在武汉下线】财联社8月1日电，我国首台掘爆机“翔龙号”在湖北省武汉市中铁科工江夏制造基地下线。这款装备融合掘进法与钻爆法两大主流工法，填补了复杂地质隧道一体化施工装备领域的空白。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:41</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">雄安新区至商丘高速铁路河北段进入运行试验阶段</h3>
+                    <div class="content-body">【雄安新区至商丘高速铁路河北段进入运行试验阶段】财联社8月1日电，随着G55371次列车从雄安站开出，雄商高铁河北段正式进入运行试验阶段，为线路开通运营做最后冲刺。运行试验是通过模拟线路正式运营状态，对高铁运输组织、设备状态等进行全面“实战”检测。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:33</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">两部门联合印发“十五五”公共机构节能降碳工作方案</h3>
+                    <div class="content-body">【两部门联合印发“十五五”公共机构节能降碳工作方案】财联社8月1日电，国管局、国家发展改革委日前联合印发《“十五五”公共机构节能降碳工作方案》，从推进和实现公共机构碳达峰、促进资源节约集约利用、加快形成绿色生产生活方式三个方面对“十五五”时期公共机构节能降碳工作作出部署。方案提出，以2025年碳排放、能源资源消费为基数，到2030年，统计范围内公共机构单位建筑面积碳排放下降8.5%，单位建筑面积能耗下降5%，人均用水量下降3%。其中，公共机构碳排放强度降低是碳达峰碳中和综合评价考核的支撑性指标之一，公共机构人均用水量下降是落实水资源刚性约束制度考核二级指标之一，每年度都需要进行考核。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:32</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月1日电，伊朗西部伊斯兰阿巴德西吉尔附近听到爆炸声。</h3>
+                    <div class="content-body">财联社8月1日电，伊朗西部伊斯兰阿巴德西吉尔附近听到爆炸声。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:15</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">海南启动赤潮灾害Ⅲ级应急响应</h3>
+                    <div class="content-body">【海南启动赤潮灾害Ⅲ级应急响应】财联社8月1日电，从海南省海洋厅获悉，针对近期海南省西部海域出现的赤潮灾害，结合最新监测数据和灾害漂移趋势，为全力防范海洋生态风险、保障水产养殖安全，海南省海洋灾害应急专项工作办公室于2026年7月31日18时正式启动赤潮灾害Ⅲ级应急响应，统筹西部沿海市县及省直相关部门全面开展监测预警、巡查防控和应急处置工作。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:18</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">南部战区位黄岩岛领海领空和周边海空域开展多个实战化科目演练</h3>
+                    <div class="content-body">【南部战区位黄岩岛领海领空和周边海空域开展多个实战化科目演练】财联社8月1日电，中国人民解放军南部战区位黄岩岛领海、领空和周边海空域组织海空联合演训，重点演练侦察预警、威慑巡航、海空管制、联合突击等实战化科目，有效检验了部队海空协同、快速支援和体系制胜能力。黄岩岛是中国固有领土，菲方划设所谓黄岩岛“领海基线”非法无效。战区部队时刻保持高度戒备，坚决捍卫国家领土主权和海洋权益。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:40</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">伊朗军方称近期使用新型无人机</h3>
+                    <div class="content-body">【伊朗军方称近期使用新型无人机】财联社8月1日电，据伊朗方面当地时间8月1日消息，伊朗陆军发言人称伊朗近期使用了新型无人机，具体细节将在未来几天内公布。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:32</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">泽连斯基：“爱国者”拦截弹短缺 基辅遭袭受损严重</h3>
+                    <div class="content-body">【泽连斯基：“爱国者”拦截弹短缺 基辅遭袭受损严重】财联社8月1日电，乌克兰总统泽连斯基通报称，俄军对乌克兰的空袭已造成9人死亡、数十人受伤。基辅受损严重，18栋建筑、一所学校、立陶宛驻乌克兰大使馆以及多处基础设施遭到破坏，而乌方仅击落一枚俄军弹道导弹。泽连斯基表示，弹道导弹拦截效果有限，主要原因是“爱国者”防空系统拦截弹短缺。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:23</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">中足联与西甲联盟达成多项战略共识</h3>
+                    <div class="content-body">【中足联与西甲联盟达成多项战略共识】财联社8月1日电，中足联理事长李克敏在北京与西甲联盟主席哈维尔·特巴斯举行会谈。双方围绕中长期战略布局、青训共建及管理人员交流等议题深入交换意见，达成多项合作共识。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:08</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月1日电，科威特表示，伊朗发动的袭击造成重大物质损失，但未造成人员受伤。</h3>
+                    <div class="content-body">财联社8月1日电，科威特表示，伊朗发动的袭击造成重大物质损失，但未造成人员受伤。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:07</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">西班牙称“偷渡潮”平息 欧盟成员国表达关注和警惕</h3>
+                    <div class="content-body">【西班牙称“偷渡潮”平息 欧盟成员国表达关注和警惕】财联社8月1日电，西班牙外交大臣阿尔瓦雷斯宣布，抵达西班牙位于北非飞地休达的至少5万名移民已“几乎全部”返回摩洛哥，本轮“偷渡潮”大致平息。针对本轮“偷渡潮”，欧盟多个成员国表达关注和警惕。欧盟委员会主席冯德莱恩表示，休达乱象“令人不可接受”，她敦促西班牙加大力度打击偷渡网络、加速移民遣返等工作。</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="国际市场">
+                <h2 class="topic-heading">
+                    <span class="topic-name">国际市场</span>
+                    <span class="topic-count">5</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">04:38</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">阿拉格齐警告美方：伊朗将坚决回应任何侵犯行为</h3>
+                    <div class="content-body">【阿拉格齐警告美方：伊朗将坚决回应任何侵犯行为】财联社8月2日电，当地时间1日，伊朗外交部长阿拉格齐分别与巴基斯坦陆军参谋长穆尼尔以及土耳其外交部长费丹通电话。通话中，各方讨论了地区最新局势，并就美国侵略性与破坏稳定行为所造成的后果，以及地区紧张局势加剧和安全风险升级交换了意见。<br><br>阿拉格齐在通话中警告美军不要采取任何冒险行动，并强调伊朗已做好充分准备，维护国家主权、安全和领土完整，并将对任何侵犯行为作出坚决回应。（央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">04:05</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">伊朗外交部：决心继续走抵抗与坚守之路</h3>
+                    <div class="content-body">【伊朗外交部：决心继续走抵抗与坚守之路】财联社8月2日电，伊朗外交部当地时间8月1日发表声明称，伊朗决心继续走抵抗与坚守之路，直至彻底消除敌人的恶行。<br><br>声明表示，当前，美国继续违反6月18日美伊谅解备忘录的相关条款，持续对伊朗港口和商船实施海上封锁，并不断对伊朗各地发动野蛮袭击，加大经济施压和非法威胁，持续对伊朗实施侵略。作为回应，伊朗武装部队的防御性打击仍在全力持续进行。<br><br>声明还称，美国及其部分地区盟友以7月8日三艘船只的所谓“事故”为借口，对伊朗发动攻击并持续至今，是其编造谎言、为违背双方协议和侵犯伊朗在霍尔木兹海峡的主权寻找借口的集中体现。（央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">01:45</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">巴基斯坦雪崩致1名中国公民失联 我使馆敦促巴方全力搜救</h3>
+                    <div class="content-body">【巴基斯坦雪崩致1名中国公民失联 我使馆敦促巴方全力搜救】财联社8月2日电，7月30日，一支国际登山队在喀喇昆仑山脉布洛阿特峰遭遇雪崩后失联。8月1日，中国驻巴基斯坦大使馆领侨处证实，该登山队的失踪者中包括1名中国公民。<br><br>我使馆表示，事件发生后，使馆已启动领事保护应急机制，与巴方有关部门保持密切联系，敦促其全力搜救失联中国公民，并及时通报搜救进展。（央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:32</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">中方在联合国举行2026世界人工智能大会暨人工智能全球治理高级别会议吹风会</h3>
+                    <div class="content-body">【中方在联合国举行2026世界人工智能大会暨人工智能全球治理高级别会议吹风会】当地时间7月31日，中国常驻联合国代表团在联合国总部举行2026世界人工智能大会暨人工智能全球治理高级别会议吹风会。<br><br>中国常驻联合国代表傅聪表示，习近平主席在大会开幕式上围绕全球人工智能治理体系、以人为本和向上向善理念、帮助全球南方缩小智能鸿沟、成立世界人工智能合作组织、支持联合国全球人工智能治理进程等，系统全面提出中国方案，为全球人工智能治理作出重要贡献。中国将秉持开源开放、合作共赢、共商共建共享理念，在联合国广阔平台上，同各方一道商讨谋划人工智能未来全球治理重大问题。<br><br>联合国数字与新兴技术特使吉尔表示，世界人工智能大会具有里程碑式的重要意义，希望世界人工智能合作组织与联合国密切对接合作。联合国人工智能独立国际科学小组成员宋海涛分享了参会感受。<br><br>7月16日，来自亚洲、非洲、拉美和欧洲的29个国家签署《关于成立世界人工智能合作组织的协定》，成为创始成员国。这标志着中方倡导推动成立世界人工智能合作组织取得重要阶段性进展。<br><br>据介绍，70多个国家和国际组织的代表出席本次吹风会。各方祝贺世界人工智能大会成功举行，高度评价习近平主席就人工智能治理提出重要看法、主张和合作倡议，欢迎成立世界人工智能合作组织，期待共同落实会议宣布的合作倡议，支持发展中国家加强能力建设，实现普惠共享、合作共赢。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:01</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span> <span class="topic-chip">宏观经济</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">比亚迪7月销量超41.9万辆 海外销售近18万辆</h3>
+                    <div class="content-body">【比亚迪7月销量超41.9万辆 海外销售近18万辆】财联社8月1日电，比亚迪公布最新销量数据，2026年7月实现汽车总销量419,211辆，其中乘用车销量达到411,072辆。海外市场成为核心增长极，7月乘用车及皮卡海外销售达179,841辆，同比增长124.3%。</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="宏观经济">
+                <h2 class="topic-heading">
+                    <span class="topic-name">宏观经济</span>
+                    <span class="topic-count">3</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-c" data-topic="宏观经济" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:54</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">莱茵河水位刷新历史最低纪录 德国航运和物流承压</h3>
+                    <div class="content-body">【莱茵河水位刷新历史最低纪录 德国航运和物流承压】财联社8月1日电，受持续高温和干旱天气影响，德国莱茵河水位持续下降。科隆水文站当地时间8月1日测得水位最低降至67厘米至68厘米，刷新2018年创下的历史最低纪录；杜伊斯堡-鲁尔奥特水文站水位也降至153厘米的历史低位。据了解，莱茵河持续低水位已影响内河航运，货船无法满载通行，需分批运输货物，运输成本上升，物流效率下降，对德国经济造成进一步压力。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="宏观经济" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:22</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">2026年上半年不锈钢粗钢产量同比增长7.19%至2107.9万吨</h3>
+                    <div class="content-body">【2026年上半年不锈钢粗钢产量同比增长7.19%至2107.9万吨】财联社8月1日电，2026年1-6月，不锈钢粗钢产量为2107.9万吨，同比增加了141.5万吨，增长了7.19%。2026年1-6月，不锈钢表观消费量为1776.7万吨，同比增加165.1万吨，增长了10.25%。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="宏观经济" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:51</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">机构：暑运前半段新疆、北京、云南旅游热度高 TOP20热门航线中8条航线票价降幅超1成</h3>
+                    <div class="content-body">【机构：暑运前半段新疆、北京、云南旅游热度高 TOP20热门航线中8条航线票价降幅超1成】财联社8月1日电，航班管家旗下DAST交通数据速递8月1日发布2026年暑运前半段民航数据总结。从入省运力（省外进港运力）上观察，部分旅游属性的地区有较高的运力增幅，其中新疆同比增长10.3%、北京同比增长7.2%、云南同比增长6.6%；除此之外，青海同比下滑16.5%、宁夏同比下滑10.6%、内蒙古同比下滑7.2%。7月份TOP20国内航线经济舱平均票价约844.9元，其中仅3条航线均价超千元，且都是北京首都相关航线；对比历史同期来看，仅上海虹桥-北京首都、深圳宝安-上海虹桥等4条航线票价同比正增长，其余16条皆有不同程度的下滑，部分航线降幅较大，深圳宝安-北京首都、成都双流-北京首都、广州白云-北京首都等8条航线降幅超1成。</div>
+                </article>
+                
+                </div>
+            </section>
+            
+    </main>
+</div>
+<script>
+    const searchInput = document.getElementById('search');
+    const topicPills = document.querySelectorAll('.topic-pill');
+    const sections = document.querySelectorAll('.topic-section');
+    let activeTopic = 'all';
+
+    function updateFilter() {
+        const query = (searchInput.value || '').toLowerCase();
+        sections.forEach(section => {
+            const topic = section.dataset.topic;
+            const visibleByTopic = activeTopic === 'all' || activeTopic === topic;
+            let hasVisibleCard = false;
+            section.querySelectorAll('.news-card').forEach(card => {
+                const text = card.innerText.toLowerCase();
+                const visible = visibleByTopic && text.includes(query);
+                card.style.display = visible ? '' : 'none';
+                if (visible) hasVisibleCard = true;
+            });
+            section.style.display = visibleByTopic && hasVisibleCard ? '' : 'none';
+        });
+    }
+
+    searchInput.addEventListener('input', updateFilter);
+
+    topicPills.forEach(pill => {
+        pill.addEventListener('click', () => {
+            const topic = pill.dataset.topic;
+            if (activeTopic === topic) {
+                activeTopic = 'all';
+                topicPills.forEach(p => p.classList.remove('active'));
+            } else {
+                activeTopic = topic;
+                topicPills.forEach(p => p.classList.toggle('active', p.dataset.topic === topic));
+            }
+            updateFilter();
+        });
+    });
+
+    document.querySelectorAll('.toggle-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const content = btn.closest('.topic-heading').nextElementSibling;
+            const expanded = btn.getAttribute('aria-expanded') === 'true';
+            content.style.display = expanded ? 'none' : 'block';
+            btn.setAttribute('aria-expanded', String(!expanded));
+            btn.textContent = expanded ? '展开' : '折叠';
+        });
+    });
+    </script>
+</body>
+</html>
