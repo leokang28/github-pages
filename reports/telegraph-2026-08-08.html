@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>财联社电报 - 2026-08-08</title>
+<style>
+    :root {
+        --color-b: #dc2626;
+        --color-c: #2563eb;
+        --color-other: #6b7280;
+        --bg: #f8fafc;
+        --card-bg: #ffffff;
+        --text: #1f2937;
+        --text-secondary: #64748b;
+        --border: #e2e8f0;
+        --radius: 12px;
+        --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    }
+    * { box-sizing: border-box; }
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+    }
+    .container { max-width: 900px; margin: 0 auto; padding: 24px 16px 64px; }
+    header { text-align: center; margin-bottom: 24px; }
+    header h1 { margin: 0 0 8px; font-size: 28px; }
+    header p { margin: 0; color: var(--text-secondary); }
+    .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+    .stat-card {
+        background: var(--card-bg);
+        border-radius: var(--radius);
+        padding: 16px;
+        box-shadow: var(--shadow);
+        text-align: center;
+        border-top: 4px solid var(--color-other);
+    }
+    .stat-card.stat-b { border-top-color: var(--color-b); }
+    .stat-card.stat-c { border-top-color: var(--color-c); }
+    .stat-value { font-size: 24px; font-weight: 700; }
+    .stat-label { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+    .filters {
+        position: sticky;
+        top: 0;
+        background: rgba(248, 250, 252, 0.96);
+        backdrop-filter: blur(8px);
+        padding: 12px 0;
+        margin-bottom: 16px;
+        border-bottom: 1px solid var(--border);
+        z-index: 10;
+    }
+    .search-box {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1px solid var(--border);
+        border-radius: 9999px;
+        font-size: 14px;
+        margin-bottom: 10px;
+        outline: none;
+    }
+    .search-box:focus { border-color: var(--color-c); }
+    .topic-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+    .topic-pill {
+        border: 1px solid var(--border);
+        background: var(--card-bg);
+        border-radius: 9999px;
+        padding: 6px 12px;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+    .topic-pill:hover, .topic-pill.active {
+        background: #eff6ff;
+        border-color: var(--color-c);
+        color: var(--color-c);
+    }
+    .topic-section { margin-bottom: 24px; }
+    .topic-heading {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 18px;
+        margin: 0 0 12px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid var(--border);
+    }
+    .topic-count {
+        background: var(--border);
+        color: var(--text-secondary);
+        font-size: 12px;
+        padding: 2px 8px;
+        border-radius: 9999px;
+    }
+    .toggle-btn {
+        margin-left: auto;
+        background: transparent;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 12px;
+        cursor: pointer;
+        color: var(--text-secondary);
+    }
+    .news-card {
+        background: var(--card-bg);
+        border-radius: var(--radius);
+        padding: 14px 16px;
+        margin-bottom: 10px;
+        box-shadow: var(--shadow);
+        border-left: 4px solid var(--color-other);
+        transition: transform 0.1s;
+    }
+    .news-card:hover { transform: translateY(-1px); }
+    .news-card.level-b { border-left-color: var(--color-b); }
+    .news-card.level-c { border-left-color: var(--color-c); }
+    .card-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+        flex-wrap: wrap;
+    }
+    .time-badge { font-size: 12px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+    .level-badge {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 2px 6px;
+        border-radius: 4px;
+        color: white;
+    }
+    .level-badge.level-b { background: var(--color-b); }
+    .level-badge.level-c { background: var(--color-c); }
+    .level-badge.level-other { background: var(--color-other); }
+    .topic-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+    .topic-chip {
+        font-size: 11px;
+        background: #f1f5f9;
+        color: var(--text-secondary);
+        padding: 2px 8px;
+        border-radius: 9999px;
+    }
+    .news-title { margin: 0 0 8px; font-size: 15px; line-height: 1.5; }
+    .content-body {
+        font-size: 14px;
+        color: var(--text-secondary);
+        white-space: pre-wrap;
+    }
+    .empty-state { text-align: center; color: var(--text-secondary); padding: 40px; }
+    @media (max-width: 640px) {
+        .stats { grid-template-columns: repeat(2, 1fr); }
+        header h1 { font-size: 22px; }
+    }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>📰 财联社电报</h1>
+        <p>2026-08-08 16:00 起 · 共 54 条</p>
+    </header>
+    <div class="stats">
+        
+        <div class="stat-card stat-total">
+            <div class="stat-value">54</div>
+            <div class="stat-label">总计</div>
+        </div>
+        
+
+        <div class="stat-card stat-b">
+            <div class="stat-value">7</div>
+            <div class="stat-label">Level B</div>
+        </div>
+        
+
+        <div class="stat-card stat-c">
+            <div class="stat-value">47</div>
+            <div class="stat-label">Level C</div>
+        </div>
+        
+
+        <div class="stat-card stat-other">
+            <div class="stat-value">0</div>
+            <div class="stat-label">其他</div>
+        </div>
+        
+    </div>
+    <div class="filters">
+        <input class="search-box" id="search" type="text" placeholder="搜索标题 / 内容 / 主题...">
+        <div class="topic-pills">
+            <button class="topic-pill" data-topic="其他">其他 (34)</button>
+<button class="topic-pill" data-topic="国际市场">国际市场 (7)</button>
+<button class="topic-pill" data-topic="公司公告">公司公告 (7)</button>
+<button class="topic-pill" data-topic="行业动态">行业动态 (3)</button>
+<button class="topic-pill" data-topic="宏观经济">宏观经济 (2)</button>
+<button class="topic-pill" data-topic="货币政策">货币政策 (1)</button>
+        </div>
+    </div>
+    <main id="news-list">
+        
+            <section class="topic-section" data-topic="宏观经济">
+                <h2 class="topic-heading">
+                    <span class="topic-name">宏观经济</span>
+                    <span class="topic-count">2</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-c" data-topic="宏观经济" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:06</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">宏观经济</span> <span class="topic-chip">国际市场</span> <span class="topic-chip">股市政策</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月9日电，伦敦证券交易所集团（LSEG）数据显示，目前美国货币市场预计美联储9月加息概率约为44%。如果下周公布的美国7月消费者价格指数（CPI）和生产者价格指数（PPI）数据表现疲弱，该概率可能进一步下降。</h3>
+                    <div class="content-body">财联社8月9日电，伦敦证券交易所集团（LSEG）数据显示，目前美国货币市场预计美联储9月加息概率约为44%。如果下周公布的美国7月消费者价格指数（CPI）和生产者价格指数（PPI）数据表现疲弱，该概率可能进一步下降。</div>
+                </article>
+                
+                <article class="news-card level-b" data-topic="宏观经济" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">20:32</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">宏观经济</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">8月8日周六《新闻联播》要闻17条</h3>
+                    <div class="content-body">【8月8日周六《新闻联播》要闻17条】财联社8月8日电，今天《新闻联播》主要内容有：<br>1、【新思想引领新征程】完善全民健身公共服务体系 让发展成果惠及全体人民； <br>2、【树立和践行正确政绩观】坚持民生优先 推动学习教育成果落到实处； <br>3、上半年我国经营主体结构持续优化； <br>4、上半年我国医药工业创新加速突破； <br>5、全国用电负荷创新高 电力保供积极应对； <br>6、【一线调研】轨道串起消费新活力； <br>7、暑期研学游升温 在旅途中增长知识； <br>8、台风“白海豚”逼近 各地加强防范； <br>9、上半年国内居民出游人次达34.63亿； <br>10、《全国幸福河湖建设项目实施方案（2026—2028年）》发布； <br>11、《民用航空发展“十五五”规划》发布； <br>12、“义新欧”中欧班列今年出口超10万标箱； <br>13、移民问题引发分歧 西班牙出台针对意大利反制措施； <br>14、伊朗称与阿曼已明确霍尔木兹海峡协议的总体框架 美媒称美军高层寻求退出伊朗战争； <br>15、沙特土耳其巴基斯坦签署共同防务协议； <br>16、日本食品自给率跌至历史最低水平； <br>17、持续干旱致美最大水库水位降至历史最低。</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="货币政策">
+                <h2 class="topic-heading">
+                    <span class="topic-name">货币政策</span>
+                    <span class="topic-count">1</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-c" data-topic="货币政策" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:21</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">货币政策</span> <span class="topic-chip">宏观经济</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">贝莱德大佬解读非农转负 称“如今加息已经没有太大意义”</h3>
+                    <div class="content-body">【贝莱德大佬解读非农转负 称“如今加息已经没有太大意义”】财联社8月9日电，对于周五美国非农就业数据意外转负的状况，贝莱德全球固定收益部门首席投资官里克·里德表示，上个月就业数据的超预期疲软，反映的正是人工智能时代的“生产率革命”。他认为，非农就业人数下降，反映出美国企业正在学习如何在不增加员工数量的情况下扩大产出。他说道：“我不认为调整隔夜联邦基金利率真正能解决问题——我们以前也见过这种情况……我只是认为，如今加息没有太大意义。”</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="国际市场">
+                <h2 class="topic-heading">
+                    <span class="topic-name">国际市场</span>
+                    <span class="topic-count">7</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-b" data-topic="国际市场" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">08:47</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">马斯克：即将发射的V3卫星其能力将比目前的V2卫星高出一个数量级 该系统今年将达到200亿美元的年度收入</h3>
+                    <div class="content-body">【马斯克：即将发射的V3卫星其能力将比目前的V2卫星高出一个数量级 该系统今年将达到200亿美元的年度收入】财联社8月9日电，马斯克当地时间8日在社交平台X上表示，“我所说的话，有些是推测性或理想化的，有些则不是。”可以确定的是，即将通过星舰发射的V3卫星，其能力将比目前通过猎鹰火箭发射的V2卫星高出一个数量级。这意味着星链V3带宽是星链V2系统的100倍以上，该系统今年将达到200亿美元的年度经常性收入（ARR）。即使每千兆字节的收入下降10倍，这也意味着SpaceX的通信收入仍将超过每年2000亿美元。</div>
+                </article>
+                
+                <article class="news-card level-b" data-topic="国际市场" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">19:56</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">伊朗接近与阿曼达成管理海峡协议</h3>
+                    <div class="content-body">【伊朗接近与阿曼达成管理海峡协议】财联社8月8日电，伊朗外交部长阿拉格齐今天（8月8日）表示，伊朗目前正在与阿曼就霍尔木兹海峡的法律机制、管理方式以及确定海峡船舶通行路线进行谈判，双方已经非常接近达成协议。但是，霍尔木兹海峡能否重新开放还取决于其他条件，包括美国对其违反美伊谅解备忘录的行为作出弥补。阿拉格齐说，过去霍尔木兹海峡存在一套分道通航制，但伊朗认为，原有路线已经不再适合作为船舶通行路线，伊方无法接受继续使用该路线。因此，有必要规划一套新的通航机制，不过这涉及复杂的技术和法律问题。目前双方正在讨论的是一条临时通航路线。在新的正式通航路线最终确定之前，将首先设立一条临时航道，并以此作为未来正式路线的基础。在这一问题上，伊朗和阿曼两国的军事部门已根据现有海图展开磋商。待相关谈判完成并形成最终结论后，新的通航路线将得到确定。 （CCTV国际时讯）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:41</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">国际足联：不支持任何违反章程的主席选举进程</h3>
+                    <div class="content-body">【国际足联：不支持任何违反章程的主席选举进程】财联社8月9日电，当地时间8月8日，国际足联发表声明称，呼应南美足联和非洲足联近期声明，以及国际足联与世界各地成员协会和洲际足联的讨论，国际足联不会支持、协助或容忍任何不符合国际足联章程、民主程序及既定治理框架的主席选举进程。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">04:16</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">乌外交部：乌无意向保加利亚方向发射任何装备</h3>
+                    <div class="content-body">【乌外交部：乌无意向保加利亚方向发射任何装备】财联社8月9日电，乌克兰外交部发言人季希8日表示，乌克兰方面正与保加利亚保持密切联系，以查明当天一架无人机在保加利亚坠落的具体情况。他强调，乌军没有蓄意向保加利亚方向发射任何装备。季希说，乌方正在核实事件的全部情况和相关技术事实，并愿与保加利亚方面开展合作，以查明事件细节。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">23:31</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">阿曼：霍尔木兹海峡通航安排谈判在积极氛围中推进</h3>
+                    <div class="content-body">【阿曼：霍尔木兹海峡通航安排谈判在积极氛围中推进】财联社8月8日电，当地时间8日，阿曼外交部发表声明称，目前有关霍尔木兹海峡通航安排的谈判正在积极、建设性的氛围中推进，并已取得兼顾各方利益的进展。声明强调，应避免采取任何可能影响相关谈判以及已经取得进展的行动。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">20:24</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">伊官员：有证据显示美军使用磷弹轰炸伊朗多地</h3>
+                    <div class="content-body">【伊官员：有证据显示美军使用磷弹轰炸伊朗多地】财联社8月8日电，据伊朗方面当地时间8月8日消息，伊朗卫生部副部长沙欣·阿洪德扎德当天表示，目前已有证据显示，美军对伊朗法尔斯省拉梅尔德市的轰炸涉及到含磷弹药。伊朗卫生部已就此开展研究，希望能在国际平台发表研究结果，向外界展示伊朗平民所遭受到的伤害。此外，布什尔省也开展了类似研究，同样发现了与含磷弹药有关的证据，不过法尔斯省的情况更加严重。阿洪德扎德表示，磷弹若没有直接导致人员死亡，也会造成伤口慢性化。那些被这类炸弹弹片击中的人，会出现长期难以愈合的伤口。原本可能两周就能愈合的伤口，可能需要三到四个月才能愈合，并形成慢性创伤。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:24</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">伊朗革命卫队：重开海峡需美国接受伊朗条件</h3>
+                    <div class="content-body">【伊朗革命卫队：重开海峡需美国接受伊朗条件】财联社8月8日电，伊朗革命卫队发言人今天（8月8日）表示，重新开放霍尔木兹海峡取决于美国完全接受伊朗的条件，与伊朗当前与阿曼的协商情况无关。 （CCTV国际时讯）</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="公司公告">
+                <h2 class="topic-heading">
+                    <span class="topic-name">公司公告</span>
+                    <span class="topic-count">7</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-b" data-topic="公司公告" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">20:11</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">债券固收</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">伯克希尔哈撒韦：2026年Q2归属于股东净利润256.67亿美元</h3>
+                    <div class="content-body">【伯克希尔哈撒韦：2026年Q2归属于股东净利润256.67亿美元】财联社8月8日电，伯克希尔哈撒韦二季度运营利润129.83亿美元，同比增长16%；二季度归属于股东的净利润256.67亿美元，上年同期123.70亿美元；二季度现金储备降至3655.1亿美元；二季度回购约45亿美元库存股。截至6月30日，股权投资公允价值总额的66%集中在美国运通、苹果、美国银行、Alphabet及可口可乐这五家公司。</div>
+                </article>
+                
+                <article class="news-card level-b" data-topic="公司公告" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">16:59</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">江波龙完成37亿元定增事项 发行价格为560元/股 较最新收盘价溢价45%</h3>
+                    <div class="content-body">【江波龙完成37亿元定增事项 发行价格为560元/股 较最新收盘价溢价45%】财联社8月8日电，江波龙(301308.SZ)公告称，公司完成向特定对象发行股票，实际发行660.71万股，发行价格为560.00元/股，募集资金总额37亿元，扣除发行费用后净额36.68亿元。发行对象最终确定为21家，包括易方达基金、金长江、赵启祥、贺伟等，限售期均为6个月。<br><br>小财注：公告显示，江波龙本次定增的定价基准日为本次发行A股股票的发行期首日，即2026年6月29日，发行价格不低于定价基准日前20个交易日公司股票交易均价的80%，即不低于452.90元/股。截至周五收盘，江波龙报386.6元/股，此次定增价格较收盘价溢价45%。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:02</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">格陵兰岛就未获许可准备钻探一事向一家美国石油公司发出严厉警告</h3>
+                    <div class="content-body">【格陵兰岛就未获许可准备钻探一事向一家美国石油公司发出严厉警告】财联社8月9日电，据报道，总部位于得克萨斯州的“格陵兰能源”公司（ Greenland Energy） 在格陵兰偏远地区詹姆斯地（Jameson Land）海岸卸下了钻探设备，该公司认为当地可能存在大量石油储量。格陵兰政府发出“严肃警告”，表示该公司尚未获得钻探许可，任何后续物流活动都必须事先获得矿物资源管理局批准。“格陵兰能源”公司称，仍在争取必要许可，计划在获批后先开钻一口勘探井。这一争端发生在华盛顿对格陵兰持续高度关注的背景下。特朗普多次强调，该地区对美国具有战略意义。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:05</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">我国渤海首个千亿方大气田Ⅰ期开发项目全面投产</h3>
+                    <div class="content-body">【我国渤海首个千亿方大气田Ⅰ期开发项目全面投产】财联社8月9日电，据中国海油，我国渤海首个千亿方大气田——渤中19-6气田Ⅰ期开发项目全面投产，日产油气当量超5200吨。渤中19-6气田位于渤海中部海域，探明天然气地质储量超2000亿立方米、探明石油液体地质储量超2亿立方米。气田埋藏深度超过5000米。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:11</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">美国能源公司起诉数据中心开发商：将电费成本转嫁民众</h3>
+                    <div class="content-body">【美国能源公司起诉数据中心开发商：将电费成本转嫁民众】财联社8月9日电，据美国方面7日消息，美国内华达州最大能源供应商内华达能源公司已经正式起诉正在该州建造数据中心的一家开发商，指控其试图将电费成本转嫁给消费者。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:40</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">阿联酋称该国一船只在霍尔木兹海峡遭袭</h3>
+                    <div class="content-body">【阿联酋称该国一船只在霍尔木兹海峡遭袭】财联社8月8日电，阿布扎比国家石油公司证实，该公司一艘船只当天凌晨在通过霍尔木兹海峡时遭导弹袭击。阿布扎比国家石油公司说，袭击未造成人员受伤，目前局面可控。该公司并未提供遭袭船只具体类型、导弹来源以及船只受损情况等更多细节。 （新华社）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:14</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">美国财长贝森特：霍尔木兹海峡将“变得无关紧要”</h3>
+                    <div class="content-body">【美国财长贝森特：霍尔木兹海峡将“变得无关紧要”】财联社8月8日电，美国财长贝森特8月6日在接受美国全国广播公司采访时表示，霍尔木兹海峡永远不会恢复到原来的样子，但他强调，这不是伊朗方面所描绘的那种对伊朗有利的局面，而是指霍尔木兹海峡将失去当前能源运输“咽喉要道”的地位。贝森特说，在未来两年内，霍尔木兹海峡将“变得无关紧要”，原本通过海峡运输的能源中将有超过50%或70%改由地下管道输送。 （CCTV国际时讯）</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="其他">
+                <h2 class="topic-heading">
+                    <span class="topic-name">其他</span>
+                    <span class="topic-count">34</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-b" data-topic="其他" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">18:14</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">霍尔木兹海峡关闭致伊拉克石油出口骤降75%</h3>
+                    <div class="content-body">【霍尔木兹海峡关闭致伊拉克石油出口骤降75%】财联社8月8日电，当地时间8日，伊拉克石油部长巴西姆·穆罕默德·胡达伊尔表示，由于霍尔木兹海峡关闭，伊拉克石油出口下降了75%。伊拉克正与伊朗就允许其石油出口进行谈判，但相关协调尚未生效。美以伊冲突爆发前，伊拉克每天通过霍尔木兹海峡出口约340万桶石油，冲突爆发后通过该海峡的出口量有所下降。胡达伊尔强调，伊拉克需要“寻找解决方案，以实现石油出口渠道的多元化”。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-b" data-topic="其他" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">17:02</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">Apple智能可配合阿里千问模型工作</h3>
+                    <div class="content-body">【Apple智能可配合阿里千问模型工作】财联社8月8日电，苹果官网显示，Apple智能可配合阿里巴巴千问模型工作。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:01</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">一船只在阿曼以东海域遭袭起火</h3>
+                    <div class="content-body">【一船只在阿曼以东海域遭袭起火】财联社8月8日电，英国海上贸易行动办公室（UKMTO）当地时间8日收到报告称，阿曼海塞卜以东18海里处发生一起突发事件。经核实的消息来源报告称，一艘船只遭“不明投射物”击中并引发火灾，目前火势已被扑灭。消息称船员均安全。有关部门正在对事件展开调查。英国海上贸易行动办公室建议过往船只谨慎航行。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:44</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">上海发布中心城区暴雨蓝色预警：注意防范城市内涝</h3>
+                    <div class="content-body">【上海发布中心城区暴雨蓝色预警：注意防范城市内涝】财联社8月9日电，上海市气象台2026年8月9日8时20分发布中心城区暴雨蓝色预警信号：预计今天到明天，中心城区大部6小时累积降水量将达70毫米以上，请注意防范极端强降雨可能引发的城市积涝。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:17</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月9日电，美国总统特朗普将他的白宫翻新计划诉至最高法院。此前美国联邦上诉法院表示，特朗普缺乏建造他那座宽敞的白宫舞厅的法律权限。</h3>
+                    <div class="content-body">财联社8月9日电，美国总统特朗普将他的白宫翻新计划诉至最高法院。此前美国联邦上诉法院表示，特朗普缺乏建造他那座宽敞的白宫舞厅的法律权限。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:10</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月9日电，亨特·拜登在接受媒体采访时表示，前美国总统乔·拜登的前列腺癌已扩散到骨骼以外，并且非常痛苦。</h3>
+                    <div class="content-body">财联社8月9日电，亨特·拜登在接受媒体采访时表示，前美国总统乔·拜登的前列腺癌已扩散到骨骼以外，并且非常痛苦。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:33</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">美副总统称美伊冲突仍处于“博弈中段”</h3>
+                    <div class="content-body">【美副总统称美伊冲突仍处于“博弈中段”】财联社8月9日电，当地时间8月8日，美国副总统万斯在采访中谈及伊朗局势时表示，美国同伊朗正在对话，美伊冲突仍处于“博弈中段”。万斯说，过去几天与伊朗的谈判已经取得了一些进展。他称，美国预计海湾地区的石油和天然气供应量将维持在冲突前的水平，并称“伊朗方面也告诉我们，他们将会这样做”。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:27</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">白海豚将在舟山到福鼎一带登陆</h3>
+                    <div class="content-body">【白海豚将在舟山到福鼎一带登陆】财联社8月9日电，中央气象台8月9日06时继续发布台风橙色预警：今年第13号台风“白海豚”（强台风级）的中心今天（9日）早晨5点钟位于浙江省温州市偏东方向大约305公里的东海南部海面上，就是北纬27.4度、东经123.7度，中心附近最大风力有14级（45米/秒），中心最低气压为950百帕，七级风圈半径为350-450公里，十级风圈半径为220-250公里，十二级风圈半径为100公里。<br><br>预计，“白海豚”将以每小时15-20公里的速度向西偏北方向移动，强度维持或略有减弱，将于9日晚上至10日早晨在浙江舟山到福建福鼎一带沿海登陆（38-45米/秒，13-14级，台风级或强台风级），登陆后继续向西偏北方向移动，强度逐渐减弱。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:53</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">消息人士：美“爱国者”导弹库存不足1700枚</h3>
+                    <div class="content-body">【消息人士：美“爱国者”导弹库存不足1700枚】财联社8月9日电，据美国方面8日消息，消息人士称，美国在同伊朗的战事中消耗了大量“爱国者”防空系统拦截弹，目前美国该类型导弹库存已不足1700枚。美方消息称，美军在战事中消耗了1500多枚“爱国者”导弹，尽管特朗普政府已与美军工企业合作加快和扩大生产，但仍需要两年多时间才能补齐这一数量的导弹。消息还显示，在对伊朗战事中，美军基本上耗尽了某些类型的远程导弹库存，例如陆军战术导弹系统和精确打击导弹。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:28</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">加拿大一省进入紧急状态应对野火灾情</h3>
+                    <div class="content-body">【加拿大一省进入紧急状态应对野火灾情】财联社8月9日电，加拿大不列颠哥伦比亚省政府8日宣布全省进入紧急状态，以应对该省多地快速蔓延的野火灾情。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:15</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">美军中央司令部司令访以 讨论“多战线局势”</h3>
+                    <div class="content-body">【美军中央司令部司令访以 讨论“多战线局势”】财联社8月9日电，据以色列方面8月8日消息，美军中央司令部司令布拉德·库珀当天抵达以色列进行短期访问，并同以色列国防军高层讨论“多战线局势”。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:13</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">土外长称沙土巴三国共同防务协议有望扩员</h3>
+                    <div class="content-body">【土外长称沙土巴三国共同防务协议有望扩员】财联社8月9日电，土耳其外长费丹8日表示，新近达成的沙特阿拉伯、土耳其和巴基斯坦三国共同防务协议旨在增强区域自主权，应当继续发展壮大，有更多国家表达加入意愿。费丹在参加访谈时表示，签署《麦加共同防务协议》是为该地区带来持久稳定的重要一步。该协议不应局限于现有三个国家，而应该继续发展壮大。他透露，有更多国家表达了加入该协议的意愿，并表示“埃及很可能在下一阶段加入”。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">05:55</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">美消防部门证实：犹他州消防直升机坠毁致两人遇难</h3>
+                    <div class="content-body">【美消防部门证实：犹他州消防直升机坠毁致两人遇难】财联社8月9日电，美国国家跨部门消防中心8日证实，此前一天在犹他州坠毁的消防直升机上的两名乘员已经遇难。据该中心通报，这架与美国林业局签订合同的直升机在扑灭野火过程中发生事故，造成飞行员和另一名机组人员遇难。美国联邦航空局此前证实失事直升机型号为西科斯基S-64。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">05:22</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">美军称已迫使53艘商船改变航线</h3>
+                    <div class="content-body">【美军称已迫使53艘商船改变航线】财联社8月9日电，当地时间8月8日，美国中央司令部表示，美国海军人员在“林肯”号航母上对F/A-18“超级大黄蜂”战机进行维护，以确保航母打击群的装备保持战备状态，继续严格执行对伊朗的海上封锁。截至当天，美军已使53艘商船改道，使2艘船只丧失航行能力，并登临检查了2艘船只。此外，美军还允许30多艘运载人道主义援助物资的船只通过封锁区。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:50</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">2026年度总票房破240亿</h3>
+                    <div class="content-body">【2026年度总票房破240亿】财联社8月8日电，据灯塔专业版数据，截至8月8日，2026年度大盘票房（含预售）突破240亿，《飞驰人生3》《功夫女足》《给阿嬷的情书》《镖人：风起大漠》《八仙！》暂列年度票房前五名。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">03:18</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">日本岩手县近海地区发生5.6级地震</h3>
+                    <div class="content-body">【日本岩手县近海地区发生5.6级地震】财联社8月9日电，据日本气象厅消息，当地时间9日2时58分左右，日本岩手县近海地区发生5.6级地震，最大震感为震度4，震源深度40千米。本次地震无海啸风险。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">02:42</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">秘鲁库斯科一客车与一卡车相撞 致9死6伤</h3>
+                    <div class="content-body">【秘鲁库斯科一客车与一卡车相撞 致9死6伤】财联社8月9日电，当地时间8月8日凌晨，秘鲁库斯科大区埃斯皮纳尔省帕尔帕塔区发生一起严重交通事故。一辆载客小型客车与一辆半挂式卡车发生猛烈碰撞，造成至少9人死亡、6人受伤。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">01:51</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">新疆阿克苏地区库车市发生3.2级地震 震源深度16公里</h3>
+                    <div class="content-body">【新疆阿克苏地区库车市发生3.2级地震 震源深度16公里】财联社8月9日电，中国地震台网正式测定：8月9日1时12分，在新疆阿克苏地区库车市（北纬41.18度，东经83.72度）发生3.2级地震，震源深度16公里。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">00:31</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">一直升机在巴西里约坠毁 造成至少4人死亡</h3>
+                    <div class="content-body">【一直升机在巴西里约坠毁 造成至少4人死亡】财联社8月9日电，当地时间8月8日，一架直升机在巴西里约热内卢市南部一片林地中坠毁，造成至少4人死亡。里约热内卢消防局接警后赶赴现场，空中行动小组已找到失事直升机残骸。目前官方尚未确认机上具体人数。救援队正在该地区搜寻其他遇难者。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">23:29</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">受台风“白海豚”影响 上海两大机场近六成航班调减取消</h3>
+                    <div class="content-body">【受台风“白海豚”影响 上海两大机场近六成航班调减取消】财联社8月8日电，受今年第13号台风“白海豚”影响，明天（9日）上海浦东机场和虹桥机场通行能力将出现下降，近六成进出港航班调减取消。两场计划取消进出港航班1384架次，其中，浦东机场取消871架次、虹桥机场取消航班513架次。请旅客及时向所乘航司了解查询航班最新动态，合理安排出行。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:44</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">伊朗：与阿曼“接近”达成协议但并不意味重开海峡</h3>
+                    <div class="content-body">【伊朗：与阿曼“接近”达成协议但并不意味重开海峡】财联社8月8日电，伊朗外长阿拉格齐当天表示，伊朗与阿曼“接近”达成协议，但并不意味着重新开放霍尔木兹海峡。在8日举行的一场记者会间隙，阿拉格齐提及伊朗同阿曼就霍尔木兹海峡通航问题谈判的进程。他说：“谈判正在进行，鉴于技术上的复杂性，我们正在确定一条临时路线，我认为我们非常接近达成协议。”阿拉格齐称：“当然，这并不意味着霍尔木兹海峡将重新开放。海峡的开放还取决于其他条件，这包括美国违反谅解备忘录应作出赔偿。” （新华社）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:25</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">罗马尼亚国防部称未发现空中目标经该国领空进入保加利亚</h3>
+                    <div class="content-body">【罗马尼亚国防部称未发现空中目标经该国领空进入保加利亚】财联社8月8日电，当地时间8月8日，罗马尼亚国防部发表声明称，针对当天上午在保加利亚境内、靠近罗马尼亚边境地区发生的爆炸事件，罗马尼亚雷达监视系统未发现任何飞行器穿越罗马尼亚领空进入保加利亚。罗马尼亚国防部说，目前正持续监测罗马尼亚边境附近局势，如出现相关重要信息，将及时发布进一步消息。保加利亚总理拉德夫8日说，一架无人机当天自罗马尼亚方向进入保加利亚领空并在该国境内爆炸，但未造成人员伤亡。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">21:41</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">明日运营开始起 上海地铁全网络地面高架区段限速运行</h3>
+                    <div class="content-body">【明日运营开始起 上海地铁全网络地面高架区段限速运行】财联社8月8日电，申通地铁集团介绍，受今年第13号台风“白海豚”影响，为确保轨道交通运营安全，上海地铁实施运营调整：8月9日运营开始起，3号线、浦江线全线限速运行；1号线、2号线、4号线、5号线、6号线、7号线、8号线、9号线、10号线、11号线、16号线、17号线、市域机场线地面、高架区段限速运行，同时，16号线取消大站车，列车站站停靠。全网络其他线路区段正常运行。上海地铁将密切关注台风路径变化，根据风速、雨量和对运营影响程度等实际情况，动态调整列车开行方案，遇紧急情况或将采取停运措施，保障乘客安全出行。请市民乘客留意官方发布的运营信息。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">21:23</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">华中最大“双膜”工艺应急水厂通水</h3>
+                    <div class="content-body">【华中最大“双膜”工艺应急水厂通水】财联社8月8日电，由三峡集团所属长江环保集团、武汉市水务集团等共同投资建设的华中地区规模最大的“双膜”工艺应急水厂——武汉梁子湖应急水厂并网通水，标志着武汉市江南区域正式构建起“一江一湖”双水源互为备援、灵活调度的供水新格局，为片区660万市民用水安全提供坚实保障。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">20:48</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">防御台风“白海豚” 浙江将防台风应急响应提升至Ⅰ级</h3>
+                    <div class="content-body">【防御台风“白海豚” 浙江将防台风应急响应提升至Ⅰ级】财联社8月8日电，为防御应对今年第13号台风“白海豚”可能正面袭击浙江等情况，经研判会商，浙江省防指决定于8月8日20时将防台风应急响应提升至Ⅰ级，要求各地各部门密切关注台风发展动态，按预案方案全力做好各项防台风工作，必要时宣布进入紧急防汛期，采取停止户外集体活动、停工、停课、停业、停运和封闭交通道路等措施。 （新华社）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:24</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">乍得霍乱疫情持续扩散：累计确诊239例 死亡13例</h3>
+                    <div class="content-body">【乍得霍乱疫情持续扩散：累计确诊239例 死亡13例】财联社8月8日电，当地时间8月8日，乍得卫生部最新数据显示，该国自6月中旬以来累计报告239例霍乱确诊病例，其中13人死亡，病死率达5.4%。本次疫情最先爆发于哈杰尔·拉米斯省卡拉尔镇，7月中旬扩散至首都恩贾梅纳，官方7月24日正式宣布霍乱疫情暴发。目前卡拉尔镇仍是疫情核心疫区。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:06</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">泽连斯基：美国将每月向乌克兰提供“爱国者”拦截导弹</h3>
+                    <div class="content-body">【泽连斯基：美国将每月向乌克兰提供“爱国者”拦截导弹】财联社8月8日电，乌克兰方面8日消息称，正在塞尔维亚访问的乌克兰总统泽连斯基当天表示，美国已与乌克兰达成协议，将每月向乌克兰提供“爱国者”防空系统拦截导弹。泽连斯基同时表示，仅靠这项供应无法完全弥补乌克兰目前的拦截导弹短缺。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:32</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">伊朗媒体发布伊朗最高领袖视频</h3>
+                    <div class="content-body">【伊朗媒体发布伊朗最高领袖视频】财联社8月8日电，伊朗迈赫尔通讯社8日在社交媒体发布了一段关于伊朗最高领袖穆杰塔巴·哈梅内伊的视频。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:46</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">苹果Mac电脑Apple智能支持使用阿里千问</h3>
+                    <div class="content-body">【苹果Mac电脑Apple智能支持使用阿里千问】《科创板日报》8日讯，《科创板日报》注意到，苹果官网的最新使用手册上，国行Mac电脑的Apple智能已支持使用阿里千问，Mac的版本需要升级至macOS 26.6才可使用。根据手册，对于某些请求，Siri 可利用千问提供更深入的答案，例如，照片和文稿的相关分析；借助千问，写作工具仅凭描述即可创作文本或图像。 （科创板日报记者 黄心怡）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:27</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">江苏省自然资源厅针对南通市启动海洋灾害四级应急响应</h3>
+                    <div class="content-body">【江苏省自然资源厅针对南通市启动海洋灾害四级应急响应】财联社8月8日电，受今年第13号台风“白海豚”影响，预计8月8日夜间至9日，江苏南部近海将出现3-5米大到巨浪；南通近岸海域将出现2.5-3.8米中到大浪。9日至10日，江苏沿海将出现一次50-100厘米风暴增水过程。江苏省自然资源厅已于8日发布海浪黄色警报，并根据《江苏省海洋灾害应急预案》规定，于8月8日12时针对南通市启动海洋灾害四级应急响应。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:56</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">新疆优化调整景区内自驾服务收费</h3>
+                    <div class="content-body">【新疆优化调整景区内自驾服务收费】财联社8月8日电，新疆维吾尔自治区文化和旅游厅8月8日消息，为持续优化旅游环境，更大力度惠及广大游客，新疆维吾尔自治区文化和旅游厅联合有关部门指导全区4A级及以上涉收取自驾服务费的旅游景区，对收费模式和标准作出优化调整。各景区制定优化调整方案，按程序报备后，将原按“人”收费、按“车”收费全部调整为按“车”收费，根据不同车型（以机动车行驶证核定载人数为准），5座及以下价格均不超过120元/车，6至7座不超过180元/车，8至19座不超过300元/车，20座及以上不超过600元/车。因票务系统需调整升级，原按“人”收费调整为按“车”收费的景区，新方案不晚于8月20日0时起执行，新方案开始实行前为过渡期，过渡期内价格均不超过30元/人；原按“车”收费的景区，新方案不晚于8月12日0时起执行，不设过渡期。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:47</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">美国参议院投票确认托德·布兰奇担任司法部长</h3>
+                    <div class="content-body">【美国参议院投票确认托德·布兰奇担任司法部长】财联社8月8日电，当地时间8日凌晨，由共和党控制的美国参议院以50票赞成、49票反对的投票结果，确认托德·布兰奇担任司法部长。当地时间6月8日，美国白宫表示，总统特朗普向美国参议院提交托德·布兰奇出任司法部长的提名。特朗普4月2日宣布，帕姆·邦迪不再担任司法部长，由副部长布兰奇代理。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:37</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">全国数标委明确：所谓“数据国家标准编制费”系冒名收取</h3>
+                    <div class="content-body">【全国数标委明确：所谓“数据国家标准编制费”系冒名收取】财联社8月8日电，全国数据标准化技术委员会（简称“全国数标委”）秘书处发布声明：近期，全国数据标准化技术委员会接到多起反映，称有部分单位或个人冒用全国数标委的名义，向企业收取所谓“数据国家标准编制费”“标准挂名费”或“标准参编费”等不正当费用。此类行为严重扰乱国家标准制修订工作秩序，损害了全国数标委的声誉及合法权益。为此，全国数标委秘书处声明：全国数标委从未，也绝不会以任何“标准挂名”“参编署名”“标准立项”等非正当名义，向任何企事业单位、社会组织或个人直接收取不正当费用。 （澎湃）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:18</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">美国会参议院通过临时拨款法案</h3>
+                    <div class="content-body">【美国会参议院通过临时拨款法案】财联社8月8日电，美国国会参议院8日通过一项联邦政府临时拨款法案，以避免联邦政府在现行预算到期后“停摆”。</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="行业动态">
+                <h2 class="topic-heading">
+                    <span class="topic-name">行业动态</span>
+                    <span class="topic-count">3</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:20</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">公司公告</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">光大证券：短期内市场或继续反弹 关注三条业绩主线</h3>
+                    <div class="content-body">【光大证券：短期内市场或继续反弹 关注三条业绩主线】财联社8月9日电，光大证券研报认为，短期内市场或继续反弹，关注三条业绩主线。近期海外股市，尤其是半导体板块逐步企稳回升，对A股科技板块企稳具有一定的正向作用。8月半年报密集披露期有望成为市场从估值消化切换至盈利驱动的拐点，财报季或将是下半年最好的配置窗口。<br><br>配置上建议围绕三条业绩主线展开。首先是科技硬件（半导体/AI算力/存储），这是本轮业绩改善最强的方向；其次为涨价链（有色/化工/煤炭），直接受益于PPI回升，业绩兑现确定性高；第三条主线为出口制造（储能/电力设备/汽车），受益于全球制造业补库与供应链优势。此外，非银金融、医药/CRO（创新药出海）、军工（订单拐点）等方向半年报景气度同样值得关注，整体呈现多条业绩主线并行的格局。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:26</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">青岛国测海遥：明年将发射多颗卫星 提供自主数据源支撑本土算法迭代</h3>
+                    <div class="content-body">【青岛国测海遥：明年将发射多颗卫星 提供自主数据源支撑本土算法迭代】财联社8月9日电，财联社记者8月7日在青岛市网信办组织的媒体调研行活动中获悉，青岛国测海遥信息技术有限公司计划发射多颗卫星组建星座，尝试探索搭建一条覆盖数据采集、自动处理、智能解译到场景应用的一体化时空数据底座平台。其中，明年一季度计划发射3颗卫星，发射协议已经签订；计划明年6月发射的一颗卫星已经整装完成。国测海遥总经理綦春峰介绍，公司发射的单颗卫星成本数千万元，可以提供自主数据源，支撑本土算法迭代。小财注：青岛国测海遥成立于2016年，专注于商业航天及卫星终端应用服务，在规划的“10+1”创新型产业体系中，该公司青岛市新一代信息技术产业链空天信息赛道的重点企业之一。 （财联社记者 肖良华）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:13</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">公司公告</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">周末投资舆情热点</h3>
+                    <div class="content-body">【周末投资舆情热点】<br>1）PCB：高盛大幅上调AI服务器PCB和CCL预测，2028年市场规模将达840亿和480亿美元。<br>2）医药生物：近期，药明康德、百济神州等药企上调2026年全年业绩指引；1-7月中国创新药BD交易总金额达1063亿美元，全球前十BD交易中国独占8席。<br>3）AI4S：斯坦福团队用生成式AI程序Evo2设计并制造16种合成噬菌体，AI4S正在完成一场科学范式的系统性跨越。<br>4）HBM：SK海力士宣布，将在韩国投资384亿美元建设晶圆厂，扩大高带宽存储器（HBM）、下一代DRAM及NAND闪存产能。</div>
+                </article>
+                
+                </div>
+            </section>
+            
+    </main>
+</div>
+<script>
+    const searchInput = document.getElementById('search');
+    const topicPills = document.querySelectorAll('.topic-pill');
+    const sections = document.querySelectorAll('.topic-section');
+    let activeTopic = 'all';
+
+    function updateFilter() {
+        const query = (searchInput.value || '').toLowerCase();
+        sections.forEach(section => {
+            const topic = section.dataset.topic;
+            const visibleByTopic = activeTopic === 'all' || activeTopic === topic;
+            let hasVisibleCard = false;
+            section.querySelectorAll('.news-card').forEach(card => {
+                const text = card.innerText.toLowerCase();
+                const visible = visibleByTopic && text.includes(query);
+                card.style.display = visible ? '' : 'none';
+                if (visible) hasVisibleCard = true;
+            });
+            section.style.display = visibleByTopic && hasVisibleCard ? '' : 'none';
+        });
+    }
+
+    searchInput.addEventListener('input', updateFilter);
+
+    topicPills.forEach(pill => {
+        pill.addEventListener('click', () => {
+            const topic = pill.dataset.topic;
+            if (activeTopic === topic) {
+                activeTopic = 'all';
+                topicPills.forEach(p => p.classList.remove('active'));
+            } else {
+                activeTopic = topic;
+                topicPills.forEach(p => p.classList.toggle('active', p.dataset.topic === topic));
+            }
+            updateFilter();
+        });
+    });
+
+    document.querySelectorAll('.toggle-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const content = btn.closest('.topic-heading').nextElementSibling;
+            const expanded = btn.getAttribute('aria-expanded') === 'true';
+            content.style.display = expanded ? 'none' : 'block';
+            btn.setAttribute('aria-expanded', String(!expanded));
+            btn.textContent = expanded ? '展开' : '折叠';
+        });
+    });
+    </script>
+</body>
+</html>
