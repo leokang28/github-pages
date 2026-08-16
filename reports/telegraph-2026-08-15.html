@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>财联社电报 - 2026-08-15</title>
+<style>
+    :root {
+        --color-b: #dc2626;
+        --color-c: #2563eb;
+        --color-other: #6b7280;
+        --bg: #f8fafc;
+        --card-bg: #ffffff;
+        --text: #1f2937;
+        --text-secondary: #64748b;
+        --border: #e2e8f0;
+        --radius: 12px;
+        --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    }
+    * { box-sizing: border-box; }
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+    }
+    .container { max-width: 900px; margin: 0 auto; padding: 24px 16px 64px; }
+    header { text-align: center; margin-bottom: 24px; }
+    header h1 { margin: 0 0 8px; font-size: 28px; }
+    header p { margin: 0; color: var(--text-secondary); }
+    .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+    .stat-card {
+        background: var(--card-bg);
+        border-radius: var(--radius);
+        padding: 16px;
+        box-shadow: var(--shadow);
+        text-align: center;
+        border-top: 4px solid var(--color-other);
+    }
+    .stat-card.stat-b { border-top-color: var(--color-b); }
+    .stat-card.stat-c { border-top-color: var(--color-c); }
+    .stat-value { font-size: 24px; font-weight: 700; }
+    .stat-label { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+    .filters {
+        position: sticky;
+        top: 0;
+        background: rgba(248, 250, 252, 0.96);
+        backdrop-filter: blur(8px);
+        padding: 12px 0;
+        margin-bottom: 16px;
+        border-bottom: 1px solid var(--border);
+        z-index: 10;
+    }
+    .search-box {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1px solid var(--border);
+        border-radius: 9999px;
+        font-size: 14px;
+        margin-bottom: 10px;
+        outline: none;
+    }
+    .search-box:focus { border-color: var(--color-c); }
+    .topic-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+    .topic-pill {
+        border: 1px solid var(--border);
+        background: var(--card-bg);
+        border-radius: 9999px;
+        padding: 6px 12px;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+    .topic-pill:hover, .topic-pill.active {
+        background: #eff6ff;
+        border-color: var(--color-c);
+        color: var(--color-c);
+    }
+    .topic-section { margin-bottom: 24px; }
+    .topic-heading {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 18px;
+        margin: 0 0 12px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid var(--border);
+    }
+    .topic-count {
+        background: var(--border);
+        color: var(--text-secondary);
+        font-size: 12px;
+        padding: 2px 8px;
+        border-radius: 9999px;
+    }
+    .toggle-btn {
+        margin-left: auto;
+        background: transparent;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 12px;
+        cursor: pointer;
+        color: var(--text-secondary);
+    }
+    .news-card {
+        background: var(--card-bg);
+        border-radius: var(--radius);
+        padding: 14px 16px;
+        margin-bottom: 10px;
+        box-shadow: var(--shadow);
+        border-left: 4px solid var(--color-other);
+        transition: transform 0.1s;
+    }
+    .news-card:hover { transform: translateY(-1px); }
+    .news-card.level-b { border-left-color: var(--color-b); }
+    .news-card.level-c { border-left-color: var(--color-c); }
+    .card-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+        flex-wrap: wrap;
+    }
+    .time-badge { font-size: 12px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+    .level-badge {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 2px 6px;
+        border-radius: 4px;
+        color: white;
+    }
+    .level-badge.level-b { background: var(--color-b); }
+    .level-badge.level-c { background: var(--color-c); }
+    .level-badge.level-other { background: var(--color-other); }
+    .topic-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+    .topic-chip {
+        font-size: 11px;
+        background: #f1f5f9;
+        color: var(--text-secondary);
+        padding: 2px 8px;
+        border-radius: 9999px;
+    }
+    .news-title { margin: 0 0 8px; font-size: 15px; line-height: 1.5; }
+    .content-body {
+        font-size: 14px;
+        color: var(--text-secondary);
+        white-space: pre-wrap;
+    }
+    .empty-state { text-align: center; color: var(--text-secondary); padding: 40px; }
+    @media (max-width: 640px) {
+        .stats { grid-template-columns: repeat(2, 1fr); }
+        header h1 { font-size: 22px; }
+    }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>📰 财联社电报</h1>
+        <p>2026-08-15 16:00 起 · 共 66 条</p>
+    </header>
+    <div class="stats">
+        
+        <div class="stat-card stat-total">
+            <div class="stat-value">66</div>
+            <div class="stat-label">总计</div>
+        </div>
+        
+
+        <div class="stat-card stat-b">
+            <div class="stat-value">5</div>
+            <div class="stat-label">Level B</div>
+        </div>
+        
+
+        <div class="stat-card stat-c">
+            <div class="stat-value">61</div>
+            <div class="stat-label">Level C</div>
+        </div>
+        
+
+        <div class="stat-card stat-other">
+            <div class="stat-value">0</div>
+            <div class="stat-label">其他</div>
+        </div>
+        
+    </div>
+    <div class="filters">
+        <input class="search-box" id="search" type="text" placeholder="搜索标题 / 内容 / 主题...">
+        <div class="topic-pills">
+            <button class="topic-pill" data-topic="其他">其他 (35)</button>
+<button class="topic-pill" data-topic="国际市场">国际市场 (15)</button>
+<button class="topic-pill" data-topic="行业动态">行业动态 (8)</button>
+<button class="topic-pill" data-topic="公司公告">公司公告 (4)</button>
+<button class="topic-pill" data-topic="商品期货">商品期货 (2)</button>
+<button class="topic-pill" data-topic="债券固收">债券固收 (1)</button>
+<button class="topic-pill" data-topic="宏观经济">宏观经济 (1)</button>
+        </div>
+    </div>
+    <main id="news-list">
+        
+            <section class="topic-section" data-topic="公司公告">
+                <h2 class="topic-heading">
+                    <span class="topic-name">公司公告</span>
+                    <span class="topic-count">4</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-b" data-topic="公司公告" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">17:33</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">非沪籍居民及境外人士置换性购房政策微调？上海房地产交易中心热线回应</h3>
+                    <div class="content-body">【非沪籍居民及境外人士置换性购房政策微调？上海房地产交易中心热线回应】财联社8月15日电，针对市场传出上海更新置换购房相关执行口径，8月15日，记者致电上海房地产交易中心热线“962269”进行咨询。针对非本市户籍居民置换性购房的问题，上海房地产交易中心热线工作人员表示，并未出台新政。据热线工作人员介绍，非本市户籍居民家庭，出售名下唯一房产，可在全市范围内置换一套住房，前后产权人需保持一致，无需提供社保或个税证明。该口径已于2024年5月28日起执行。<br><br>针对多套住房，非本市户籍居民家庭或成年单身人士出售名下部分房产（即名下有两套及以上的），再次购房时，购买住房的套数与位置要与售出房屋一致——卖掉外环外房屋只能外环外买；卖掉外环内房屋，只能外环内买，免于提交社保或个税证明。该口径已于2026年2月26日起执行。针对境外人士的购房置换，热线工作人员表示，境外个人出售名下上海全部房产后，可在本市置换并购买一套住房，免于提交外国人居留许可证（工作类）、自购房之日前连续满一年的本市劳动合同，以及购房之日前连续满一年的社保、个税缴纳证明，但仍需签署境外个人购房自住承诺书。该口径于2026年7月29日起执行。 （澎湃新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:56</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">国际市场</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">近一周机构调研个股逾70只 九号公司-WD调研机构数最多</h3>
+                    <div class="content-body">【近一周机构调研个股逾70只 九号公司-WD调研机构数最多】财联社8月16日电，近一周机构调研个股有70多只，九号公司-WD调研机构数最多。九号公司-WD有267家机构调研，包括49家基金公司、61家证券公司、91家私募、16家保险公司等。九号公司-WD在调研中透露，目前欧盟对割草机器人反倾销调查的最终裁定尚未作出，预计将于明年年初公布终裁结果，相关时间安排以主管机构正式发布的信息为准。公司正积极推进海外产能建设，已在东南亚三家代工厂开展代工及扩产工作，并将结合政策变化、产能进度、供应链条件及客户需求等因素，推动更多产能向东南亚布局。鹏鼎控股、盛弘股份、恒逸石化等个股均有100家以上机构评级。恒逸石化最新动态市盈率为5.4倍，属于半年报业绩暴增的低市盈率品种。另外，五洲特纸、中原内配、国航远洋等个股半年报归母净利（按照半年报、快报、预告净利中值计算）同比增长超50%，折算动态市盈率低于20倍且近一周均有10家以上机构调研。从市场表现来看，近一周机构调研股平均上涨0.16%，炬光科技、盛弘股份、药石科技等个股均涨超10%。 （证券时报）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:53</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">股市政策</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">泰国成立专门机构强化数据中心管理</h3>
+                    <div class="content-body">【泰国成立专门机构强化数据中心管理】财联社8月15日电，泰国政府网站14日发布公告，宣布设立“数据中心经营政策委员会”。该委员会旨在为作为未来产业基础设施的数据中心业务制定明确监管政策，在促进投资的同时，重点管控其对电力、水资源及环境的影响，以平衡产业发展与国家整体利益。公告指出，数据中心运营需消耗大量电力，在当前国家用电需求持续攀升、发电增量有限及偏远地区供电能力不足的情况下，数据中心的扩张可能对电价、民众用电权益、电力系统稳定性及国家能源安全构成潜在影响。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:12</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">刘益谦控股子公司新理益新进成为颀中科技第七大股东</h3>
+                    <div class="content-body">【刘益谦控股子公司新理益新进成为颀中科技第七大股东】财联社8月15日电，颀中科技(688352.SH)周五晚间发布2026年半年报，截至二季度末，新理益集团有限公司持有颀中科技400.22万股，占总股本比例0.34%，为公司的第七大股东。以颀中科技周五收盘价18.83元/股估算，新理益在颀中科技的持股市值约7536.14万元。<br><br>小财注：新理益系刘益谦的控股子公司。</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="国际市场">
+                <h2 class="topic-heading">
+                    <span class="topic-name">国际市场</span>
+                    <span class="topic-count">15</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:36</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span> <span class="topic-chip">股市政策</span> <span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">哈佛持有价值22亿美元SpaceX股份</h3>
+                    <div class="content-body">【哈佛持有价值22亿美元SpaceX股份】财联社8月16日电，哈佛大学投资管理机构披露持有价值22亿美元SpaceX股份。这家机构早年投资埃隆・马斯克旗下火箭企业，在SpaceX重磅上市后收获巨额回报。哈佛管理公司于周五在监管申报文件中披露该持仓。在其规模43亿美元的美股投资组合里，SpaceX成为持仓市值最高的单一标的。这笔持仓充分体现：SpaceX在6月创下纪录的IPO，为一众大学捐赠基金带来丰厚收益。不少高校捐赠基金早在十余年前就通过风投渠道布局这家公司。根据最新公开数据，截至2025年6月，哈佛管理公司管理资产规模约570亿美元。并非只有哈佛受益于SpaceX登陆公开市场。加州大学旗下投资机构本周申报文件显示，持有价值约10亿美元SpaceX股票；北卡罗来纳大学、圣路易斯华盛顿大学同样持有该公司投资。</div>
+                </article>
+                
+                <article class="news-card level-b" data-topic="国际市场" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">20:51</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">伊朗称已与阿曼就霍尔木兹海峡通行方案达成协议</h3>
+                    <div class="content-body">【伊朗称已与阿曼就霍尔木兹海峡通行方案达成协议】财联社8月15日电，伊朗外交部发言人巴加埃当地时间8月15日表示，尽管美国从中阻挠，伊朗和阿曼之间的会谈仍在积极推进，双方已就霍尔木兹海峡航道通行方案达成协议。</div>
+                </article>
+                
+                <article class="news-card level-b" data-topic="国际市场" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">19:52</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">8月15日周六《新闻联播》要闻21条</h3>
+                    <div class="content-body">【8月15日周六《新闻联播》要闻21条】财联社8月15日电，今天《新闻联播》主要内容有：<br>1、【新思想引领新征程】法治护航美丽中国建设 筑牢中华民族永续发展生态根基； <br>2、文献纪录片《江泽民》今晚继续播出； <br>3、【凝心聚力 真抓实干 奋力实现“十五五”良好开局】北京建设历史文化名城 让保护与发展相融共生； <br>4、日本无条件投降81周年 各地举行活动铭记历史缅怀先烈； <br>5、我国多措并举加快绿色低碳发展； <br>6、多地出现强降雨天气 防汛救灾加紧进行； <br>7、各地创新举措 推进完整社区建设； <br>8、【新闻特写】中国，我还会再来！ <br>9、前7个月全国铁路发送旅客28亿人次； <br>10、前7个月中国—中东欧国家经贸合作示范区贸易额超370亿元； <br>11、我国进一步规范检验类医疗服务项目收费； <br>12、中消协发布《中国消费者绿色消费指南（2026版）》； <br>13、中欧北极快航季节性航线开启常态化运营； <br>14、“CMG电影文化嘉年华·天津专场”启动； <br>15、日本民众举行集会 敦促日本政府反省侵略战争罪行； <br>16、国际人士批评日本歪曲历史 加速“再军事化”等危险举动； <br>17、印尼发生7.7级强震 已致38人死亡； <br>18、伊朗称美破坏停火 协议无法延长； <br>19、古巴谴责美对古实施极限施压和经济扼杀； <br>20、数据显示8月美消费者信心指数显著下滑； <br>21、干旱持续 欧洲多条河流水位达新低。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:47</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">伊朗外交部：美以非法行动导致霍尔木兹海峡“不稳定”</h3>
+                    <div class="content-body">【伊朗外交部：美以非法行动导致霍尔木兹海峡“不稳定”】财联社8月16日电，伊朗外交部发言人巴加埃15日表示，霍尔木兹海峡目前的局势是美国和以色列“非法行动”的直接结果。他表示，在美以对伊朗的“非法军事行动”之前，霍尔木兹海峡是完全开放的，而美国和以色列利用这条水道以及邻近地区策划对伊朗的袭击，这导致了海峡的不稳定。他强调，伊朗作为霍尔木兹海峡的沿岸国家，过去和现在都有权采取一系列措施来维护自身利益和国家安全。巴加埃还谴责美国对伊朗的海上封锁是侵略行为，这一行动也违反了此前双方达成的谅解备忘录。此外他还表示，尽管美国从中阻挠，伊朗和阿曼之间的会谈仍在积极推进，双方已就霍尔木兹海峡航道通行方案达成协议。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:27</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月16日电，英伟达正洽谈向SB Energy投资30亿美元，作为其参与OpenAI数据中心交易的一部分。</h3>
+                    <div class="content-body">财联社8月16日电，英伟达正洽谈向SB Energy投资30亿美元，作为其参与OpenAI数据中心交易的一部分。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">05:44</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span> <span class="topic-chip">商品期货</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">厄瓜多尔总统诺沃亚抵达北京 开启访华行程</h3>
+                    <div class="content-body">【厄瓜多尔总统诺沃亚抵达北京 开启访华行程】财联社8月16日电，今天（16日）早晨，厄瓜多尔共和国总统丹尼尔·罗伊－希尔克里斯特·诺沃亚·阿辛抵达北京，开始为期8天的访华行程。此访是诺沃亚总统首次对中国进行国事访问。近年来，在两国元首战略引领下，中厄关系保持良好发展势头，双方签署了共建“一带一路”合作文件和自由贸易协定。中国是厄瓜多尔第二大贸易伙伴，对厄出口汽车及零配件、机电产品、钢材等。同时，厄瓜多尔是中国在拉美第八大贸易伙伴，向中国出口原油、对虾、矿产等。2025年，中厄双边贸易额为173.3亿美元。两国各领域务实合作成果丰硕。外交部发言人在谈及此访时表示，今年是中厄建立全面战略伙伴关系十周年，中方期待通过此访进一步夯实两国政治互信，赓续传统友谊，推动中厄全面战略伙伴关系不断取得新进展，更好造福两国人民。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:44</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">黎巴嫩谴责以色列袭击黎南违反框架协议</h3>
+                    <div class="content-body">【黎巴嫩谴责以色列袭击黎南违反框架协议】财联社8月15日电，黎巴嫩总统奥恩15日谴责以色列当天对黎南地区发动的空袭，称以方袭击违反黎以美三方框架协议和国际法，导致奈拜提耶地区安萨尔村一家人全部遇难。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">21:33</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span> <span class="topic-chip">行业动态</span> <span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">程福波到中国石油调研强调：坚决扛牢能源安全使命 加快建设世界一流综合性能源化工企业</h3>
+                    <div class="content-body">【程福波到中国石油调研强调：坚决扛牢能源安全使命 加快建设世界一流综合性能源化工企业】财联社8月15日电，国务院国资委党委书记、主任程福波8月14日到中国石油调研保障能源安全、科技创新和产业发展、深化改革和党的建设等工作，强调要深入学习贯彻习近平总书记关于国家能源安全的重要论述，全面落实“四个革命、一个合作”能源安全新战略，更好统筹发展和安全，树牢底线思维、极限思维，全力强创新、促转型、稳增长、防风险，持续加大油气勘探开发力度，提升能源高效供给能力，推进产业绿色转型与布局优化，加快打造基业长青的世界一流综合性能源与化工公司，为推进能源革命、保障能源安全提供有力支撑。<br><br>程福波深入了解企业智能运营中心运行情况，与集团领导班子座谈交流，并听取工作意见建议。他指出，中国石油的发展史是一部艰苦奋斗的创业史，见证了我国石油工业从弱到强发展历程。特别是近年来企业坚决落实党中央、国务院决策部署，积极应对国际局势动荡、行业形势变化，持续加强油气勘探开发和增储上产，形成国内原油产量、国内天然气产量当量、海外油气权益产量当量“三个1亿吨”格局并不断巩固，有力保供应、稳市场，高质量发展迈出坚实步伐，充分彰显了能源保供“顶梁柱”作用。<br><br>程福波强调，中国石油要坚持以习近平总书记重要指示精神为统领，突出抓好能源保供，加大增储上产力度，统筹高效勘探和效益开发，着力增强优质资源获取能力，把能源饭碗端得更牢；抓好转型升级，找准发展方向，提升自主创新能力，在深地深海能源、高端化工新材料等领域加强应用基础研究和基础研究，强化关键核心技术攻关，推动传统产业智能化、绿色化、融合化发展，因地制宜发展新兴产业，培育壮大新动能新优势；扎实推进稳增长提效益，保持对市场供应跟踪研判，及时调整经营策略，狠抓降本增效，合理扩大有效投资，提升高质量发展成色；抓好新一轮国资国企改革方案落地见效，加快构建与世界一流企业相适应的体制机制，进一步加强穿透式监管，压紧压实生态环境保护责任，坚决守住安全生产风险底线。要坚持党的领导加强党的建设，持续树牢和践行正确政绩观，弘扬石油精神和大庆精神、铁人精神，纵深推进全面从严治党，充分发挥高质量党建引领保障作用。<br><br>国务院国资委有关厅局负责同志参加调研。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">21:19</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">印尼地震死亡人数上升至47人</h3>
+                    <div class="content-body">【印尼地震死亡人数上升至47人】财联社8月15日电，根据印尼国家抗灾署公布的最新数据，截至印尼雅加达时间今天18时48分（北京时间19时48分），印尼东努沙登加拉省7.7级地震造成的死亡人数已升至47人。 （CCTV国际时讯）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">20:57</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">联合国追加资金应对埃博拉疫情</h3>
+                    <div class="content-body">【联合国追加资金应对埃博拉疫情】财联社8月15日电，联合国分管人道主义事务的副秘书长托马斯·弗莱彻14日表示，埃博拉病毒正在刚果（金）“占据上风”。联合国将追加3050万美元拨款，增派工作人员，扩大应对疫情行动。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:12</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span> <span class="topic-chip">商品期货</span></div>
+                    </div>
+                    <h3 class="news-title">金价反弹黄金市场交易又火了 分析师：下半年金价波动可能会加大</h3>
+                    <div class="content-body">【金价反弹黄金市场交易又火了 分析师：下半年金价波动可能会加大】财联社8月15日电，最近，金价连日上涨，截至8月14日，国际黄金现货价上涨8.36%，国内金价每克上涨超80元，各地黄金市场交易火热。那么，未来黄金走势如何？菜百股份高级黄金投资分析师李洋判断，如果中长期持有，我们看好未来走势，但是从短期、下半年来看，黄金价格波动可能还会加大。国家高级黄金投资分析师宋蒋圳介绍，这轮反弹有“修补”成分，但也有扎实的基本面支撑。目前，金价已经在900元每克上方，面临多空激辩和技术性震荡，不建议普通人在此位置投入过重仓位。 （央视财经）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:50</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">伊朗总统称绝不会违抗最高领袖</h3>
+                    <div class="content-body">【伊朗总统称绝不会违抗最高领袖】财联社8月15日电，伊朗总统佩泽希齐扬当地时间8月14日表示，敌人如今破坏伊朗国家稳定的方式不仅仅是军事手段，还企图在伊朗内部制造分裂，破坏内部团结。他强调，无论他个人的想法如何，但他绝不会违抗伊朗最高领袖，因为团结远比个人想法更为重要，他还表示，伊朗会继续抗争，绝不屈服于敌人的暴政与侵略。 （CCTV国际时讯）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:41</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">国防部新闻发言人蒋斌就日本政要参拜靖国神社答记者问</h3>
+                    <div class="content-body">【国防部新闻发言人蒋斌就日本政要参拜靖国神社答记者问】财联社8月15日电，国防部新闻发言人蒋斌就日本政要参拜靖国神社答记者问。记者：据报道，在日本战败投降日当天，日本首相高市早苗向靖国神社供奉祭祀费，日本防卫大臣小泉进次郎等前往参拜。请问对此有何评论？<br><br>蒋斌：靖国神社是日本军国主义发动对外侵略战争的精神工具和象征，供奉有双手沾满亚太国家人民鲜血的战犯。日本政客有关行径公然亵渎历史正义，严重伤害亚太受害国人民感情，本质上是掩盖否定侵略罪责，挑战世界反法西斯战争胜利成果与战后国际秩序。一边嘴上标榜追求和平，一边向战争罪魁祸首顶礼膜拜，这种虚伪的作派，充分暴露出日本右翼势力严重扭曲的历史观和为军国主义扬幡招魂的危险图谋。<br><br>正视侵略历史、深刻反省战争罪责，是日本发展同亚洲邻国关系的政治基础。今年是东京审判开庭80周年，我们要求日方切实汲取历史教训，停止倒行逆施，若一意孤行推进“新型军国主义”，成为危害地区和平的祸根乱源，必将再次受到正义审判和历史清算。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:21</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">伊朗司法总监回应特朗普：霍尔木兹海峡属于伊朗</h3>
+                    <div class="content-body">【伊朗司法总监回应特朗普：霍尔木兹海峡属于伊朗】财联社8月15日电，伊朗司法总监埃杰伊当地时间8月15日表示，美国总统针对霍尔木兹海峡发表的荒谬言论，完全源于其个人幻觉。在现实世界中，这道重要国际水道的真正所有者和主导者是伊朗。埃杰伊强调，伊朗已在军事层面证明，霍尔木兹海峡是伊朗领土与主权不可分割的一部分。他补充道，无论从国际法角度还是国家主权准则来看，霍尔木兹海峡属于伊朗都是明确且毫无争议的客观事实。埃杰伊表示，特朗普及其顾问必须明白，霸权主义的靴子绝不可能踏上霍尔木兹海峡。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:34</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">伊朗外长说无意延长停火协议</h3>
+                    <div class="content-body">【伊朗外长说无意延长停火协议】财联社8月15日电，伊朗外交部长阿拉格齐今天（8月15日）在接受伊朗媒体采访时表示，伊朗无意延长与美方的停火协议，且尚未决定是否重启与美国的谈判。阿拉格齐还说，卡塔尔和巴基斯坦作为调解方正开展交换信息的工作，并与伊朗保持联系，但这并不意味着伊美双方正在进行谈判。此前，美国和伊朗方面6月17日公布谅解备忘录正式文本。根据这份文件，美伊承诺在60天内进行谈判并达成最终协议。 （CCTV国际时讯）</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="其他">
+                <h2 class="topic-heading">
+                    <span class="topic-name">其他</span>
+                    <span class="topic-count">35</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-b" data-topic="其他" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">20:29</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">河南周口川汇区贾鲁河东岸堤防溃口成功合龙</h3>
+                    <div class="content-body">【河南周口川汇区贾鲁河东岸堤防溃口成功合龙】财联社8月15日电，经过多方应急抢险力量昼夜不停努力，8月15日晚上8时29分，河南省周口市川汇区贾鲁河东岸堤防117米溃口成功合龙。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">20:02</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">多部门会商部署重点地区防汛抢险工作</h3>
+                    <div class="content-body">【多部门会商部署重点地区防汛抢险工作】财联社8月15日电，国家防总办公室、应急管理部8月15日继续组织中国气象局、水利部、自然资源部、工业和信息化部、住房和城乡建设部、交通运输部等部门以及黑龙江、江苏、浙江、安徽、河南、广东等重点省份联合会商，研判近期强降雨影响，研究部署重点地区防汛抢险工作。<br><br>国家防总针对太湖流域汛情提升针对江苏的防汛应急响应至三级，启动针对浙江的防汛四级应急响应，增派工作组赶赴江苏协助指导抗洪抢险工作；继续维持针对河南的防汛三级应急响应、针对安徽的防汛四级应急响应。国家防减救灾委维持针对浙江、河南、陕西、黑龙江的国家四级救灾应急响应。应急管理部维持针对浙江、安徽、河南、湖北的地质灾害四级应急响应。<br><br>会商指出，太湖流域发生流域性较大洪水，太湖水位上涨较快，周边河网多个站点水位超警戒、超保证；淮河流域沙颍河和长江滁河等部分河段维持高水位运行，堤防防守压力大；浙江、福建、广东等地仍有强暴雨，局地发生山洪、地质灾害的风险较高，防汛救灾形势严峻复杂。会商强调，要盯紧夜间和山区降雨，加强雨情水情监测预报，加强重点地区风险研判和指挥调度，督促做好山洪和地质灾害防范应对工作。要全面加强超警戒堤防、超汛限水库的巡查防守，压紧压实防汛责任和措施，特别是对险工险段、历史出险点、堤防桥梁交叉部位等，加密巡查频次，及时组织险情抢护，坚决防止重要堤防决口、水库垮坝。要加强信息共享和突发险情报送，省际间、上下游要及时共享实时雨情水情及预测预报意见、会商研判结果等信息，水库堤防发现险情要及时报告防汛指挥机构，确保信息畅通、响应及时、处置高效。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:43</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">四川等地局部有大暴雨 下周江南多地热力升级高温增多</h3>
+                    <div class="content-body">【四川等地局部有大暴雨 下周江南多地热力升级高温增多】财联社8月16日电，据中国天气网，今天（8月16日），随着低涡北上，东北地区多地降雨将增强，同时，甘肃、四川等地部分地区雨势较强。明后天，华南多地也将遭遇强降雨，公众需关注预警预报信息，外出带好雨具。同时，随着副热带高压西伸增强，南方高温将再度增多，江南多地也将加入高温阵营，需注意及时补水降温，降低中暑风险。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:31</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月16日电，乌克兰首都基辅当地时间16日响起多次爆炸声。 （央视新闻）</h3>
+                    <div class="content-body">财联社8月16日电，乌克兰首都基辅当地时间16日响起多次爆炸声。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:12</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">也门摩卡港遭袭受损 运营活动全面停止</h3>
+                    <div class="content-body">【也门摩卡港遭袭受损 运营活动全面停止】财联社8月16日电，也门胡塞武装近日对也门重要港口摩卡港持续发起大规模导弹和无人机袭击。15日，摩卡港管理方对外介绍，袭击造成港口基础设施严重受损，港口运营活动已经全面停止。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:55</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">俄称控制一居民点 乌称远程打击俄目标</h3>
+                    <div class="content-body">【俄称控制一居民点 乌称远程打击俄目标】财联社8月16日电，俄罗斯国防部15日通报称，俄军控制了扎波罗热地区的一个居民点。过去一天，俄军对乌军后勤中心、燃料能源和交通基础设施、远程无人机和无人艇组装车间实施了打击。此外，俄军还对147个区域内的乌军和外国雇佣军临时部署点实施了打击。通报称，俄军继续对服务于乌军的乌克兰港口基础设施和船只实施打击。乌克兰武装部队总参谋部15日通报称，过去一天，前线地区发生233次战斗，乌军在多个方向击退俄军进攻。乌军对俄军指挥所、兵力集结区、火炮系统以及无人机控制点等目标发动了打击。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:13</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">日本千叶县暴雨已致9人死亡 超千栋房屋被淹</h3>
+                    <div class="content-body">【日本千叶县暴雨已致9人死亡 超千栋房屋被淹】财联社8月16日电，据日本千叶县政府和警方16日公布的消息，截至目前，千叶县13日开始的暴雨已导致9人死亡，受淹房屋超过1000栋。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">05:09</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">美国印第安纳州遭遇恶劣天气 至少5人死亡</h3>
+                    <div class="content-body">【美国印第安纳州遭遇恶劣天气 至少5人死亡】财联社8月16日电，央视记者当地时间8月15日获悉，美国印第安纳州当局表示，本周席卷全州的强风暴和洪水已导致至少5人死亡。过去一周，该州连降暴雨，导致多条河流的水位创下历史新高，迫使居民纷纷向高处转移。目前已有十多个县宣布进入地方灾害状态，最新的灾情主要集中在从汉密尔顿县延伸至印第安纳波利斯北部郊区的河道沿线。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:10</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">2026年8月票房破30亿</h3>
+                    <div class="content-body">【2026年8月票房破30亿】财联社8月15日电，据网络平台数据，截至8月15日，2026年8月总票房（含预售）突破30亿，《蜘蛛侠：崭新之日》《欢迎来龙餐馆》《八仙！》《奥德赛》《功夫女足》暂列8月票房榜前五。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">00:38</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">印尼中苏拉威西省附近海域发生6.2级地震</h3>
+                    <div class="content-body">【印尼中苏拉威西省附近海域发生6.2级地震】财联社8月16日电，据印尼气象、气候和地球物理局发布的报告，当地时间8月15日23时25分，印尼中苏拉威西省附近海域发生6.2级地震， 震源深度44公里。预计不会有海啸风险。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">00:06</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">津巴布韦船只倾覆已致68人死亡</h3>
+                    <div class="content-body">【津巴布韦船只倾覆已致68人死亡】财联社8月16日电，当地时间15日，津巴布韦警方公布，该国北部卡里巴湖11日下午发生的船只倾覆事故死亡人数上升到68人。津巴布韦政府说，事故发生时，船上载有119名成人，另有数量不明的儿童。目前，搜救工作仍在进行中。津巴布韦总统姆南加古瓦已宣布这起事故为“国家灾难”。据津巴布韦方面稍早前消息，事故船只因遭遇强风发生倾覆。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:18</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">石家庄市气象台8月15日21时44分发布雷电黄色预警信号</h3>
+                    <div class="content-body">【石家庄市气象台8月15日21时44分发布雷电黄色预警信号】财联社8月15日电，石家庄市气象台2026年08月15日21时44分发布雷电黄色预警信号：预计今天后半夜到16日上午，我市全部县区有雷阵雨或阵雨，雷雨时伴有短时强降水、短时大风等强对流天气，请注意防范。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">21:45</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">航行警告：南海海域军事训练</h3>
+                    <div class="content-body">【航行警告：南海海域军事训练】财联社8月15日电，据中国海事局网站消息，江门海事局发布航行警告，8月16日至17日，每天0时至12时，南海部分海域进行军事训练，禁止驶入。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">21:29</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">韩国西江大学18万条个人信息泄露 朴槿惠或在其中</h3>
+                    <div class="content-body">【韩国西江大学18万条个人信息泄露 朴槿惠或在其中】财联社8月15日电，韩国西江大学15日确认，该校约18万条个人信息泄露，涉及在校学生、毕业生、教职员和其他人员，据信包括韩国前总统朴槿惠的个人信息。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">20:22</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">美国弗吉尼亚州立大学发生枪击事件</h3>
+                    <div class="content-body">【美国弗吉尼亚州立大学发生枪击事件】财联社8月15日电，据美国方面15日消息，美国弗吉尼亚州立大学发生枪击事件，多人中枪，校园随即进入封锁状态。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">20:13</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">纪念江泽民同志诞辰100周年大会17日上午在京隆重举行 习近平将出席大会并发表重要讲话</h3>
+                    <div class="content-body">【纪念江泽民同志诞辰100周年大会17日上午在京隆重举行 习近平将出席大会并发表重要讲话】纪念江泽民同志诞辰100周年大会将于8月17日上午10时在人民大会堂隆重举行。中共中央总书记、国家主席、中央军委主席习近平将出席大会并发表重要讲话。 （新华社）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:54</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">雷电+雷雨大风+暴雨三预警齐发 深圳进入暴雨戒备状态</h3>
+                    <div class="content-body">【雷电+雷雨大风+暴雨三预警齐发 深圳进入暴雨戒备状态】财联社8月15日电，深圳市气象台于2026年8月15日18时49分发布多项预警信号：全市雷电预警信号：覆盖全市范围。雷雨大风黄色预警信号：覆盖珠江口、深圳湾、南山区（南头、南山、蛇口、招商街道）和宝安区（松岗、福永、西乡、沙井、新安、航城、福海、新桥、燕罗街道）。暴雨黄色预警信号：覆盖南山区、福田区、宝安区、光明区、龙华区、珠江口和深圳湾。预计19时前后，深圳将自西向东出现雷雨，最大小时雨强30毫米左右，并伴有8级左右雷暴大风和强雷电。深圳全市进入暴雨戒备状态。上述区域存在山洪风险，请注意防御暴雨可能引发的局部内涝、山洪等灾害。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:47</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">巴布亚新几内亚北部海岸发生5.4级地震</h3>
+                    <div class="content-body">【巴布亚新几内亚北部海岸发生5.4级地震】财联社8月15日电，据美国地震调查局官网显示，当地时间15日晚，巴布亚新几内亚北部海岸发生5.4级地震。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:46</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">胡塞武装称沙特袭击也门西北部萨达省</h3>
+                    <div class="content-body">【胡塞武装称沙特袭击也门西北部萨达省】财联社8月15日电，也门胡塞武装15日称，沙特阿拉伯军队当日早晨对也门西北部萨达省部分地区发动炮弹和导弹袭击。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:42</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">印尼7.7级地震死亡人数升至40人</h3>
+                    <div class="content-body">【印尼7.7级地震死亡人数升至40人】财联社8月15日电，印尼国家搜救局公布的最新数据显示，截至印尼雅加达时间18时30分（震区时间19时30分），印尼东努沙登加拉省7.7级地震造成的死亡人数已升至40人，另有50人受伤。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:39</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月15日电，据伊朗方面消息，伊朗军事官员称，三名伊朗空军人员在三月份针对美国基地的行动后失踪，目前被拘留在卡塔尔。</h3>
+                    <div class="content-body">财联社8月15日电，据伊朗方面消息，伊朗军事官员称，三名伊朗空军人员在三月份针对美国基地的行动后失踪，目前被拘留在卡塔尔。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:34</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">匈牙利总理：已开始沉船作业抬升水位 保障核电站运行</h3>
+                    <div class="content-body">【匈牙利总理：已开始沉船作业抬升水位 保障核电站运行】财联社8月15日电，匈牙利总理毛焦尔当地时间15日在保克什核电站举行的新闻发布会上表示，驳船的受控沉降工作已经开始，尽管多瑙河主河道的水位仍在下降，但核电站泵站处的水位已上升了一厘米。毛焦尔表示，若不采取这一干预措施，16日晚间，多瑙河水位将降至极低水平，迫使该核电站两台仍在运行的涡轮机中的一台停机，并可能导致后续全面停机。他指出，沉降驳船和建造潜堰正是为了防止这种情况发生。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:20</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">印尼苏门答腊岛发生6.8级地震 震源深度170千米</h3>
+                    <div class="content-body">【印尼苏门答腊岛发生6.8级地震 震源深度170千米】财联社8月15日电，中国地震台网正式测定：08月15日18时54分在印尼苏门答腊岛（北纬2.95度，东经99.05度）发生6.8级地震，震源深度170千米。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:14</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">黎总理：以色列升级行动极其危险 破坏了稳定南部地区的努力</h3>
+                    <div class="content-body">【黎总理：以色列升级行动极其危险 破坏了稳定南部地区的努力】财联社8月15日电，黎巴嫩总理纳瓦夫·萨拉姆称，15日清晨以来，以色列在纳巴蒂耶区安萨尔镇、代尔扎赫拉尼镇以及邻近村庄的行动不断升级，伴随着空袭、猛烈炮击和对家中居民的恐吓，这令人严重关切，破坏了在南部建立稳定的努力。萨拉姆说，在以色列空袭安萨尔镇中丧生的7人不在军事基础设施中，在空袭中丧生的儿童和妇女也不是军事目标。萨拉姆强调，如果黎巴嫩境内存在任何军事设施，处理这些设施的责任完全在于黎巴嫩国家，由黎巴嫩军队负责，以色列必须停止军事升级趋势。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:09</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">水利部和中国气象局联合发布黄色山洪灾害气象预警</h3>
+                    <div class="content-body">【水利部和中国气象局联合发布黄色山洪灾害气象预警】财联社8月15日电，水利部和中国气象局8月15日18时联合发布黄色山洪灾害气象预警：预计8月15日20时至16日20时，四川北部、云南西北部、西藏东北部和东南部、甘肃南部、青海南部、新疆东南部等地部分地区可能发生山洪灾害（蓝色预警），其中，四川北部、云南西北部、西藏东北部和东南部、甘肃南部、新疆东南部局地发生山洪灾害可能性较大（黄色预警）。其他地区也可能因局地短历时强降水引发山洪灾害，请各地注意做好实时监测、防汛预警和转移避险等防范工作。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:05</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">印尼苏门答腊岛附近发生6.4级左右地震</h3>
+                    <div class="content-body">【印尼苏门答腊岛附近发生6.4级左右地震】财联社8月15日电，中国地震台网自动测定：08月15日18时54分在印尼苏门答腊岛附近（北纬3.01度，东经98.91度）发生6.4级左右地震，最终结果以正式速报为准。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:55</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">未来10天华南或成降水最多区域 江南、华南下周高温范围扩大</h3>
+                    <div class="content-body">【未来10天华南或成降水最多区域 江南、华南下周高温范围扩大】财联社8月15日电，伴随着“白海豚”残涡东移入海，华东等地降雨将逐渐减弱。不过降雨并未就此退场，随后残涡还会北上，导致东北地区东部降雨有所增强。明后天，辽宁东部、吉林东部、黑龙江东部将有明显降雨。下周，副热带高压再度加强西伸，我国雨热分布又将被其掌控——副热带高压南侧的华南，受季风槽或低压影响，迎来强降雨；副热带高压掌控下的江南至黄淮，高温闷热天气又会陆续发展增多。今后10天，华南或是我国降水最多的地方。据中央气象台中期预报，未来10天江南、华南、西南地区及东北地区东部和北部等地的累计降水量有50～90毫米，其中四川盆地西部、广西、广东和云南等地的部分地区100～150毫米，华南南部沿海局地超过250毫米；上述大部地区降水量较常年同期偏多5成至1倍，部分地区偏多2倍以上。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:44</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">淮河防总、淮委调整淮河流域应急响应</h3>
+                    <div class="content-body">【淮河防总、淮委调整淮河流域应急响应】财联社8月15日电，淮河防汛抗旱总指挥部、水利部淮河水利委员会8月15日对淮河流域防汛应急响应实施调整，涉及河南省、安徽省、江苏省和山东省。根据《淮河防汛抗旱总指挥部防汛抗旱应急预案》《淮河水利委员会水旱灾害防御应急预案》，经综合研判，淮河防总、淮委8月15日12时终止河南省淮河及以南地区的防汛四级应急响应、洪水防御Ⅳ级应急响应，维持该省沙颍河、洪汝河水系防汛二级应急响应、洪水防御Ⅱ级应急响应，将该省淮河以北其他地区防汛应急响应调整为四级、洪水防御应急响应调整为Ⅳ级；终止安徽省淮河以南地区的防汛四级应急响应、洪水防御Ⅳ级应急响应，维持该省淮河及以北地区的防汛四级应急响应、洪水防御Ⅳ级应急响应；针对江苏省、山东省，终止其淮河流域（片）的防汛四级应急响应、洪水防御Ⅳ级应急响应。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:26</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">河南三地出现溃口险情：北汝河堤岸溃口完成封堵 另两处仍在抢险</h3>
+                    <div class="content-body">【河南三地出现溃口险情：北汝河堤岸溃口完成封堵 另两处仍在抢险】财联社8月15日电，受今年第13号台风“白海豚”残余涡旋影响，10日开始，河南出现大范围持续性强降雨，多条河流高位运行。河南平顶山、许昌、周口三地相继出现溃口险情，其中，12日晚，平顶山市郏县长桥镇渔西村北汝河堤岸发生溃口，溃口宽度40余米。14日晚，该溃口已完成封堵。13日，清潩河许昌鄢陵段发生溃口险情，溃口的长度有十多米。13日23时许，周口市川汇区新北环桥下贾鲁河东岸堤坝出现溃口，由于水流流速快，溃口不断扩大至110多米。目前，这两处溃口的封堵工作仍在进行中。记者15日18时许从现场了解到，贾鲁河川汇区段溃口封堵进入最后攻坚，溃口还余10米，现场水流加大，预计决口封堵将在今晚完成。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:25</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">北京发布雷电黄色预警 延庆怀柔等区局地短时雨强较大</h3>
+                    <div class="content-body">【北京发布雷电黄色预警 延庆怀柔等区局地短时雨强较大】财联社8月15日电，北京气象台8月15日16时20分发布雷电黄色预警信号：预计，8月16日凌晨至下午，北京市自西向东将有分散性雷阵雨。其中，延庆、怀柔、昌平、房山、顺义等区的局地短时雨强较大，并伴有6级左右阵风，请注意防范。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:26</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">韩国总统李在明：将追缴亲日反民族行为者财产</h3>
+                    <div class="content-body">【韩国总统李在明：将追缴亲日反民族行为者财产】财联社8月15日电，韩国总统李在明15日表示，韩国政府将调查、追缴亲日反民族行为者不当聚敛的财产，并追究其历史责任。李在明当天在世宗文化会馆举行的光复节81周年庆祝仪式上说，随着6月2日《亲日反民族行为者财产的国家归属等相关特别法》正式颁布，韩国政府将更加负责地管理收归国家所有的亲日财产，确保相关财产能够完整用于对独立有功者及其遗属的礼遇和支援。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:01</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">原煤炭工业合肥设计研究院党委书记曹荣平接受纪律审查和监察调查</h3>
+                    <div class="content-body">【原煤炭工业合肥设计研究院党委书记曹荣平接受纪律审查和监察调查】财联社8月15日电，据安徽省纪委监委消息：原煤炭工业合肥设计研究院党委书记曹荣平涉嫌严重违纪违法，目前正接受安徽省纪委监委纪律审查和监察调查。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:51</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">以军称空袭黎巴嫩真主党多处基础设施</h3>
+                    <div class="content-body">【以军称空袭黎巴嫩真主党多处基础设施】财联社8月15日电，以色列国防军当地时间15日发布声明称，以军在黎巴嫩南部所谓“安全区”内的阿里·塔希尔高地遭黎巴嫩真主党袭击。作为回应，以军于15日凌晨对黎南部纳巴蒂耶和安萨尔地区的真主党基础设施发动了空袭。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:19</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">北京市发布雷电黄色预警</h3>
+                    <div class="content-body">【北京市发布雷电黄色预警】财联社8月15日电，北京市于8月15日16时20分发布雷电黄色预警：预计，8月16日凌晨至下午，我市自西向东将有分散性雷阵雨。其中，延庆、怀柔、昌平、房山、顺义等区的局地短时雨强较大，并伴有6级左右阵风，请注意防范。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:12</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">水利部：太湖流域将发生流域性大洪水</h3>
+                    <div class="content-body">【水利部：太湖流域将发生流域性大洪水】财联社8月15日电，水利部今天（15日）上午举行会商，分析研判全国的防汛形势，目前全国59条河流仍维持超警，太湖流域将发生流域性大洪水。 （央视新闻）</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="行业动态">
+                <h2 class="topic-heading">
+                    <span class="topic-name">行业动态</span>
+                    <span class="topic-count">8</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-b" data-topic="行业动态" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">17:18</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">黄仁勋出手安抚AI算力市场：英伟达可能会“为单个投资项目提供最高25%的残值支持机制”</h3>
+                    <div class="content-body">【黄仁勋出手安抚AI算力市场：英伟达可能会“为单个投资项目提供最高25%的残值支持机制”】财联社8月15日电，本周十分罕见的一大场景就是黄仁勋携手六位华尔街资管巨头，一起为“将AI算力打造为独立资产类别”背书，分析认为这是黄仁勋在践行自己提出的词元经济学，而这也标志着AI热潮正在从技术竞赛延伸至资本竞赛。但最新计划也引发了投资者对“循环融资”和债务风险的担忧，面对质疑，黄仁勋再次亲自出面安抚市场。他表示，英伟达可能会“为单个投资项目提供最高25%的残值支持机制”，并会审慎评估每个项目。此后市场情绪稍微得到缓解。 （央视财经）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">21:59</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">公司公告</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">国产算力迎扩张浪潮：大厂“超预期”加码投资 产业链多环节开启扩产</h3>
+                    <div class="content-body">【国产算力迎扩张浪潮：大厂“超预期”加码投资 产业链多环节开启扩产】财联社8月15日电，国产算力产业链正掀起新一轮投资热潮。中芯国际透露，中国互联网公司大幅提高硬件投资在公司此前预测之外，客户下线量都远超原来预期，多零部件供不应求。腾讯大幅增加算力采购，阿里扩充模块化数据中心全球产能。广发证券指出，云厂商上调资本开支重新成为AI产业链利好。在云厂商的投资扩产已经开始带来一定利润回报的背景下，更高的AI基础设施投入一方面能够抬升云厂商自身的远期盈利预期，另一方面也意味着更强的硬件采购需求，从而缓解市场对于上游芯片、通信连接和存储订单增长放缓的担忧。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:05</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">福建：到2030年力争全省工业战略性新兴产业产值占规模以上工业产值比重达35%左右</h3>
+                    <div class="content-body">【福建：到2030年力争全省工业战略性新兴产业产值占规模以上工业产值比重达35%左右】财联社8月16日电，福建省人民政府日前印发《福建省“十五五”新兴产业和未来产业发展规划》。《规划》中的发展目标为，到2030年，力争全省工业战略性新兴产业产值占规模以上工业产值比重达35%左右，全社会研发经费投入年均增长10%，培育万亿级新能源产业集群，力争新材料产业集群突破九千亿，集成电路和光电产业集群突破三千亿，打造人工智能、生物医药、节能环保、低空经济等千亿级产业集群，争取培育氢能、生物制造等若干百亿级未来产业集群，建成国内领先、特色鲜明的新兴产业和未来产业体系。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:09</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">福建：培育集成电路、化合物半导体、新型显示、光电元器件四大赛道</h3>
+                    <div class="content-body">【福建：培育集成电路、化合物半导体、新型显示、光电元器件四大赛道】财联社8月16日电，福建省人民政府日前印发《福建省“十五五”新兴产业和未来产业发展规划》，其中提到，面向人工智能等产业重大需求，充分发挥我省半导体制造与核心器件源头创新优势，培育集成电路、化合物半导体、新型显示、光电元器件四大赛道。集成电路围绕未来高算力低功耗芯片发展需求，提升芯片设计、特色工艺芯片制造、封装测试、零部件配套等水平；化合物半导体推动宽禁带与超宽禁带半导体发展，加快构建全链条产业生态；新型显示聚焦未来显示技术创新，引领高端显示市场；光电元器件以核心材料、关键器件攻关为核心，打造光电材料与器件创新策源地。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:08</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">福建：深耕新型储能、新能源汽车与零部件、海上风电、先进核能四大赛道</h3>
+                    <div class="content-body">【福建：深耕新型储能、新能源汽车与零部件、海上风电、先进核能四大赛道】财联社8月16日电，福建省人民政府日前印发《福建省“十五五”新兴产业和未来产业发展规划》，其中提到，立足福建在全球锂电制造引领优势与优质能源资源禀赋，深耕新型储能、新能源汽车与零部件、海上风电、先进核能四大赛道，推动技术共研、场景共建与生态共融，构建“源网荷储”高度协同的产业创新生态，建设世界级新能源产业集群。其中，新型储能以锂离子电池储能为核心，多元拓展钠离子电池储能、液流储能、压缩空气储能等技术路线，构建覆盖关键材料、专用电芯、系统集成到回收利用的全产业链；新能源汽车与零部件建设车能路云一体化生态，打造东南区域新能源汽车制造与出口基地；海上风电着力提升设备制造和服务的配套能力，构建覆盖全省域的海上风电运维服务网络；先进核能探索拓展供汽等多元化利用场景，构建“风光核储”多能互补的清洁能源体系。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:40</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">中欧北极快航常态化 20天直达欧洲</h3>
+                    <div class="content-body">【中欧北极快航常态化 20天直达欧洲】8月15日19时许，海杰航运“迪拜塔”号缓缓驶离浙江宁波舟山港穿山港区集装箱码头，标志着中欧北极集装箱航线（以下简称“中欧北极快航”）实现常态化运营，为中欧贸易开辟一条快捷高效、绿色低碳的北向物流大通道。本年度中欧北极快航首航船舶在国内首靠宁波舟山港，出境后依次停靠英国费利克斯托、荷兰鹿特丹、德国汉堡、波兰格丁尼亚等港口。本航次装载储能柜、动力电池、光伏组件、新能源零部件等高附加值热敏货物，货源集中来自浙江宁波、义乌等长三角制造业集群，精准匹配欧洲市场旺季出口交付需求。据介绍，中欧北极快航在时效及安全性上优势突出。相较传统苏伊士运河40天左右的航程，该航线单程仅需20天，航程缩减近一半，可有效避开地缘冲突带来的船期不稳、成本上涨等问题。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:11</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">上半年煤炭供应充足 迎峰度夏用能有保障</h3>
+                    <div class="content-body">【上半年煤炭供应充足 迎峰度夏用能有保障】财联社8月16日电，记者从中国煤炭工业协会了解到，今年上半年全国规模以上工业原煤日均产量达1307万吨，为历史同期第二高，煤炭作为主体能源的压舱石作用持续发挥。目前，我国进入迎峰度夏用能高峰时期，全国大部分地区气温较常年同期偏高，部分地区出现了阶段性高温热浪。为积极应对极端气候，做好迎峰度夏煤炭保供工作，煤炭行业充分发挥大型现代化煤矿和智能化煤矿优势，全国煤炭生产供应平稳有序。专家表示，下半年，我国宏观经济继续保持平稳较快增长，“AI+”应用场景越来越广泛，大数据与算力用能继续快速增加，拉动能源消费需求持续增长，煤炭仍将是全国能源安全稳定供应的主体和兜底保障重要力量。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:14</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">机器人消费节启动 促消费专项资金提升至1800万元</h3>
+                    <div class="content-body">【机器人消费节启动 促消费专项资金提升至1800万元】财联社8月15日电，北京经开区8月15日启动“2026 E-Town机器人消费节”。今年的消费节在2025年基础上全面升级，促消费专项资金从首届的1500万元提升至1800万元，重点向人工智能、具身智能产业倾斜。</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="债券固收">
+                <h2 class="topic-heading">
+                    <span class="topic-name">债券固收</span>
+                    <span class="topic-count">1</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-c" data-topic="债券固收" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">01:51</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">债券固收</span> <span class="topic-chip">国际市场</span> <span class="topic-chip">股市政策</span></div>
+                    </div>
+                    <h3 class="news-title">邦迪枪击案后澳新州将启动枪支回购计划</h3>
+                    <div class="content-body">【邦迪枪击案后澳新州将启动枪支回购计划】财联社8月16日电，据澳大利亚方面当地时间15日消息，澳新南威尔士州政府将启动枪支回购计划。这是去年该州发生悉尼邦迪滩枪击事件后收紧枪支管控的最新举措。据悉，该计划将于11月2日启动，新州因此将成为澳大利亚首个实施相关枪支回购计划的州。预计约有5万名持枪许可证持有人将受到新规影响，涉及枪支约27.4万支。根据回购计划，不同类型枪支的补偿标准从每支450至1000澳元不等（约合2150至4780元人民币），部分高价值枪支的补偿上限为每支1万澳元（约合4.78万元人民币）。新州州长克里斯·明斯15日在一份声明中说，邦迪滩枪击事件后，新州出台了更严格的枪支管控法律，下一步是回收并销毁根据新规不得继续持有的枪支。“社区内危险枪支越少，新州就越安全。”悉尼邦迪滩去年12月发生枪击事件，造成包括1名作案嫌疑人在内的16人死亡。事件发生后，新州收紧枪支管控法律，限制大多数持证人的持枪数量，并加强对部分类型枪支的管控。 （央视新闻）</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="商品期货">
+                <h2 class="topic-heading">
+                    <span class="topic-name">商品期货</span>
+                    <span class="topic-count">2</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-c" data-topic="商品期货" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:57</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">商品期货</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">伊朗与塔吉克斯坦达成长期石油合作协议</h3>
+                    <div class="content-body">【伊朗与塔吉克斯坦达成长期石油合作协议】财联社8月15日电，据伊朗方面消息，当地时间8月15日，伊朗和塔吉克斯坦在最新一轮石油谈判中就能源领域的长期合作达成协议。该协议涵盖两大核心内容：一是向塔吉克斯坦出口伊朗石油产品，二是伊朗向塔吉克斯坦炼油厂供应所需的原油。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="商品期货" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:19</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">商品期货</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月15日电，据报道，伊朗和塔吉克斯坦正在就向塔吉克斯坦炼油厂供应伊朗过剩石油产品和原油一事进行磋商。</h3>
+                    <div class="content-body">财联社8月15日电，据报道，伊朗和塔吉克斯坦正在就向塔吉克斯坦炼油厂供应伊朗过剩石油产品和原油一事进行磋商。</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="宏观经济">
+                <h2 class="topic-heading">
+                    <span class="topic-name">宏观经济</span>
+                    <span class="topic-count">1</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-c" data-topic="宏观经济" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:02</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">宏观经济</span> <span class="topic-chip">商品期货</span></div>
+                    </div>
+                    <h3 class="news-title">鸡蛋价格同比涨幅明显 专家预测后市将趋于稳定</h3>
+                    <div class="content-body">【鸡蛋价格同比涨幅明显 专家预测后市将趋于稳定】财联社8月15日电，据北京新发地农产品批发市场消息，这两天普通鸡蛋批发价比上月同期上涨约5.5%，较去年同期上涨约48%，日交易量为540吨，同比增加128吨。中国农业科学院农学经济与发展研究所副研究员朱宁表示，就后市来看，因为临近中秋国庆“双节”以及大中小学开学，鸡蛋的消费潜力将完全释放，蛋价将规律性偏强运行，鸡蛋供应则受二季度补栏较多的影响，近期新开产蛋鸡较多，鸡蛋市场供应有增长预期，有利于稳定蛋价，鸡蛋价格大幅上涨的可能性不大。 （央视新闻）</div>
+                </article>
+                
+                </div>
+            </section>
+            
+    </main>
+</div>
+<script>
+    const searchInput = document.getElementById('search');
+    const topicPills = document.querySelectorAll('.topic-pill');
+    const sections = document.querySelectorAll('.topic-section');
+    let activeTopic = 'all';
+
+    function updateFilter() {
+        const query = (searchInput.value || '').toLowerCase();
+        sections.forEach(section => {
+            const topic = section.dataset.topic;
+            const visibleByTopic = activeTopic === 'all' || activeTopic === topic;
+            let hasVisibleCard = false;
+            section.querySelectorAll('.news-card').forEach(card => {
+                const text = card.innerText.toLowerCase();
+                const visible = visibleByTopic && text.includes(query);
+                card.style.display = visible ? '' : 'none';
+                if (visible) hasVisibleCard = true;
+            });
+            section.style.display = visibleByTopic && hasVisibleCard ? '' : 'none';
+        });
+    }
+
+    searchInput.addEventListener('input', updateFilter);
+
+    topicPills.forEach(pill => {
+        pill.addEventListener('click', () => {
+            const topic = pill.dataset.topic;
+            if (activeTopic === topic) {
+                activeTopic = 'all';
+                topicPills.forEach(p => p.classList.remove('active'));
+            } else {
+                activeTopic = topic;
+                topicPills.forEach(p => p.classList.toggle('active', p.dataset.topic === topic));
+            }
+            updateFilter();
+        });
+    });
+
+    document.querySelectorAll('.toggle-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const content = btn.closest('.topic-heading').nextElementSibling;
+            const expanded = btn.getAttribute('aria-expanded') === 'true';
+            content.style.display = expanded ? 'none' : 'block';
+            btn.setAttribute('aria-expanded', String(!expanded));
+            btn.textContent = expanded ? '展开' : '折叠';
+        });
+    });
+    </script>
+</body>
+</html>
