@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>财联社电报 - 2026-08-29</title>
+<style>
+    :root {
+        --color-b: #dc2626;
+        --color-c: #2563eb;
+        --color-other: #6b7280;
+        --bg: #f8fafc;
+        --card-bg: #ffffff;
+        --text: #1f2937;
+        --text-secondary: #64748b;
+        --border: #e2e8f0;
+        --radius: 12px;
+        --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    }
+    * { box-sizing: border-box; }
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+    }
+    .container { max-width: 900px; margin: 0 auto; padding: 24px 16px 64px; }
+    header { text-align: center; margin-bottom: 24px; }
+    header h1 { margin: 0 0 8px; font-size: 28px; }
+    header p { margin: 0; color: var(--text-secondary); }
+    .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+    .stat-card {
+        background: var(--card-bg);
+        border-radius: var(--radius);
+        padding: 16px;
+        box-shadow: var(--shadow);
+        text-align: center;
+        border-top: 4px solid var(--color-other);
+    }
+    .stat-card.stat-b { border-top-color: var(--color-b); }
+    .stat-card.stat-c { border-top-color: var(--color-c); }
+    .stat-value { font-size: 24px; font-weight: 700; }
+    .stat-label { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+    .filters {
+        position: sticky;
+        top: 0;
+        background: rgba(248, 250, 252, 0.96);
+        backdrop-filter: blur(8px);
+        padding: 12px 0;
+        margin-bottom: 16px;
+        border-bottom: 1px solid var(--border);
+        z-index: 10;
+    }
+    .search-box {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1px solid var(--border);
+        border-radius: 9999px;
+        font-size: 14px;
+        margin-bottom: 10px;
+        outline: none;
+    }
+    .search-box:focus { border-color: var(--color-c); }
+    .topic-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+    .topic-pill {
+        border: 1px solid var(--border);
+        background: var(--card-bg);
+        border-radius: 9999px;
+        padding: 6px 12px;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+    .topic-pill:hover, .topic-pill.active {
+        background: #eff6ff;
+        border-color: var(--color-c);
+        color: var(--color-c);
+    }
+    .topic-section { margin-bottom: 24px; }
+    .topic-heading {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 18px;
+        margin: 0 0 12px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid var(--border);
+    }
+    .topic-count {
+        background: var(--border);
+        color: var(--text-secondary);
+        font-size: 12px;
+        padding: 2px 8px;
+        border-radius: 9999px;
+    }
+    .toggle-btn {
+        margin-left: auto;
+        background: transparent;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 12px;
+        cursor: pointer;
+        color: var(--text-secondary);
+    }
+    .news-card {
+        background: var(--card-bg);
+        border-radius: var(--radius);
+        padding: 14px 16px;
+        margin-bottom: 10px;
+        box-shadow: var(--shadow);
+        border-left: 4px solid var(--color-other);
+        transition: transform 0.1s;
+    }
+    .news-card:hover { transform: translateY(-1px); }
+    .news-card.level-b { border-left-color: var(--color-b); }
+    .news-card.level-c { border-left-color: var(--color-c); }
+    .card-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+        flex-wrap: wrap;
+    }
+    .time-badge { font-size: 12px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+    .level-badge {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 2px 6px;
+        border-radius: 4px;
+        color: white;
+    }
+    .level-badge.level-b { background: var(--color-b); }
+    .level-badge.level-c { background: var(--color-c); }
+    .level-badge.level-other { background: var(--color-other); }
+    .topic-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+    .topic-chip {
+        font-size: 11px;
+        background: #f1f5f9;
+        color: var(--text-secondary);
+        padding: 2px 8px;
+        border-radius: 9999px;
+    }
+    .news-title { margin: 0 0 8px; font-size: 15px; line-height: 1.5; }
+    .content-body {
+        font-size: 14px;
+        color: var(--text-secondary);
+        white-space: pre-wrap;
+    }
+    .empty-state { text-align: center; color: var(--text-secondary); padding: 40px; }
+    @media (max-width: 640px) {
+        .stats { grid-template-columns: repeat(2, 1fr); }
+        header h1 { font-size: 22px; }
+    }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>📰 财联社电报</h1>
+        <p>2026-08-29 16:00 起 · 共 53 条</p>
+    </header>
+    <div class="stats">
+        
+        <div class="stat-card stat-total">
+            <div class="stat-value">53</div>
+            <div class="stat-label">总计</div>
+        </div>
+        
+
+        <div class="stat-card stat-b">
+            <div class="stat-value">3</div>
+            <div class="stat-label">Level B</div>
+        </div>
+        
+
+        <div class="stat-card stat-c">
+            <div class="stat-value">50</div>
+            <div class="stat-label">Level C</div>
+        </div>
+        
+
+        <div class="stat-card stat-other">
+            <div class="stat-value">0</div>
+            <div class="stat-label">其他</div>
+        </div>
+        
+    </div>
+    <div class="filters">
+        <input class="search-box" id="search" type="text" placeholder="搜索标题 / 内容 / 主题...">
+        <div class="topic-pills">
+            <button class="topic-pill" data-topic="其他">其他 (22)</button>
+<button class="topic-pill" data-topic="国际市场">国际市场 (12)</button>
+<button class="topic-pill" data-topic="公司公告">公司公告 (6)</button>
+<button class="topic-pill" data-topic="行业动态">行业动态 (6)</button>
+<button class="topic-pill" data-topic="宏观经济">宏观经济 (5)</button>
+<button class="topic-pill" data-topic="商品期货">商品期货 (1)</button>
+<button class="topic-pill" data-topic="债券固收">债券固收 (1)</button>
+        </div>
+    </div>
+    <main id="news-list">
+        
+            <section class="topic-section" data-topic="国际市场">
+                <h2 class="topic-heading">
+                    <span class="topic-name">国际市场</span>
+                    <span class="topic-count">12</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-b" data-topic="国际市场" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">18:15</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">尼日尔爆发军人哗变</h3>
+                    <div class="content-body">【尼日尔爆发军人哗变】财联社8月29日电，当地时间今天（8月29日）凌晨起，尼日尔首都尼亚美经历一夜剧烈枪战。据消息人士披露，此次冲突系尼日尔武装部队内部年轻军官策划发动的军人哗变。叛乱部队分别从蒂拉贝里和多索两个方向向首都尼亚美汇聚，多路突袭并将目标锁定为总统府、迪奥里·哈马尼国际机场以及尼日尔国家电视台等核心设施。据消息人士介绍，目前针对国家电视台和总统府的攻势已被击退，但位于机场附近的101空军基地周边冲突仍在持续，双方仍在展开激烈交火。此前突发信号中断的尼日尔国家电视台已恢复播出。 （CCTV国际时讯）</div>
+                </article>
+                
+                <article class="news-card level-b" data-topic="国际市场" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">20:01</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">8月29日周六《新闻联播》要闻22条</h3>
+                    <div class="content-body">【8月29日周六《新闻联播》要闻22条】财联社8月29日电，今天《新闻联播》主要内容有：<br>1、【新思想引领新征程】践行全球治理倡议 推动建设更加美好的世界； <br>2、中央党校（国家行政学院）举行秋季学期开学典礼 蔡奇出席并讲话； <br>3、各方力量全力挺进受灾核心区 西藏吉隆县泥石流灾害抢险救援持续进行； <br>4、我国将推出多项举措加力促进有效投资； <br>5、上半年数字产业收入超20万亿元； <br>6、2026年中国国际服务贸易交易会将于9月9日在京开幕； <br>7、前七个月我国物流运行稳中有进； <br>8、我国居民主要健康指标持续向好； <br>9、财政部等部门紧急拨付1.5亿元资金支持防汛防台风抢险救灾； <br>10、国家发展改革委紧急安排1亿元支持浙江 福建台风灾害灾后应急恢复； <br>11、人民币跨境支付系统持续扩容； <br>12、2025年中国与上合组织其他成员国贸易额达5235亿美元； <br>13、今年前7月中国与吉尔吉斯斯坦贸易额达117亿美元； <br>14、我国首次实现地月双向高速激光通信； <br>15、衡水至黄骅港高铁开始联调联试； <br>16、“2026中国文学盛典·鲁迅文学奖之夜”在上海举行； <br>17、2026全球创业者峰会在北京闭幕； <br>18、吉尔吉斯斯坦各界表示习近平主席署名文章为开创两国关系高质量发展新局面指引方向 国际人士期待比什凯克峰会推动上合组织命运共同体建设迈上新台阶； <br>19、总台精品影视节目吉尔吉斯斯坦和埃及展播活动启动； <br>20、伊称未经协调船只不可通过霍尔木兹海峡； <br>21、日本大规模干预汇市未能阻止日元贬值； <br>22、西班牙将采取措施加强休达边境管控。</div>
+                </article>
+                
+                <article class="news-card level-b" data-topic="国际市场" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">18:39</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">应急管理部紧急调派隧道专家赴尼泊尔实施国际救援行动</h3>
+                    <div class="content-body">【应急管理部紧急调派隧道专家赴尼泊尔实施国际救援行动】财联社8月29日电，应尼泊尔政府请求，8月29日，应急管理部紧急调派5名中方隧道专家，从西藏吉隆搭乘直升机，于北京时间16时58分飞抵尼泊尔灾区，立即投入尼泊尔水电站隧道救援工作。同时，根据救援工作需要，又紧急增派4名中方隧道专家赴尼，全力支持尼泊尔开展隧道救援工作。 （央视）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:33</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">尼日尔军政府发布声明呼吁民众保持冷静</h3>
+                    <div class="content-body">【尼日尔军政府发布声明呼吁民众保持冷静】财联社8月29日电，当地时间8月29日8时许，尼日尔保卫祖国国家委员会发布官方海报及声明，表示国防与安全部队已全面动员保卫祖国。声明呼吁广大民众面对当前突发事件保持冷静、团结与警惕，切勿传播未经证实的信息。当天凌晨1时左右，尼日尔首都尼亚美多个核心区域传出剧烈枪炮与爆炸声。武装分子针对迪奥里.哈马尼国际机场、101空军基地展开袭击，并试图强行突破总统府周边的安全警戒线，密集交火一直持续至天明。当天9时左右，尼日尔国家电视台信号突然中断。目前，首都安全局势仍不稳定。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:46</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">王毅同尼泊尔外长希西尔通电话</h3>
+                    <div class="content-body">【王毅同尼泊尔外长希西尔通电话】财联社8月29日电，中共中央政治局委员、外交部长王毅29日同尼泊尔外长希西尔通电话。<br><br>王毅表示，尼泊尔边境地区突发冰川崩塌引发严重泥石流灾害，造成两国重大人员伤亡、失联，是近年来两国间发生的最严重跨境灾害，救灾工作复杂性和艰巨性前所未有。中方高度重视，习近平主席立即作出重要指示，对抢险救援和应急处置工作提出明确要求。李强总理赶赴灾区现场指导工作。中方在紧急开展抢险自救的同时，第一时间伸出援手，支持尼方应急救灾。习近平主席已向鲍德尔总统致慰问电，李强总理也向巴伦德拉总理表达慰问。中共中央政治局会议专门指出，要对尼泊尔受灾地区提供紧急援助，开展国际救援合作。这是中方作出的重要政治决定，体现了对尼方的友好情谊。<br><br>王毅表示，中方对尼一揽子援助正在落实，包括紧急现汇援助和人道主义援助。中方提供的救灾物资即将运抵加德满都。中方隧道救援专家兵分两路，奔赴灾区和加德满都驰援。中方已同尼方分享灾区影像、卫星和水文数据等重要信息，包括上游堰塞湖预警信息。对在中方一侧滞留的尼泊尔公民，中方已作出妥善安排，将协助他们尽快返尼，感谢并希望尼方继续救助转移在尼的中国公民。中尼是山水相连、命运与共的共同体。面对灾情，两国要坚定站在一起，携手应对，共克时艰，以实际行动诠释跨越喜马拉雅的传统友谊。<br><br>希西尔转达尼方领导人向中国政府、人民和遇难者家属的慰问，衷心感谢中方提供紧急人道主义援助，表示尼中都是受灾国，但中方克服困难，第一时间向尼方表示慰问、提供援助，充分展现尼中关系的高水平。尼方再次向中方表达谢意，将继续同中方通力合作，全力救援中方受困失联人员，并合力营救失联外国公民。尼方愿同中方加强灾后重建、防灾减灾、应对气候变化等领域合作，推动两国战略合作伙伴关系不断向前发展。 （新华社）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:34</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">美伊冲突半年造成多重影响 IMF预计2026年全球通胀率将升至4.7%</h3>
+                    <div class="content-body">【美伊冲突半年造成多重影响 IMF预计2026年全球通胀率将升至4.7%】财联社8月29日电，美伊冲突延宕半年，给中东地区和全球带来多个维度的影响。分析人士指出，这场战事不仅引发能源与航运危机、拖累全球经济增长，也严重冲击中东格局。首先是全球能源供应被严重扰乱。这场冲突对世界“能源咽喉”霍尔木兹海峡航运造成巨大冲击，商船通过量从战前日均130至140艘降至个位数，降幅超九成。海峡通航受阻显著推高国际油价，国际油价一度突破每桶126美元，目前仍维持在约88美元的较高水平，价格总体比战前高出20%以上。其次，能源涨价拖累主要经济体抑制通胀的努力。美国7月消费者价格指数同比上涨 3.4%，其中汽油价格上涨 24.6%；欧元区和英国7月通胀率均升至 2.9%。国际货币基金组织预计，受能源和食品价格上涨影响，2026年全球通胀率将升至4.7%。世界银行警告，若能源供应持续中断，今年全球经济增长可能仅1.3%。 （央视财经）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:08</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">伊朗副外长：未经协调任何船只无法通过霍尔木兹海峡</h3>
+                    <div class="content-body">【伊朗副外长：未经协调任何船只无法通过霍尔木兹海峡】财联社8月30日电，伊朗外交部副部长加里巴巴迪29日表示，霍尔木兹海峡目前完全关闭。任何船只如通过该海峡，均需要经过伊朗的协调和许可。加里巴巴迪说，伊朗武装力量完全掌握霍尔木兹海峡的一切动向，美国方面有关船只通过该海峡的说法“完全不属实”。他说，伊朗已与阿曼就船只通过霍尔木兹海峡的相关安排达成谅解，但在美国履行其承诺之前，霍尔木兹海峡不会重新开放。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">05:28</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">土耳其外交部就黑海船只遭袭事件召见乌克兰大使</h3>
+                    <div class="content-body">【土耳其外交部就黑海船只遭袭事件召见乌克兰大使】财联社8月30日电，当地时间8月29日获悉，土耳其外交部已召见乌克兰驻土大使，就本周早些时候土方运营船只在黑海图阿普谢港附近遭袭一事提出交涉。土方表达了对相关袭击事件的反应，并就确保黑海人员、财产、航行以及环境安全的必要性提出警告。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">04:34</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">尼日尔首都国际机场恢复正常运营</h3>
+                    <div class="content-body">【尼日尔首都国际机场恢复正常运营】财联社8月30日电，当地时间8月29日下午，尼日尔国家民航局发布通告称，位于首都尼亚美的迪奥里·哈马尼国际机场的航空运营已全面恢复正常。当地时间29日凌晨，尼亚美多地传出密集枪声和爆炸声，地点包括迪奥里·哈马尼国际机场周边以及总统府附近。尼日尔国防部29日晚些时候发布公报说，首都尼亚美101号军事基地一些士兵当天企图发动兵变，目前局势已得到控制。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:55</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">尼日尔总统府附近道路遭封锁 国家电视台已停播</h3>
+                    <div class="content-body">【尼日尔总统府附近道路遭封锁 国家电视台已停播】财联社8月29日电，当地时间8月29日早晨9时起，尼日尔国家电视台已停止播出，尼亚美迪奥里·哈马尼国际机场关闭，通往总统府的道路已被封锁。当天稍早时，尼日尔首都尼亚美多个地区传出持续枪击和爆炸声。消息人士称，武装分子袭击了该市的迪奥里·哈马尼国际机场，并试图突破总统府周边安全警戒线。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:17</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">俄外长称未因乌克兰向美发最后通牒</h3>
+                    <div class="content-body">【俄外长称未因乌克兰向美发最后通牒】财联社8月29日电，8月28日，俄罗斯外长拉夫罗夫在接受采访时表示，虽然现美国政府经常将乌克兰危机称为“拜登的战争”，但特朗普政府仍在武器和资金等方面支持乌克兰。对于特朗普政府支持乌克兰打击俄罗斯领土一事，莫斯科从未向美国发出过任何最后通牒。#俄外长称英国从来没有永久盟友#拉夫罗夫还表示，英国在俄乌冲突中的角色“极其负面”。他表示，英国从来没有任何永久的盟友，对美国也不例外，因为英国一直“看不起在大西洋彼岸建立国家的盎格鲁-撒克逊人。” （CCTV国际时讯）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:03</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">扎波罗热核电站外部供电持续中断 备用能源仅够约10天</h3>
+                    <div class="content-body">【扎波罗热核电站外部供电持续中断 备用能源仅够约10天】财联社8月29日电，国际原子能机构总干事格罗西8月29日发表声明表示，扎波罗热核电站外部电力供应已中断超过一周，目前依靠应急柴油发电机维持核安全和安保所需电力。该机构警告，如近期无法恢复外部供电或补充柴油，电站可能在约10天后面临全站断电风险。</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="宏观经济">
+                <h2 class="topic-heading">
+                    <span class="topic-name">宏观经济</span>
+                    <span class="topic-count">5</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-c" data-topic="宏观经济" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:42</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">宏观经济</span> <span class="topic-chip">国际市场</span> <span class="topic-chip">货币政策</span></div>
+                    </div>
+                    <h3 class="news-title">美联储前官员锐评沃什讲话：或提前为9月加息埋下伏笔</h3>
+                    <div class="content-body">【美联储前官员锐评沃什讲话：或提前为9月加息埋下伏笔】财联社8月30日电，美联储主席沃什在杰克逊霍尔年会发表重要演讲，但未给明确政策前瞻指引，称美国经济向好、劳动力市场充分就业但通胀仍过高。对此，前美联储副主席布林德认为，该表态属另一种前瞻指引，或暗示倾向加息。沃什讲话后，市场预计9月美联储加息概率从35%升至约60%。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="宏观经济" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">20:56</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">三部门调拨1万件中央救灾物资支持云南受灾群众安置</h3>
+                    <div class="content-body">【三部门调拨1万件中央救灾物资支持云南受灾群众安置】财联社8月29日电，国家防灾减灾救灾委员会办公室、应急管理部针对近期强降雨导致云南昆明市磨憨磨丁经济合作区洪涝灾害影响，根据灾区群众避险转移和安置救助需要，会同国家粮食和物资储备局调拨帐篷、折叠床、被子、毛毯等1万件中央救灾物资，支持灾区做好救灾救助工作。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="宏观经济" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:25</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">上海市政府党组召开会议</h3>
+                    <div class="content-body">【上海市政府党组召开会议】财联社8月29日电，上海市委副书记、市政府党组书记朱忠明今天（8月29日）主持召开市政府党组会议并指出，要深入贯彻落实习近平总书记考察上海重要讲话精神和对上海工作重要指示要求，在市委的坚强领导下，胸怀“两个大局”，牢记“四个放在”，忠诚履职、苦干实干，抓好今年经济社会高质量发展各项工作，奋力推动“十五五”实现良好开局。 （上海发布）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="宏观经济" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:46</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">联合国机构：欧美持续高温干旱加剧森林承压</h3>
+                    <div class="content-body">【联合国机构：欧美持续高温干旱加剧森林承压】财联社8月29日电，联合国欧洲经济委员会发布新闻公报说，在欧洲和北美地区，持续的严重干旱以及创纪录的夏季高温正加剧森林生态系统所承受的压力。欧盟下属机构欧洲干旱观测网站的数据显示，欧盟和英国50%地区目前处于干旱状态，降水严重不足已显著影响土壤湿度和森林健康。持续干旱、高温压力、野火风险叠加树皮甲虫大规模暴发、植物病害等次生灾害，正导致欧洲森林出现前所未有的枯死现象。在中欧和西欧，部分地区正在经历60多年来时间最长、持续性最强的年度降水不足，引发大范围树冠落叶和林冠受损。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="宏观经济" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:25</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">宏观经济</span> <span class="topic-chip">股市政策</span></div>
+                    </div>
+                    <h3 class="news-title">垂直升降载人飞行器在香港首航试飞</h3>
+                    <div class="content-body">【垂直升降载人飞行器在香港首航试飞】财联社8月29日电，eVTOL垂直升降飞行器昨日在中国香港特区顺利完成试飞。该项目此前入选了香港特区政府低空经济“监管沙盒 X”首批非传统航空器试点项目。记者在现场看到，飞行器垂直升空过程中姿态平稳，在空中悬停一段时间后缓慢下降，全程起降动作连贯顺畅，最后安全着陆。据研发企业代表介绍，此次试飞的机型为旗舰型载人产品，主要针对城市交通拥堵、地面通勤时间过长等问题，未来将应用于载人出行场景。 （中新网）</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="公司公告">
+                <h2 class="topic-heading">
+                    <span class="topic-name">公司公告</span>
+                    <span class="topic-count">6</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:50</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">大港油田储气库群周期注气量突破20亿立方米 再创历史新高</h3>
+                    <div class="content-body">【大港油田储气库群周期注气量突破20亿立方米 再创历史新高】财联社8月29日电，据大港油田天津储气库分公司消息，截至目前，大港油田储气库群本轮注气周期累计注气量已超过20亿立方米，完成整体注气计划的90%，较去年同期增长8%，周期注气量再度刷新历史纪录，为京津冀地区冬季天然气保供蓄足“底气”。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:37</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月30日电，随着美股二季度财报季接近尾声，博通周三盘后公布的业绩也将成为市场焦点。博通目前市值约为1.7万亿美元。</h3>
+                    <div class="content-body">财联社8月30日电，随着美股二季度财报季接近尾声，博通周三盘后公布的业绩也将成为市场焦点。博通目前市值约为1.7万亿美元。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:08</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">国际市场</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月30日电，随着绝大多数企业已经完成业绩披露，根据LSEG数据，经调整后，标普500指数成分股第二季度盈利预计同比增长34.5%。</h3>
+                    <div class="content-body">财联社8月30日电，随着绝大多数企业已经完成业绩披露，根据LSEG数据，经调整后，标普500指数成分股第二季度盈利预计同比增长34.5%。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:18</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">国际市场</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">杰瑞股份：预计今年燃气轮机及配套设备订单超200亿元 2027年进入大批量交付期</h3>
+                    <div class="content-body">【杰瑞股份：预计今年燃气轮机及配套设备订单超200亿元 2027年进入大批量交付期】财联社8月29日电，财联社记者今日从杰瑞股份获悉，目前公司燃气轮机订单合同额已超25亿美元，预计2026年集团燃气轮机发电机组及配套设备整体订单额将超200亿人民币，行业景气度至少延续至2031年。但受主机限制，大批量交付预计在2027年进行。“年底主机将大批量到位。”公司相关负责人表示，因为提前锁定上游主机订单，主机涨价对公司影响不大。 （财联社记者 肖良华）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:36</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">南京住房公积金管理中心：进一步扩大住房公积金异地贷款范围</h3>
+                    <div class="content-body">【南京住房公积金管理中心：进一步扩大住房公积金异地贷款范围】财联社8月29日电，南京住房公积金管理中心8月29日公告称，为更好发挥住房公积金制度作用，进一步满足购房人跨区域住房消费需求，现将住房公积金异地贷款范围扩展至全国。全国范围内的住房公积金缴存人，在南京市购房均可向南京住房公积金管理中心申请住房公积金贷款。本通知自2026年9月1日起施行。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:34</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">宏观经济</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">国光量子获得数千万元战略投资 加码光子集成量子计算</h3>
+                    <div class="content-body">【国光量子获得数千万元战略投资 加码光子集成量子计算】财联社8月29日电，近日，北京中科国光量子科技有限公司（简称“国光量子”）再获数千万元战略融资，由国家级新区郑州航空港经济综合实验区管委会下属基金领投。双方将围绕“光子集成量子计算”进行技术、资本与产业资源的协同。 （科创板日报记者 黄心怡）</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="行业动态">
+                <h2 class="topic-heading">
+                    <span class="topic-name">行业动态</span>
+                    <span class="topic-count">6</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:41</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">公司公告</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">智能机器人生态出海大会落地柳州 机器人产业加速布局东盟海外市场</h3>
+                    <div class="content-body">【智能机器人生态出海大会落地柳州 机器人产业加速布局东盟海外市场】财联社8月29日电，8月28日至29日，智能机器人生态出海大会在柳州召开。本次大会聚焦机器人生态集聚与海外市场开拓，依托区位优势抢抓东盟合作机遇，助推产业出海与新质生产力发展。大会完成东盟智能机器人产业服务平台合作备忘录签署，并落地多项合作签约，订单及项目覆盖东盟、俄罗斯市场，涵盖整机制造、核心零部件、新能源、显示器件、智能科技等领域。现场汇聚近40家企业及高职院校，展出工业、人形、特种、康养、农业、巡检等6大类超100件机器人及智能装备产品。柳州拥有齐全的工业门类和丰富的应用场景，优必选、极目机器人等重点企业已落地，产品广泛应用于汽车制造。独特区位优势为对接东盟提供天然条件。大会汇聚全国资源，依托共建面向东盟智能机器人产业服务平台，持续补齐创新、标准认证、跨境服务短板，助力国产机器人开拓全球市场，打造对外开放合作新高地。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:11</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月30日电，XAI表示，GROK机器人现可与X平台配合使用。</h3>
+                    <div class="content-body">财联社8月30日电，XAI表示，GROK机器人现可与X平台配合使用。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">02:19</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">公司公告</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">巴克莱：AI模型公司每赚100美元 约35至40美元流向三大云巨头</h3>
+                    <div class="content-body">【巴克莱：AI模型公司每赚100美元 约35至40美元流向三大云巨头】财联社8月30日电，巴克莱在报告中称，AI模型公司每获得100美元收入，其中约有35至40美元会以推理算力费用的形式流向三大云巨头，即亚马逊AWS、微软Azure和谷歌云平台（GCP）。在这部分收入中，云服务商能够获得约10至20美元的营业利润，对应约35%至45%的营业利润率。报告指出，AI实验室付费推理业务的利润率已经大幅攀升，从2025年的低双位数水平升至2026年的50%至65%甚至更高，调整后毛利率同比提升30至50个百分点。巴克莱分析师认为，实际利润率可能甚至高于报告中的估算，但随着前沿模型竞争加剧以及算力供给持续增加，利润率预计将逐步回落。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">21:54</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">截至7月底我国智算总规模达到245万PFLOPS</h3>
+                    <div class="content-body">【截至7月底我国智算总规模达到245万PFLOPS】财联社8月29日电，国家数据局相关负责人在2026中国国际大数据产业博览会主题交流活动上表示，截至2026年7月底，全国智算总规模达245万PFLOPS（FP16），八大国家算力枢纽和三个算电协同发展区已建成智算规模占全国比重超85%，已有145万PFLOPS智能算力纳入国家级监测调度平台监测范围，算力资源集约化利用、一体化调度能力不断增强。下一步，国家数据局将继续优化算力布局提升供给能力，强化监测调度提高利用效率，深化算电协同，培育产业生态，全面推动算力高质量发展。 （新华社）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:33</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">14家央国企将开放超60亿条高价值数据</h3>
+                    <div class="content-body">【14家央国企将开放超60亿条高价值数据】财联社8月29日电，2026中国国际大数据产业博览会正在贵州贵阳举行。14家央国企汇聚超500项优质数据资源，预计开放数据总量超60亿条，覆盖电力、油气管网、物流、汽车、农机等十余个行业。在此过程中，可信数据空间提供安全可控的数据流通和开发环境，通过可信数据空间与人工智能融合应用，赋能一批高价值场景落地。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:35</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">安达集团副总裁张蓓：人工智能重塑保险业 企业竞争终将回归专业能力和客户价值</h3>
+                    <div class="content-body">【安达集团副总裁张蓓：人工智能重塑保险业 企业竞争终将回归专业能力和客户价值】财联社8月29日电，今日，安达集团副总裁、首席中国战略官张蓓表示，2002年，即中国加入世贸组织的第二年，安达选择投资华泰。如今，安达成为华泰的控股股东，既是中国金融业持续对外开放的一个缩影，也是双方长期信任、水到渠成的结果。面向未来，客户需求将持续演变，科技变革特别是人工智能正深刻重塑保险行业，但无论技术如何变迁，企业竞争的本质终将回归专业能力和客户价值。 （财联社记者 夏淑媛）</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="其他">
+                <h2 class="topic-heading">
+                    <span class="topic-name">其他</span>
+                    <span class="topic-count">22</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:33</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">西藏吉隆发布会：堰塞体已溢流泄洪 发生整体溃决的可能性较小</h3>
+                    <div class="content-body">【西藏吉隆发布会：堰塞体已溢流泄洪 发生整体溃决的可能性较小】财联社8月30日电，今天（30日），西藏吉隆“8·26”泥石流灾害新闻发布会在吉隆镇举行。8月26日上午，因尼泊尔一侧发生泥石流灾害，造成西藏日喀则市吉隆县吉隆口岸重大人员伤亡、失联。据分析，制约此次灾害处置最突出的风险，就是位于国门核心区域上方的堰塞体。该堰塞体已经溢流泄洪，目前总体情况稳定，发生整体溃决的可能性较小。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:27</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">吉隆泥石流排查出261名失联外籍人员</h3>
+                    <div class="content-body">【吉隆泥石流排查出261名失联外籍人员】财联社8月30日电，记者30日从西藏自治区人民政府新闻办公室召开的新闻发布会获悉，经外事、公安、文旅、应急等多部门联合开展全域拉网排查、线索溯源比对，目前西藏吉隆泥石流灾害排查出261名失联外籍人员，涵盖哈萨克斯坦1人、马来西亚3人、尼泊尔104人、印度49人、南非4人、爱尔兰2人、爱沙尼亚2人、德国3人、俄罗斯3人、法国2人、芬兰1人、荷兰2人、拉脱维亚33人、立陶宛1人、葡萄牙1人、乌克兰1人、西班牙1人、匈牙利1人、英国15人、加拿大6人、美国18人、澳大利亚6人、新西兰2人，共23个国家，中方已向有关国家驻华使领馆通报。经过多轮全域摸排、点位清查及口岸逐人核查，目前吉隆县已无外籍游客滞留。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:27</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">西藏吉隆发布会：冰岩崩从发生到冲击我国吉隆口岸仅约6至7分钟</h3>
+                    <div class="content-body">【西藏吉隆发布会：冰岩崩从发生到冲击我国吉隆口岸仅约6至7分钟】财联社8月30日电，今天（30日），西藏吉隆“8·26”泥石流灾害新闻发布会在吉隆镇举行。8月26日上午，因尼泊尔一侧发生泥石流灾害，造成西藏日喀则市吉隆县吉隆口岸重大人员伤亡、失联。<br><br>会上介绍，这次灾害是气候变暖长期作用下冰川失稳所致，灾害暴发突然、洪峰流量大、运行速度快、破坏性强、影响范围广，这也是青藏高原及周边地区冰冻圈灾害呈现的全新显著特征。通过监测发现，此次冰岩崩从发生到冲击我国吉隆口岸仅约6至7分钟。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:15</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">西藏吉隆“8·26”泥石流灾害已致16人遇难</h3>
+                    <div class="content-body">【西藏吉隆“8·26”泥石流灾害已致16人遇难】财联社8月30日电，今天（30日），西藏吉隆“8·26”泥石流灾害新闻发布会在吉隆镇举行。8月26日上午，因尼泊尔一侧发生泥石流灾害，造成西藏日喀则市吉隆县吉隆口岸重大人员伤亡、失联。截至29日18时，灾害造成16人遇难，546人失联。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:18</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月30日电，马斯克表示，美国天然气涡轮机生产存在瓶颈因素，瓶颈在于叶片和导叶的铸造。</h3>
+                    <div class="content-body">财联社8月30日电，马斯克表示，美国天然气涡轮机生产存在瓶颈因素，瓶颈在于叶片和导叶的铸造。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:10</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月30日电，SpaceX猎鹰重型火箭已在肯尼迪航天中心39A发射工位完成垂直竖立，准备迎接今天的发射。</h3>
+                    <div class="content-body">财联社8月30日电，SpaceX猎鹰重型火箭已在肯尼迪航天中心39A发射工位完成垂直竖立，准备迎接今天的发射。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:29</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">尼日尔军方称逮捕多名企图发动兵变的士兵</h3>
+                    <div class="content-body">【尼日尔军方称逮捕多名企图发动兵变的士兵】财联社8月30日电，当地时间8月29日，尼日尔国防部表示，该国国防与安全部队已成功挫败当天发生在首都尼亚美的兵变企图，多名参与叛乱的士兵被现场逮捕。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">20:30</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">2026年度总票房破280亿</h3>
+                    <div class="content-body">【2026年度总票房破280亿】财联社8月29日电，据灯塔专业版数据，截至8月29日，2026年度大盘票房(含预售)突破280亿，《飞驰人生3》《功夫女足》《给阿嬷的情书》《欢迎来龙餐馆》《八仙！》暂列年度票房前五名。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">03:41</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">伊朗副外长称不急于重新开放霍尔木兹海峡</h3>
+                    <div class="content-body">【伊朗副外长称不急于重新开放霍尔木兹海峡】财联社8月30日电，当地时间8月29日，伊朗副外长加里巴巴迪表示，伊朗已与阿曼就霍尔木兹海峡通行安排达成谅解，但该谅解不会自动进入执行阶段。加里巴巴迪表示，除非美国履行其义务，否则伊朗与阿曼就霍尔木兹海峡达成的谅解不会进入执行阶段，伊朗不急于重新开放霍尔木兹海峡。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">03:15</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">以国家安全总局证实以总理长子在美国曾遭安全威胁</h3>
+                    <div class="content-body">【以国家安全总局证实以总理长子在美国曾遭安全威胁】财联社8月30日电，当地时间8月29日，以色列国家安全总局（辛贝特）证实，以总理内塔尼亚胡长子亚伊尔此前在美国时遭遇“重大”安全威胁，因此辛贝特决定紧急将他及其安保团队一同撤离回以色列。内塔尼亚胡有两个儿子。他24日接受采访时声称，伊朗曾“试图暗杀他的一个儿子”。不过，他没有透露是哪个儿子，也未说明事发时间。随后有消息称，内塔尼亚胡长子亚伊尔在美国佛罗里达州生活期间成为伊朗的“暗杀目标”。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">01:15</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">索马里与土耳其联合行动 解救一艘遭劫持货船</h3>
+                    <div class="content-body">【索马里与土耳其联合行动 解救一艘遭劫持货船】财联社8月30日电，当地时间8月29日，索马里国防部发表声明称，索军方与土耳其海军联合开展行动，成功解救此前在索马里海域遭海盗劫持的货船“拉图福”号。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">00:30</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">佩斯科夫：当前看不到俄欧关系改善的基础</h3>
+                    <div class="content-body">【佩斯科夫：当前看不到俄欧关系改善的基础】财联社8月30日电，当地时间8月29日获悉，俄罗斯总统新闻秘书佩斯科夫当天对媒体表示，当前看不到俄欧关系改善的基础。佩斯科夫指出，欧洲方面的政治家在口头和行动上均对俄持对抗立场。但他重申，俄方仍对开展对话持开放态度。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">00:04</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">日本千叶县东部近海发生4.8级地震</h3>
+                    <div class="content-body">【日本千叶县东部近海发生4.8级地震】财联社8月30日电，据日本气象厅消息，当地时间8月30日0时17分左右，日本千叶县东部近海发生4.8级地震，震源深度约30公里。据悉，震中位于千叶县东部近海，茨城县、东京都等地亦有震感。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:09</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">乌克兰称基辅州一仓库遇袭致37人死亡</h3>
+                    <div class="content-body">【乌克兰称基辅州一仓库遇袭致37人死亡】财联社8月29日电，乌克兰基辅州州长特卡琴科29日在社交媒体发布消息称，俄罗斯日前袭击该州布恰区一座仓库，造成37人死亡。 （央视）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">21:34</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">伊朗称在其境内捣毁一美以相关“恐怖分子团伙”</h3>
+                    <div class="content-body">【伊朗称在其境内捣毁一美以相关“恐怖分子团伙”】财联社8月29日电，当地时间29日，伊朗伊斯兰革命卫队宣布，其在该国东南部锡斯坦-俾路支斯坦省萨拉万地区捣毁一恐怖分子团伙。伊朗革命卫队称，该团伙隶属于美国和以色列，企图在该省实施一系列恐怖袭击。行动缴获了20包爆炸物及爆炸物配件、武器弹药、“星链”设备等。美国和以色列对此暂无回应。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">20:04</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">水利部和中国气象局联合发布红色山洪灾害气象预警</h3>
+                    <div class="content-body">【水利部和中国气象局联合发布红色山洪灾害气象预警】财联社8月29日电，水利部和中国气象局8月29日18时联合发布红色山洪灾害气象预警：预计，8月29日20时至8月30日20时，湖南南部、广西东北部等地部分地区发生山洪灾害可能性大，发布橙色预警，局地发生山洪灾害可能性很大，发布红色预警。请各地注意做好实时监测、防汛预警和转移避险等防范工作。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:39</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">冰岛就是否重启入盟谈判举行公投</h3>
+                    <div class="content-body">【冰岛就是否重启入盟谈判举行公投】财联社8月29日电，冰岛29日举行全民公投，就是否重启加入欧盟的谈判进行表决。冰岛人口约40万。此次公投于当地时间29日9时开始。选民只需选择“赞成”或“反对”。投下“赞成”票意味着同意授权政府重启入盟谈判。计票将在当天22时投票结束后开始。冰岛2009年申请加入欧盟并启动相关谈判。2013年，持疑欧立场的政府上台后搁置谈判。有分析认为，如果冰岛最终加入欧盟，可能对欧洲的其他非欧盟国家产生示范效应。 （新华社）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:38</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">乌称基辅州再遭俄军打击 多处物流设施起火</h3>
+                    <div class="content-body">【乌称基辅州再遭俄军打击 多处物流设施起火】财联社8月29日电，当地时间8月29日，乌克兰国家紧急情况局发布最新通报，基辅州在经历凌晨一轮袭击后，再度遭到俄军军事打击，州内多处物流基础设施被击中并引发大规模火灾。目前，当地救援力量已开展灭火与善后处置工作。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:07</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">尼泊尔山洪遇难人数升至669人</h3>
+                    <div class="content-body">【尼泊尔山洪遇难人数升至669人】财联社8月29日电，根据尼泊尔警方29日公布的数据，尼泊尔北部地区山洪造成的死亡人数升至669人。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:50</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">尼日尔国防部称局势已得到控制</h3>
+                    <div class="content-body">【尼日尔国防部称局势已得到控制】财联社8月29日电，当地时间8月29日11时20分，尼日尔国家电视台播出尼日尔国防部的一份声明。声明呼吁民众照常生活，称局面已得到控制。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:02</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">交通运输部回应“建议取消ETC设备使用”</h3>
+                    <div class="content-body">【交通运输部回应“建议取消ETC设备使用”】财联社8月29日电，近期，交通运输部针对“高速公路无卡便捷通行模式推广”等问题进行回应。交通运输部公路局相关负责人表示，当前设置ETC车道的目的在于提升高速公路通行效率、优化公众高速出行体验，同时促进物流业降本增效。通行频次高的车主，可根据个人需求自主自愿选择办理ETC设备，通过合作银行线下网点、ETC官方服务小程序、支付宝相关服务入口等多种正规线上线下渠道便捷申领ETC设备。同时，为进一步提升高速公路通行效率、便利群众出行，交通运输部当前已印发《高速公路“手机+”无卡便捷通行实施方案（2026-2028年）》，积极稳妥推广“手机+”无卡便捷通行模式。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:17</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">乌称基辅近郊遭无人机袭击 已致27人遇难</h3>
+                    <div class="content-body">【乌称基辅近郊遭无人机袭击 已致27人遇难】财联社8月29日电，当地时间8月29日，乌克兰总统泽连斯基通报，基辅近郊米拉村自昨夜起持续遭遇俄军无人机袭击，目前各项善后处置工作正在有序推进。此次袭击击中村内一处仓库并引发爆炸，造成大量人员伤亡和基础设施损毁。截至目前，本次袭击已造成27人遇难、数十人受伤，超370名民众完成紧急疏散，相关疏散工作仍在持续推进。乌方表示，按照规定，弹药禁止存放于居民区及民用建筑周边，后续将依据调查结论，对相关决策及履职失职人员依法追责。据悉，乌克兰总理、内务部长已就本次袭击事件完成专项工作汇报。俄罗斯方面对上述袭击暂无回应。</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="商品期货">
+                <h2 class="topic-heading">
+                    <span class="topic-name">商品期货</span>
+                    <span class="topic-count">1</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-c" data-topic="商品期货" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:08</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">商品期货</span> <span class="topic-chip">宏观经济</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">普京：俄罗斯在全球煤炭市场占据领先地位</h3>
+                    <div class="content-body">【普京：俄罗斯在全球煤炭市场占据领先地位】财联社8月30日电，俄罗斯总统普京表示，俄罗斯在全球煤炭市场占据领先地位，煤炭及其他矿产资源仍然是国民经济的重要支柱之一。8月30日是俄罗斯矿工节。普京向煤炭行业从业者致以节日祝贺，并肯定他们为增强俄罗斯主权和国防能力所作出的贡献。普京在视频讲话中指出：“煤炭、焦炭、铁矿石及其他自然资源是大自然对俄罗斯的慷慨馈赠，至今仍是国家经济的重要基石。目前，俄罗斯煤炭储量居世界第二位，出口量居第三位，开采量居第六位。尽管煤炭行业当前面临复杂形势，俄罗斯在全球市场上仍保持领先地位。”</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="债券固收">
+                <h2 class="topic-heading">
+                    <span class="topic-name">债券固收</span>
+                    <span class="topic-count">1</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-c" data-topic="债券固收" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:17</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">债券固收</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">华泰资产杨平：华泰资产管理规模达1.08万亿 投行端发力基础设施股权与ABS</h3>
+                    <div class="content-body">【华泰资产杨平：华泰资产管理规模达1.08万亿 投行端发力基础设施股权与ABS】财联社8月29日电，今日，华泰保险集团资深副总经理兼首席投资官杨平表示，截至6月末，华泰资产管理规模达到1.08万亿元，其中第三方资金占比达92%。未来，华泰资产投资业务将重点落地低波稳健混合系列、红利主题权益系列、多元增强固收+创新系列、机构专属定制策略系列四大类产品线，投行业务着重发展基础设施股权投资（IEI）和资产支持计划（ABS）。 （财联社记者 夏淑媛）</div>
+                </article>
+                
+                </div>
+            </section>
+            
+    </main>
+</div>
+<script>
+    const searchInput = document.getElementById('search');
+    const topicPills = document.querySelectorAll('.topic-pill');
+    const sections = document.querySelectorAll('.topic-section');
+    let activeTopic = 'all';
+
+    function updateFilter() {
+        const query = (searchInput.value || '').toLowerCase();
+        sections.forEach(section => {
+            const topic = section.dataset.topic;
+            const visibleByTopic = activeTopic === 'all' || activeTopic === topic;
+            let hasVisibleCard = false;
+            section.querySelectorAll('.news-card').forEach(card => {
+                const text = card.innerText.toLowerCase();
+                const visible = visibleByTopic && text.includes(query);
+                card.style.display = visible ? '' : 'none';
+                if (visible) hasVisibleCard = true;
+            });
+            section.style.display = visibleByTopic && hasVisibleCard ? '' : 'none';
+        });
+    }
+
+    searchInput.addEventListener('input', updateFilter);
+
+    topicPills.forEach(pill => {
+        pill.addEventListener('click', () => {
+            const topic = pill.dataset.topic;
+            if (activeTopic === topic) {
+                activeTopic = 'all';
+                topicPills.forEach(p => p.classList.remove('active'));
+            } else {
+                activeTopic = topic;
+                topicPills.forEach(p => p.classList.toggle('active', p.dataset.topic === topic));
+            }
+            updateFilter();
+        });
+    });
+
+    document.querySelectorAll('.toggle-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const content = btn.closest('.topic-heading').nextElementSibling;
+            const expanded = btn.getAttribute('aria-expanded') === 'true';
+            content.style.display = expanded ? 'none' : 'block';
+            btn.setAttribute('aria-expanded', String(!expanded));
+            btn.textContent = expanded ? '展开' : '折叠';
+        });
+    });
+    </script>
+</body>
+</html>
