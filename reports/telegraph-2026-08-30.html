@@ -1,0 +1,1911 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>财联社电报 - 2026-08-30</title>
+<style>
+    :root {
+        --color-b: #dc2626;
+        --color-c: #2563eb;
+        --color-other: #6b7280;
+        --bg: #f8fafc;
+        --card-bg: #ffffff;
+        --text: #1f2937;
+        --text-secondary: #64748b;
+        --border: #e2e8f0;
+        --radius: 12px;
+        --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    }
+    * { box-sizing: border-box; }
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+    }
+    .container { max-width: 900px; margin: 0 auto; padding: 24px 16px 64px; }
+    header { text-align: center; margin-bottom: 24px; }
+    header h1 { margin: 0 0 8px; font-size: 28px; }
+    header p { margin: 0; color: var(--text-secondary); }
+    .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+    .stat-card {
+        background: var(--card-bg);
+        border-radius: var(--radius);
+        padding: 16px;
+        box-shadow: var(--shadow);
+        text-align: center;
+        border-top: 4px solid var(--color-other);
+    }
+    .stat-card.stat-b { border-top-color: var(--color-b); }
+    .stat-card.stat-c { border-top-color: var(--color-c); }
+    .stat-value { font-size: 24px; font-weight: 700; }
+    .stat-label { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+    .filters {
+        position: sticky;
+        top: 0;
+        background: rgba(248, 250, 252, 0.96);
+        backdrop-filter: blur(8px);
+        padding: 12px 0;
+        margin-bottom: 16px;
+        border-bottom: 1px solid var(--border);
+        z-index: 10;
+    }
+    .search-box {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1px solid var(--border);
+        border-radius: 9999px;
+        font-size: 14px;
+        margin-bottom: 10px;
+        outline: none;
+    }
+    .search-box:focus { border-color: var(--color-c); }
+    .topic-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+    .topic-pill {
+        border: 1px solid var(--border);
+        background: var(--card-bg);
+        border-radius: 9999px;
+        padding: 6px 12px;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+    .topic-pill:hover, .topic-pill.active {
+        background: #eff6ff;
+        border-color: var(--color-c);
+        color: var(--color-c);
+    }
+    .topic-section { margin-bottom: 24px; }
+    .topic-heading {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 18px;
+        margin: 0 0 12px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid var(--border);
+    }
+    .topic-count {
+        background: var(--border);
+        color: var(--text-secondary);
+        font-size: 12px;
+        padding: 2px 8px;
+        border-radius: 9999px;
+    }
+    .toggle-btn {
+        margin-left: auto;
+        background: transparent;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 12px;
+        cursor: pointer;
+        color: var(--text-secondary);
+    }
+    .news-card {
+        background: var(--card-bg);
+        border-radius: var(--radius);
+        padding: 14px 16px;
+        margin-bottom: 10px;
+        box-shadow: var(--shadow);
+        border-left: 4px solid var(--color-other);
+        transition: transform 0.1s;
+    }
+    .news-card:hover { transform: translateY(-1px); }
+    .news-card.level-b { border-left-color: var(--color-b); }
+    .news-card.level-c { border-left-color: var(--color-c); }
+    .card-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+        flex-wrap: wrap;
+    }
+    .time-badge { font-size: 12px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+    .level-badge {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 2px 6px;
+        border-radius: 4px;
+        color: white;
+    }
+    .level-badge.level-b { background: var(--color-b); }
+    .level-badge.level-c { background: var(--color-c); }
+    .level-badge.level-other { background: var(--color-other); }
+    .topic-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+    .topic-chip {
+        font-size: 11px;
+        background: #f1f5f9;
+        color: var(--text-secondary);
+        padding: 2px 8px;
+        border-radius: 9999px;
+    }
+    .news-title { margin: 0 0 8px; font-size: 15px; line-height: 1.5; }
+    .content-body {
+        font-size: 14px;
+        color: var(--text-secondary);
+        white-space: pre-wrap;
+    }
+    .empty-state { text-align: center; color: var(--text-secondary); padding: 40px; }
+    @media (max-width: 640px) {
+        .stats { grid-template-columns: repeat(2, 1fr); }
+        header h1 { font-size: 22px; }
+    }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>📰 财联社电报</h1>
+        <p>2026-08-30 16:00 起 · 共 155 条</p>
+    </header>
+    <div class="stats">
+        
+        <div class="stat-card stat-total">
+            <div class="stat-value">155</div>
+            <div class="stat-label">总计</div>
+        </div>
+        
+
+        <div class="stat-card stat-b">
+            <div class="stat-value">19</div>
+            <div class="stat-label">Level B</div>
+        </div>
+        
+
+        <div class="stat-card stat-c">
+            <div class="stat-value">136</div>
+            <div class="stat-label">Level C</div>
+        </div>
+        
+
+        <div class="stat-card stat-other">
+            <div class="stat-value">0</div>
+            <div class="stat-label">其他</div>
+        </div>
+        
+    </div>
+    <div class="filters">
+        <input class="search-box" id="search" type="text" placeholder="搜索标题 / 内容 / 主题...">
+        <div class="topic-pills">
+            <button class="topic-pill" data-topic="公司公告">公司公告 (59)</button>
+<button class="topic-pill" data-topic="其他">其他 (45)</button>
+<button class="topic-pill" data-topic="行业动态">行业动态 (21)</button>
+<button class="topic-pill" data-topic="国际市场">国际市场 (15)</button>
+<button class="topic-pill" data-topic="宏观经济">宏观经济 (6)</button>
+<button class="topic-pill" data-topic="商品期货">商品期货 (3)</button>
+<button class="topic-pill" data-topic="货币政策">货币政策 (2)</button>
+<button class="topic-pill" data-topic="股市政策">股市政策 (2)</button>
+<button class="topic-pill" data-topic="债券固收">债券固收 (2)</button>
+        </div>
+    </div>
+    <main id="news-list">
+        
+            <section class="topic-section" data-topic="国际市场">
+                <h2 class="topic-heading">
+                    <span class="topic-name">国际市场</span>
+                    <span class="topic-count">15</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-b" data-topic="国际市场" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">22:21</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span> <span class="topic-chip">宏观经济</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">下周资本市场大事提醒：中国8月官方PMI数据周一出炉；美国8月非农数据周五公布；燧原科技周三开启申购 “国产GPU四小龙”将齐聚资本市场</h3>
+                    <div class="content-body">【下周资本市场大事提醒：中国8月官方PMI数据周一出炉；美国8月非农数据周五公布；燧原科技周三开启申购 “国产GPU四小龙”将齐聚资本市场】<br>1、8月31日，中国8月官方PMI数据出炉，包括制造业PMI、非制造业商务活动指数等。此前7月份中国制造业PMI为49.2%。‌‌<br>2、8月非农就业报告将于周五（9月4日）公布。7月非农爆冷意外减少2.3万人，为年内最差，市场预期8月或增5.5万人。该数据可以反映就业市场的稳定程度，以及高通胀是否传导至薪资端，投资者将据此判断美联储最早于9月加息的可能性。<br>3、8月31日至9月1日，在吉尔吉斯共和国主持下，上海合作组织成员国元首理事会会议将在比什凯克举行。各国元首将审议当前国际和地区热点问题，讨论多边合作发展情况以及政治安全、经贸、交通、能源、数字化、人工智能、人文交往、可持续发展等领域合作前景。<br>4、G20财长和央行行长会议将于8月31日至9月1日在美国北卡罗来纳州阿什维尔举行，由贝森特主持。这也是美国在去年回避南非主导的G20进程后，重新主导该多边议程的首次重要亮相。<br>5、下周（8月31日-9月6日）将有3只新股发行，其中科创板2只，北交所1只。具体来看，8月31日发行的是百迈科；9月2日发行的是燧原科技；9月3日发行的是信诺维。其中，燧原科技与摩尔线程、沐曦股份、壁仞科技被合称为“国产GPU四小龙”。此前，摩尔线程、沐曦股份、壁仞科技在上市首日的收盘涨幅分别为425.46%、692.95%、75.82%。<br>6、MSCI指数在8月指数审议调整结果8月31日收盘后生效。其中，MSCI中国指数新纳入智谱等33只标的，剔除协鑫科技、金蝶国际等32只标的。此次纳入的33只股票中，31只来自A股。<br>7、下周博通财报表现将影响人工智能（AI）交易走势，其他值得关注的企业包括戴尔科技、惠普企业、露露乐檬、美敦力等，中概股蔚来汽车也将发布业绩。<br>8、Shein定档9月1日赴港IPO，文件显示，Shein通过港股IPO筹资17亿美元，以每股48.56港元的价格发行约2.8亿股股票。<br>9、百度香港联交所及纳斯达克双重主要上市将于9月1日生效。据公司公告，此举提升两地流动性与融资弹性，中概股回归标杆意义延续，关注港股科技板块情绪。<br>10、下周（8月31日-9月6日）共有31家公司限售股陆续解禁。按8月28日收盘价计算，解禁市值居前三位的是：航天智造（60.5亿元）、宏和科技（34.6亿元）、聚仁新材（11.3亿元）。<br>11、2026世界动力电池大会9月3日至4日在四川宜宾举办，旨在推动全球绿色低碳可持续发展，加快动力电池和新能源汽车产业高质量发展。<br>12、2026中国国际消费电子博览会9月4日至6日在青岛举办，博览会以“AI领航智启未来”为主题，瞄准当今全球消费电子产业前沿与未来趋势。<br>13、第十四届半导体设备材料及核心部件展(CSEAC2026)8月31日至9月2日在无锡举行，是半导体设备材料及核心部件领域的展览会，展览规划超7万平方米，集结1300余家国内外企业，覆盖晶圆制造设备、封测设备、核心部件及材料等领域，海外展商占比达16%。<br>14、G20科技部长级会议将于9月1日至2日在美国北卡罗来纳州举行，马斯克、黄仁勋、奥特曼等科技巨头出席。<br>15、美联储将于9月3日公布最新经济状况褐皮书，同时多名联邦公开市场委员会成员将就经济前景与货币政策发表讲话，市场关注其对降息时点的暗示。<br>16、特斯拉将于当地时间9月3日在奥斯汀发布无方向盘、无踏板的无人驾驶车型Cybercab。<br><br>下周海外重要经济事件概览（北京时间）：<br><br>周一（8月31日）：美国8月达拉斯联储商业活动指数、德国8月CPI。<br>周二（9月1日）：欧元区8月CPI、法国/德国/欧元区8月制造业PMI终值、英国8月制造业PMI终值、美国8月标普全球制造业PMI终值、美国8月ISM制造业PMI、美国7月JOLTs职位空缺。<br>周三（9月2日）：美国7月工厂订单月率、加拿大央行公布利率决议、新西兰联储公布利率决议和货币政策声明、澳大利亚第二季度GDP、美国8月ADP就业人数。<br>周四（9月3日）：美联储公布经济状况褐皮书、欧元区7月PPI、美国7月贸易帐、美国8月ISM非制造业PMI、美国8月标普全球服务业/综合PMI终值、法国/德国/欧元区8月服务业/综合PMI终值。<br>周五（9月4日）：美国8月季调后非农就业人口、美国8月失业率、欧元区7月零售销售。</div>
+                </article>
+                
+                <article class="news-card level-b" data-topic="国际市场" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">08:12</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span> <span class="topic-chip">公司公告</span> <span class="topic-chip">股市政策</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月31日早间新闻精选</h3>
+                    <div class="content-body">【财联社8月31日早间新闻精选】 <br>1、中国人民银行、金融监管总局联合印发《关于改革完善房地产信贷管理 推动加快构建房地产发展新模式的意见》。关于个人住房贷款政策，有这些变化：一、个人住房贷款最长期限延长至40年；二、存量浮动利率房贷可协商调整利率或置换贷款；三、个人住房贷款发放时点要求；四、还款困难可协商调整还款计划。<br>2、证监会制定《关于资本市场支持构建房地产发展新模式的意见》，支持上市房企再融资以及综合运用发行股份、定向可转债、现金等工具收购涉房资产。<br>3、国家金融监督管理总局、中国人民银行印发《个人住房贷款管理办法（试行）》，其中提出，合理设定借款人个人住房贷款的月房贷支出与收入比例上限和月所有债务支出与收入比例上限，其中月房贷支出与收入比控制在50%以下（含50%），月所有债务支出与收入比控制在60%以下（含60%）。<br>4、财政部、税务总局、中国证监会发布关于规范转让上市公司限售股个人所得税政策的公告。其中提出，个人转让上市公司限售股取得的所得，按照“财产转让所得”，适用20%税率缴纳个人所得税。<br>5、住房城乡建设部、自然资源部、金融监管总局联合印发《关于完善商品住房销售制度的通知》，《通知》明确，各地要有力有序推行商品住房现房销售，实现“所见即所得”，从根本上防范交付风险，维护购房人合法权益。<br>6、国家数据局局长刘烈宏在2026中国国际大数据产业博览会上表示，要围绕国民经济重大场景，研究探索词元增值订阅、按效付费等商业模式。<br>7、据国家数据局消息，20余家算力调度主体正式入驻全国一体化算力网监测调度试验验证平台，全面提升算力调度运营服务能力。据介绍，全国一体化算力网作为“六张网”之一，是“十五五”规划提出的重大工程。<br>8、覆铜板厂商建滔积层板年内第七次涨价，对所有厚度FR-4覆铜板统一涨价10%；PP半固化片分规格调价，7628（含）以上厚布PP涨价10%，7628以下薄布PP涨价20%。<br>9、从中国科学院空间应用工程与技术中心获悉，日前，我国在地月激光通信试验任务中取得重要突破，成功在超过40万公里的地月距离上建立起双向激光链路，首次实现地月双向高速激光通信。<br>10、长鑫存储发布消息，长鑫LPDDR6内存正式量产，小米18 Fold新折叠旗舰手机首发搭载。<br>11、长鑫科技公告称，上半年实现营业收入1503.1亿元，同比增长873.64%；归属于上市公司股东的净利润776.05亿元，同比扭亏为盈。公司表示，展望2026年下半年，全球DRAM产品供给紧缺格局将继续延续。<br>12、比亚迪上半年营收3,448.2亿元人民币，同比下降7.13%；上半年净利润123.3亿元人民币，同比下降20.5%。<br>13、五粮液公告，上半年实现营业收入284.17亿元，同比增长20.87%；归属于上市公司股东的净利润87.53亿元，同比增长89.3%。<br>14、中国石油上半年实现营业收入15274.91亿元，同比增长5.3%；归属于母公司股东净利润1039.36亿元，同比增长22.0%。<br>15、赣锋锂业公告，上半年实现营业收入230.97亿元，同比增长175.75%；归属于上市公司股东的净利润42.57亿元，同比扭亏为盈。<br>16、华特气体公告，拟募资不超7亿元用于江苏华特半导体材料生产基地建设项目等。有研硅公告，拟收购山东有研艾斯及山东有研半导体股权，预计构成重大资产重组。<br>17、中坚科技公告，拟投资12亿元建设智能机器人产业化项目。生益电子公告，全资子公司拟投资22.57亿元建设“芯算智联”高速互联电路板制造项目。<br>18、2连板香江控股公告，全资子公司签订不超9.7亿元算力技术服务合同。海星股份公告，拟定增募资不超21亿元，用于AI算力电源用高性能高压电极箔项目等。<br>19、隆基绿能上半年实现营业收入270.45亿元，同比下降17.58%；归属于上市公司股东的净利润为亏损36.84亿元。<br>20、华正新材上半年归属于上市公司股东的净利润1.73亿元，同比增长305.28%。浪潮信息公告，上半年归属于上市公司股东的净利润29.52亿元，同比增长269.59%。<br>21、*ST元道公告，触及重大违法强制退市情形，股票将于8月31日停牌。万里石公告，涉嫌信息披露违法违规，公司及实控人被证监会立案。<br>22、美股三大指数周五收盘集体下跌，道指跌0.02%，纳指跌0.52%，标普500指数跌0.25%。当周，道指累涨0.53%，纳指累涨0.85%，标普500指数累涨0.49%。<br>23、美联储主席沃什表示，通胀数据并未显示通胀趋势出现显著改善；如果通胀率不能快速达到2%，就还有工作要做。<br>24、伊朗伊斯兰革命卫队31日凌晨在社交媒体发布消息称，伊朗向美军基地发射导弹。稍早前，伊朗拉腊克岛附近传出爆炸声。<br>25、伊朗总统佩泽希齐扬表示，伊朗目前正在努力确保，如果霍尔木兹海峡在特定框架下重新开放，美国也必须履行其义务。<br>26、“大空头”迈克尔·伯里发帖称加码做空英伟达，但同时也买入了英伟达的看涨期权。他认为英伟达的垄断地位持续时间有限，未来利润率将会因此下降。<br>27、Anthropic计划在9月7日后公布其IPO招股说明书，并可能在9月下旬或10月初在美上市。报道称，公司希望在IPO中筹集至少1300亿美元以扩张算力。</div>
+                </article>
+                
+                <article class="news-card level-b" data-topic="国际市场" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">08:07</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月31日电，日经225指数下跌2.3%，至64860.54点。软银集团股价下跌4.8%，东京电子跌4.4%。</h3>
+                    <div class="content-body">财联社8月31日电，日经225指数下跌2.3%，至64860.54点。软银集团股价下跌4.8%，东京电子跌4.4%。</div>
+                </article>
+                
+                <article class="news-card level-b" data-topic="国际市场" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">08:01</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月31日电，韩国KOSPI指数开盘下跌2.6%报6613.58点；日经225指数低开1.11%报65668.51点。</h3>
+                    <div class="content-body">财联社8月31日电，韩国KOSPI指数开盘下跌2.6%报6613.58点；日经225指数低开1.11%报65668.51点。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:14</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">河南：加强“六张网”项目储备、建设</h3>
+                    <div class="content-body">【河南：加强“六张网”项目储备、建设】财联社8月31日电，河南省人民政府办公厅日前印发《坚决打好打赢经济发展夏秋季战役 推动2026年下半年经济持续向新向优向好发展重点任务举措的通知》，其中提到，加强“六张网”项目储备、建设。筹备召开“六张网”建设现场会，完善项目储备库，建立“实施一批、前期一批、储备一批”滚动推进机制。加快沙颍河“通港达园”工程建设，建成雄安新区至商丘高铁河南段，开工京港高铁阜阳至黄冈段、辉鄄高速卫辉至辉县段和普通干线公路穿城改建项目，加快推进南信合高铁、郑州新郑国际机场三期扩建工程。开工建设陕豫直流工程，加快推进陕煤信阳等煤电项目和林州弓上等抽水蓄能项目建设。开工豫东水资源配置工程，推动昭平台水库扩容等重大水利工程建设，积极推进老旧水库更新改造。全年新建、改造城市地下管网5000公里。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:24</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">IMAX票房创25年来最强暑期档纪录</h3>
+                    <div class="content-body">【IMAX票房创25年来最强暑期档纪录】财联社8月30日电，今年暑期档，优质大片供给充足，消费者对高品质观影体验的需求集中释放，带动高端放映市场强势增长。其中IMAX票房同比增长近四成，创下进入中国25年来的最强暑期档纪录。数据显示，截至8月29日，IMAX中国暑期档票房突破7.23亿元人民币，同比增长39%。其中进口片《奥德赛》以3.1亿元IMAX票房登顶暑期档冠军，IMAX票房占影片全国总票房比例高达54.6%。电影《蜘蛛侠：崭新之日》首周末IMAX票房突破1.3亿元，创下2019年以来好莱坞影片在内地的最佳IMAX开画日成绩。国产影片方面，IMAX特制拍摄的《欢迎来龙餐馆》上映5日后票房突破7亿元。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:57</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">伊朗打击驻约旦美军</h3>
+                    <div class="content-body">【伊朗打击驻约旦美军】财联社8月31日电，据美国福克斯新闻援引一名美国消息人士报道称，当地时间8月31日凌晨，伊朗对驻约旦美军发起打击。据称目前“尚未造成重大影响”，“来袭导弹几乎全部被拦截”。另有伊朗媒体报道称，伊朗向霍尔木兹海峡的美国船只发射导弹。 （CCTV国际时讯）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:14</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月31日电，现货白银向上触及66美元/盎司，日内上涨0.02%。</h3>
+                    <div class="content-body">财联社8月31日电，现货白银向上触及66美元/盎司，日内上涨0.02%。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:03</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月31日电，现货白银日内跌幅扩大至1%，报65.62美元/盎司。</h3>
+                    <div class="content-body">财联社8月31日电，现货白银日内跌幅扩大至1%，报65.62美元/盎司。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">03:33</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">叙利亚高官14年来首访利比亚 叙使馆恢复运作</h3>
+                    <div class="content-body">【叙利亚高官14年来首访利比亚 叙使馆恢复运作】财联社8月31日电，利比亚外交部当地时间8月30日宣布，利比亚代理外长塔希尔·巴奥尔在的黎波里会见叙利亚过渡政府外长希巴尼，双方就加强双边协调与磋商交换意见。同日，叙利亚驻的黎波里大使馆恢复运作。利比亚外交部在声明中指出，叙利亚驻的黎波里大使馆在关闭14年后恢复运作，将加强外交沟通并便利领事服务。声明补充说，会谈还涉及启动“利比亚-叙利亚联合高级委员会”程序，这将有利于双方在经济等领域开展更广泛合作。希巴尼此次访问是14年来叙利亚高级官员首次访问利比亚，两国正努力恢复外交关系，并扩大政治、经济和安全领域合作。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">02:37</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">塞浦路斯一客轮倾覆8死17失踪</h3>
+                    <div class="content-body">【塞浦路斯一客轮倾覆8死17失踪】财联社8月31日电，一艘载有267人的客轮8月30日在塞浦路斯北部海域倾覆。截至目前已造成至少8人死亡、17人失踪。据称这艘私营客轮于当天中午从塞浦路斯北部凯里尼亚港出发后不久，船体便开始进水。它当时刚刚离港约4海里（7.41公里），正驶往土耳其塔舒朱港。据当地媒体报道，由于前一日天气恶劣，港务部门并未批准客轮出港。该船自行驶离港口后，船长发现船头进水，曾试图返航，但未能成功。幸存者称，该船行驶过程中剧烈摇晃，被风浪不断地抛离水面后又重重摔回水中。当地媒体报道说，船体老化可能是导致进水的主要原因。 （CCTV国际时讯）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">23:25</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span> <span class="topic-chip">行业动态</span> <span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">全球亿万富翁人数创新高 AI热潮催生亿万富翁财富增长</h3>
+                    <div class="content-body">【全球亿万富翁人数创新高 AI热潮催生亿万富翁财富增长】财联社8月30日电，据美国《财富》杂志网站近日报道，财富情报公司Altrata的最新报告显示，2025年全球亿万富翁人数达3795人，创下历史新高；亿万富翁总财富额同比增长12.8%，达到15.1万亿美元，同样刷新纪录，这一数字接近美国标普500指数成分股总市值的四分之一。在这些亿万富翁中，资产超过500亿美元的有29人，包括拉里·佩奇、埃隆·马斯克和杰夫·贝索斯等。具体来看，AI投资热潮是亿万富翁财富增长的主要驱动力，不少科技领域的富翁身家随企业人工智能业务扩张大幅增值。亿万富翁们最倾向于在体育和慈善两个领域进行财富配置，共有201人拥有体育团体或投资体育特许经营权。报告指出，投资专业赛事的运动队伍，不仅能彰显财富规模，还可以通过此渠道拓展社交圈层。而投资慈善事业则成为亿万富翁利用其财富和社会影响力，在某些领域回馈社会并推动革新的方式之一。 （央视财经）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">21:35</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">特斯拉在中国香港、中国澳门推出更平价版Model 3</h3>
+                    <div class="content-body">【特斯拉在中国香港、中国澳门推出更平价版Model 3】财联社8月30日电，特斯拉已正式在中国香港、中国澳门市场推出配置简化、售价更低的Model 3轿车版本。根据特斯拉官网信息，这款新车型在中国香港的起售价为‌20.5万港元（约合26150美元）‌，比此前在售的基础版车型售价降低8.5%；在中国澳门的起售价为‌25.2万澳门元（约合31200美元）‌。该版本对部分内外饰配置进行了删减或降级，调整范围涵盖氛围灯、内饰纺织面料、轮毂等部件，同时官方标称的单次充电最大续航里程提升至572公里。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">20:51</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">尼泊尔泥石流794人遇难</h3>
+                    <div class="content-body">【尼泊尔泥石流794人遇难】财联社8月30日电，根据尼泊尔警方公布的最新数据，截至当地时间今天（8月30日）17时45分，尼泊尔泥石流造成的遇难人数升至794人。 （CCTV国际时讯）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="国际市场" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:35</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">国际市场</span> <span class="topic-chip">商品期货</span></div>
+                    </div>
+                    <h3 class="news-title">习近平抵达比什凯克出席2026年上海合作组织峰会并对吉尔吉斯斯坦进行国事访问</h3>
+                    <div class="content-body">【习近平抵达比什凯克出席2026年上海合作组织峰会并对吉尔吉斯斯坦进行国事访问】当地时间8月30日下午，国家主席习近平乘专机抵达比什凯克，应吉尔吉斯斯坦总统扎帕罗夫邀请，出席2026年上海合作组织峰会并对吉尔吉斯斯坦进行国事访问。<br><br>习近平和夫人彭丽媛抵达比什凯克玛纳斯国际机场时，扎帕罗夫总统夫妇热情迎接。扎帕罗夫向彭丽媛献花。当地女青年向习近平主席夫妇献上传统面点、蜂蜜，用传统礼节欢迎最尊贵的客人。礼兵分列红毯两侧致敬。两国元首夫妇共同欣赏当地传统乐器弹唱表演和猎鹰、猎犬、传统武士方阵、马队、毡房等文化展示。当地青少年演唱中国歌曲。<br><br>习近平发表书面讲话，代表中国政府和中国人民，向扎帕罗夫总统和吉尔吉斯斯坦人民致以诚挚问候和良好祝愿。<br><br>习近平指出，中吉传统友好源远流长，巍峨的天山见证了两国人民跨越千年的友好交往史。建交34年来，中吉关系历经国际风云变幻考验，始终健康稳定发展，达到新时代全面战略伙伴关系的高水平。近年来，两国合作迎来快速发展的“黄金期”，双边贸易额、两国人员往来再创新高，中吉乌铁路等大项目顺利实施，实实在在的互利合作成果广泛惠及两国人民。访问期间，我将同扎帕罗夫总统就中吉关系、两国各领域合作以及共同关心的国际和地区问题深入交换意见，为构建中吉命运共同体擘画新蓝图。我期待出席上海合作组织比什凯克峰会，同各方一道推动上海合作组织不断实现新发展。<br><br>蔡奇、王毅等陪同人员同机抵达。<br><br>中国驻吉尔吉斯斯坦大使刘江平也到机场迎接。 （新华社）</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="行业动态">
+                <h2 class="topic-heading">
+                    <span class="topic-name">行业动态</span>
+                    <span class="topic-count">21</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:35</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">公司公告</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">昨日行情回顾</h3>
+                    <div class="content-body">【昨日行情回顾】财联社8月31日电，上个交易日双创指数集体冲高回落，此前一度涨超1%。沪深两市成交额2.1万亿，较上一个交易日缩量242亿。1）近期多家机构发布报告，上调英伟达目标股价，有分析师分析师喊出550美元“最乐观目标价”，对应13万亿美元总市值，刺激隔夜英伟达股价全天高开高走收涨近9%。但算力硬件股早盘快速冲高后持续回落，早盘一度大涨超5%的光模块龙头中际旭创午后震荡翻绿。2）美股企业软件巨头赛富时以及网络安全巨头CRWD发布最新季度财报，营收及净利润表现均超出市场预期，隔夜赛富时股价大涨22%，美股网络安全概念股CRWD收涨20%。软件、网络安全两大分支带动AI应用端大涨，鼎捷数智、麒麟信安、天融信、久其软件涨停，奇安信、福昕软件、深信服等多股早盘一度涨超10%。但算力硬件等方向对双创指数拖累作用明显，也间接影响到整个应用端表现。3）农产品价格涨价持续催化农业板块站上风口，玉米种子龙头万向德农缩量晋级4连板，叠加净利润断层的棉花股新赛股份连续2日一字涨停，林业、渔业、棕榈油、白糖等分支接连展开补涨，进而带动下游食品加工行业展开补涨，黑芝麻、祖名股份双双涨停。4）化工板块延续此前强势，农药股新农股份巨震分歧后回封晋级3连板，潞化科技、赤天化、泸天化等化肥股涨停。由于霍尔木兹海峡承载全球海运化肥贸易的三分之一，该海峡通行受阻引发航运大幅萎缩，使得海外尿素等化肥价格仍处于高位。</div>
+                </article>
+                
+                <article class="news-card level-b" data-topic="行业动态" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">08:34</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">债券固收</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">投资日历：周一资本市场大事提醒</h3>
+                    <div class="content-body">【投资日历：周一资本市场大事提醒】<br>①今日共有1只新股申购，为北交所的百迈科（920268）。<br>②MSCI中国指数新纳入智谱等33只股票，调整将于8月31日收盘后生效实施。<br>③第十四届半导体设备材料及核心部件展（CSEAC 2026）将于8月31日至9月2日在无锡举行。<br>④第十八届集成电路封测产业链创新发展论坛将于8月31日至9月2日举办。<br>⑤第30届鲁台经贸洽谈会将于8月31日至9月3日举办。<br>⑥A股2026年中报披露截止日。<br>⑦今日有3400亿元7天期逆回购到期。<br>⑧今日将公布中国8月官方PMI等数据。</div>
+                </article>
+                
+                <article class="news-card level-b" data-topic="行业动态" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">16:10</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">公司公告</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">订单排到年底 千亿液冷赛道加速升温</h3>
+                    <div class="content-body">【订单排到年底 千亿液冷赛道加速升温】财联社8月30日电，过去，数据中心主要靠风扇和空调“吹凉”。但万卡智算中心、超节点等高功率算力集群加速落地后，芯片功耗不断攀升，传统风冷越来越吃力。于是，液冷被迅速推到台前。业内人士表示，单机功率超过100千瓦后，冷板式液冷的压力会明显增加；当AI服务器机柜功率达到200千瓦以上，浸没式方案会更有优势。在需求的扩张下，竞争很快传到了生产端。山东济南，高端AI服务器生产线上，一批液冷服务器正加紧装配测试，即将交付投产；山东青岛莱西，一处液冷核心设备部件CDU组装产线，订单已经排到12月底；广东佛山，一家液冷部件生产企业今年的订单、产值和交付量同比都接近100%增长。赛迪顾问数据显示，2025年中国液冷数据中心市场规模达到159.8亿元，同比增长45.2%。根据行业机构预测，2026年全球智算液冷市场规模或将突破千亿元。只要AI服务器功率还在上升，机柜密度还在提高，智算中心还在持续建设，智算液冷市场就会继续扩张。 （央视财经）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:53</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">公司公告</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">【九点特供】金融监管总局发布一揽子办法实现对房地产全周期金融支持，中长期将从宏观层面重构房地产信贷制度；求是网发文要求充分发挥词元驱动智能经济高质量发展的引擎作用</h3>
+                    <div class="content-body">①金融监管总局发布一揽子办法实现对房地产全周期金融支持，中长期将从宏观层面重构房地产信贷制度，未来3年行业内部格局将显著分化，这家公司上半年地产主业结转利润实际较为可观；<br>②求是网发文要求充分发挥词元驱动智能经济高质量发展的引擎作用，分析师看好AI时代“词元经济”发展浪潮下算力租赁等AI云计算服务环节，这家公司算力业务在手订单充裕；<br>③Gap涨近13%，公司二季度业绩超预期，同时上调全年盈利指引。</div>
+                </article>
+                
+                <article class="news-card level-b" data-topic="行业动态" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">20:40</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">商品期货</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">8月30日周日《新闻联播》要闻21条</h3>
+                    <div class="content-body">【8月30日周日《新闻联播》要闻21条】财联社8月30日电，今天《新闻联播》主要内容有： <br>1、习近平离京出席2026年上海合作组织峰会并对吉尔吉斯斯坦、埃及进行国事访问； <br>2、习近平抵达比什凯克出席2026年上海合作组织峰会并对吉尔吉斯斯坦进行国事访问； <br>3、《平“语”近人——习近平喜欢的典故》（多语种版）在上海合作组织国家主流媒体播出； <br>4、【凝心聚力 真抓实干 奋力实现“十五五”良好开局】内蒙古加快绿色产业发展； <br>5、我国推出新举措加快数据产业发展； <br>6、上半年全国新设外商投资企业3.5万户； <br>7、西藏吉隆县泥石流灾害抢险救援工作有力有序推进； <br>8、科技助力田管 推动粮食稳产增收； <br>9、“虫口夺粮”背后的科技力量； <br>10、技能培训提升就业能力； <br>11、我国健全多层次医保体系 满足多样化保障需求；<br>12、到2030年我国将基本建成现代农产品产地市场体系； <br>13、我国首版全国几何基准影像发布； <br>14、新疆750千伏超高压输电线路总长度突破15000公里； <br>15、广州中欧班列十年累计进出口货值超1100亿元；<br>16、推动中吉新时代全面战略伙伴关系迈上新台阶——吉尔吉斯斯坦各界人士欢迎习近平主席对吉尔吉斯斯坦进行国事访问；<br>17、中塞合作建设的人形机器人工厂启动量产； <br>18、伊朗称美国履行承诺前不会重开海峡； <br>19、乌基辅州一军火仓库遭袭发生连环爆炸； <br>20、英媒称欧盟天然气储备或降至13年来最低； <br>21、加拿大在安大略湖旁树立名称标牌。</div>
+                </article>
+                
+                <article class="news-card level-b" data-topic="行业动态" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">16:33</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">债券固收</span> <span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">中信证券：AI在Q2集中体现 而能化接下来可能逐步升温</h3>
+                    <div class="content-body">【中信证券：AI在Q2集中体现 而能化接下来可能逐步升温】财联社8月30日电，中信证券研报指出，2022年后A股“结构性快速轮动”是常态，极高轮动速度持续时间一般在1~2个月，高速轮动背后的共性是盈利上修的广度不足，可持续的主线稀缺。当前，贸易摩擦步入高发期，汇兑损益的影响也在放大，出海作为A股最重要的业绩线索之一遭遇估值约束，制约了行情的宽度，容易形成行业快速轮动的市场状态。打破僵局需要新的变化，近期的AI进展强化了算力需求快速增长的既有趋势，但不足以改变远期商业化叙事，若后续看到类似RSI、防蒸馏等可能的新变化出现则有望打开远期估值空间。在行情快速轮动的阶段，主要的风格策略当中，赢家大部分是“低估值系”策略，不过其中只有PB-ROE策略在快速轮动环境下明显占优，且策略收益率随着轮动速度提升而进一步增强，动量策略则是快速轮动阶段最受损的策略，高轮动下市场机会或将更多体现为具备业绩支撑品种的估值修复。配置上，我们在中期策略中提出“AI+能化”的杠铃结构，AI在Q2集中体现，而能化接下来可能逐步升温。</div>
+                </article>
+                
+                <article class="news-card level-b" data-topic="行业动态" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">23:39</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">公司公告</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">多家锂电池产业链上市公司披露半年报 天齐锂业上半年净利同比增长4925%</h3>
+                    <div class="content-body">【多家锂电池产业链上市公司披露半年报 天齐锂业上半年净利同比增长4925%】财联社8月30日电，据财联社不完全统计，截至发稿，包括宁德时代、亿纬锂能、赣锋锂业、天齐锂业、天赐材料、德福科技、恩捷股份、天华新能、科达利、国轩高科、多氟多、中矿资源、佛塑科技、欣旺达、鹏辉能源、蔚蓝锂芯、盛新锂能、永兴材料、川能动力、震裕科技、雅化集团、融捷股份、容百科技、珠海冠宇、龙蟠科技、华盛锂电、派能科技、德赛电池、ST天际在内的多家锂电池产业链上市公司披露半年报。其中，天齐锂业上半年净利润同比增长4925%，国轩高科Q2净利环比增长6371%。</div>
+                </article>
+                
+                <article class="news-card level-b" data-topic="行业动态" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">16:55</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">公司公告</span> <span class="topic-chip">商品期货</span></div>
+                    </div>
+                    <h3 class="news-title">华正新材：上半年净利润同比增长305% 覆铜板售价和销量上升</h3>
+                    <div class="content-body">【华正新材：上半年净利润同比增长305% 覆铜板售价和销量上升】财联社8月30日电，华正新材(603186.SH)发布2026年半年度报告，上半年实现营业收入29.6亿元，同比增长41.28%；归属于上市公司股东的净利润1.73亿元，同比增长305.28%。营业收入变动主要系覆铜板售价和销量上升所致。2026年上半年，覆铜板行业整体处于结构性上行周期，受益于AI算力驱动的高景气周期以及新能源汽车电子需求的稳定释放，高端覆铜板产品需求旺盛，为行业提供了增量空间；同时，受上游核心原材料价格阶段性上行的影响，覆铜板产品售价同步提升，行业整体迎来量价齐升的增长态势。小财注：公司Q2净利润1.42亿，之前预告区间为1.24亿-1.74亿，Q1净利润0.31亿，据此计算，Q2净利润环比增长359%。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:06</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">公司公告</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">中信证券：2026年以来国内龙头模拟公司光模块相关业务快速放量 带动业绩快速增长</h3>
+                    <div class="content-body">【中信证券：2026年以来国内龙头模拟公司光模块相关业务快速放量 带动业绩快速增长】财联社8月31日电，中信证券指出，在AI算力旺盛需求推动下，光模块终端持续放量、速率升级推动相关模拟芯片料号需求快速增长，海外头部厂商指引积极，据测算2026年全球光模块模拟芯片需求超100亿元，目前全球格局以海外龙头为主导，国产替代加速推进。2026年以来国内龙头模拟公司光模块相关业务迎来快速放量，进而带动业绩快速增长。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:46</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">公司公告</span> <span class="topic-chip">商品期货</span></div>
+                    </div>
+                    <h3 class="news-title">【财联社早知道】我国首次实现地月双向高速激光通信，机构称将进一步加速产业落地进程，这家公司已与国内少数拥有全自研、国产化可控垂直生态链的空间激光通信企业签署重整投资协议；高端铜箔，需求暴涨260%</h3>
+                    <div class="content-body">①我国首次实现地月双向高速激光通信，机构称将进一步加速产业链技术迭代与产业落地进程，这家公司已与国内少数拥有全自研、国产化可控垂直生态链的空间激光通信企业签署重整投资协议；<br>②高端铜箔，需求暴涨260%！机构称当前行业双重景气共振，这家公司的HVLP1-3已进入批量供货阶段，主要配套英伟达项目及光模块市场；<br>③这家小金属公司2026年半年度净利润同比增长2522%。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:19</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">公司公告</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">研发活力迸发 A股半年报勾勒创新图景</h3>
+                    <div class="content-body">【研发活力迸发 A股半年报勾勒创新图景】财联社8月31日电，2026年上半年，一批A股产业龙头持续以研发“活水”浇灌创新土壤，研发投入加速转化为企业的业绩增长，多家企业在AI算力、新能源、创新药等硬科技赛道交出亮眼答卷。据不完全统计，截至8月30日，5500余家A股上市公司披露上半年研发投入情况，合计研发投入超过8100亿元，同比增长超过7%。从研发规模看，1200余家公司研发投入超过1亿元，900多家公司研发投入占营业收入比例（简称“研发强度”）超过10%。从研发投入增幅看，超过2800家公司研发投入实现同比增长，占比五成以上，其中逾1200家公司研发投入增幅超过20%。 （上证报）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:20</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">特努斯接任苹果CEO在即 秋季新品与AI成首要任务</h3>
+                    <div class="content-body">【特努斯接任苹果CEO在即 秋季新品与AI成首要任务】《科创板日报》31日讯，苹果将于当地时间9月1日完成CEO交接：现任硬件工程高级副总裁约翰・特努斯（John Ternus）接替蒂姆・库克（Tim Cook），后者转任董事会执行主席，并继续负责与全球政策制定者沟通等事务。特努斯上任后的首要任务包括主持9月9日举行的苹果秋季新品发布会，今年新品包括首款折叠屏iPhone、可识别说话者并按用户调整内容的智能显示器。同时他还负责监督一些更远的产品线，包括带摄像头的 AirPods、智能眼镜、家庭安防系统、机械臂显示器和可佩戴摄像头等。这些设备对于苹果在人工智能时代延续其数十年的成功至关重要。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:12</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">河南：高水平建设医疗、农业领域2个国家人工智能应用中试基地 推进人工智能创新生态社区建设</h3>
+                    <div class="content-body">【河南：高水平建设医疗、农业领域2个国家人工智能应用中试基地 推进人工智能创新生态社区建设】财联社8月31日电，河南省人民政府办公厅日前印发《坚决打好打赢经济发展夏秋季战役 推动2026年下半年经济持续向新向优向好发展重点任务举措的通知》，其中提到，培育智能经济新形态。深入实施“人工智能+”行动，高水平建设医疗、农业领域2个国家人工智能应用中试基地，推进人工智能创新生态社区建设。制定省数据产业集聚区和数据产业园培育指引，开展数字产业集群梯次培育、高质量数据集建设、可信数据空间建设等行动。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:46</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">公司公告</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">河南：力争全年新能源汽车产量达到100万辆</h3>
+                    <div class="content-body">【河南：力争全年新能源汽车产量达到100万辆】财联社8月31日电，河南省人民政府办公厅日前印发《坚决打好打赢经济发展夏秋季战役 推动2026年下半年经济持续向新向优向好发展重点任务举措的通知》，其中提到，巩固拓展新兴产业快速发展势头。推动新能源汽车、电子信息、新材料等新兴产业扩能增效，推动12英寸大硅片、金刚石热沉片达产满产，建成投产液冷服务器、皮卡车、乘用车技改、动力电池等项目，力争全年新能源汽车产量达到100万辆。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:31</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">公司公告</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">【点金互动易】磷化工+化肥，这家公司是国内磷化工龙头，矿肥一体化构筑成本壁垒，磷矿价格和盈利维持高位，新项目打开长期成长空间</h3>
+                    <div class="content-body">①磷化工+化肥，这家公司是国内磷化工龙头，矿肥一体化构筑成本壁垒，磷矿价格和盈利维持高位，新项目打开长期成长空间；<br>②具身智能+电力巡检，这家公司防冰除冰机器人通过国际领先鉴定，四足巡检机器人加速落地，自研大模型完成备案，空天地立体巡检开启AI新引擎。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:45</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">公司公告</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">创新出海双向提速 医药企业半年报释放回暖信号</h3>
+                    <div class="content-body">【创新出海双向提速 医药企业半年报释放回暖信号】财联社8月31日电，Wind数据显示，截至8月30日22时50分，A股共有508家医药上市公司披露2026年半年报，191家公司实现归母净利润同比增长，其中40家归母净利润同比增长超100%。分析人士认为，医药景气新周期背景下，国内创新药产业链加速崛起。近年国家多举措全链条支持创新药发展，叠加人才储备和研发效率等多维优势，我国创新药企逐步具备全球竞争力。与此同时，部分跨国药企陆续面临“专利悬崖”困境，对外采购和扩充创新管线需求与日俱增，国内创新药企顺势而为，以海外授权等商务拓展（BD）形式实现创新出海，该领域有望开启新一轮高景气周期。 （中证报）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">04:23</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">国际市场</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">给机器人当“启蒙老师” 数据标注产业正加快发展</h3>
+                    <div class="content-body">【给机器人当“启蒙老师” 数据标注产业正加快发展】财联社8月31日电，为期三天的2026中国国际大数据产业博览会在贵州贵阳闭幕。数博会上，数据标注相关场景和服务产品的展示，成为今年的一大亮点。在数博会现场，相关企业展示机器人进行数据采集和标注的工作场景吸引了不少观众。作为人工智能发展的重要支撑，数据标注产业正加快发展步伐。在贵州惠水，轻量化视频拍摄设备记录下工厂等场景里工作的动作，为机器人充当“启蒙老师”；在贵安新区，工作人员操作数十台机器人，通过多个传感器记录物流运输等场景中的视频数据，并进行标注。眼下，贵州将数据采集和数据标注作为数字经济发展的新动能与重点产业，已集聚数据采集和标注企业135家，从业人员超1.6万人。 （央视财经）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">02:23</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月31日电，美国总统特朗普表示，美国不要加拿大产的汽车、零部件或任何东西；加拿大几十年来一直在坑害美国，这种情况会停止的。</h3>
+                    <div class="content-body">财联社8月31日电，美国总统特朗普表示，美国不要加拿大产的汽车、零部件或任何东西；加拿大几十年来一直在坑害美国，这种情况会停止的。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:33</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月30日电，亚马逊表示，Aws Govcloud美国现已提供多种AI模型系列，能够为政府客户提供备受需求的人工智能模型选择。</h3>
+                    <div class="content-body">财联社8月30日电，亚马逊表示，Aws Govcloud美国现已提供多种AI模型系列，能够为政府客户提供备受需求的人工智能模型选择。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:28</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">【金牌纪要库】2026至2027年存储需求继续扩张，DDR6升级与国产产业链增量落在哪些环节？</h3>
+                    <div class="content-body">①长鑫LPDDR6内存正式量产，DDR6或增加负责放大和整理信号的RCD接口芯片需求，这两家企业已提前在DDR6相关产业链布局；②企业级SSD是NAND中增长最快的部分，2026年需求预计增长约66%，具备企业级SSD批量交付能力的企业受益；③先进DRAM和高层数NAND需要更多钨材料形成导电连接，2026年六氟化钨已经出现供应偏紧，这两家为国内可供应相应钨材料的企业。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="行业动态" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:00</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">行业动态</span> <span class="topic-chip">公司公告</span> <span class="topic-chip">货币政策</span></div>
+                    </div>
+                    <h3 class="news-title">【风口研报·洞察】房地产行业迎来四部门&quot;超级政策包&quot;，销售制度与信贷规则面临一次性重写，分析师看好偏轻资产运营的公司穿越周期能力较优；如何应对快速轮动的行情</h3>
+                    <div class="content-body">①如何应对快速轮动的行情；②房地产行业迎来四部门&quot;超级政策包&quot;，销售制度与信贷规则面临一次性重写，分析师看好偏轻资产运营的公司穿越周期能力较优；③今日全市场机构研报共发布1179篇，盈峰环境等7股评级得到上调，9家公司获得首度覆盖，其中福斯特、京东方A获新财富分析师深度覆盖；④在个股机构关注度排行中，海信视像首次上榜，前五名依次为安井食品&gt;迎驾贡酒&gt;海天味业&gt;新华保险&gt;海信视像。</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="公司公告">
+                <h2 class="topic-heading">
+                    <span class="topic-name">公司公告</span>
+                    <span class="topic-count">59</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-b" data-topic="公司公告" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">19:33</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">商品期货</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">近30家A股上市公司本周披露并购重组最新公告 有研硅拟收购山东有研艾斯及山东有研半导体股权</h3>
+                    <div class="content-body">【近30家A股上市公司本周披露并购重组最新公告 有研硅拟收购山东有研艾斯及山东有研半导体股权】财联社8月30日电，据财联社不完全统计，截至发稿，本周（8月24日-8月30日）包括*ST高科、有研硅、天府文旅、道恩股份、菲沃泰、雪天盐业、楚天高速、宇邦新材、安达智能、信维通信、香农芯创、招商南油、湖南黄金、豪尔赛、欧科亿、高凌信息、东杰智能、华昌化工、飞乐音响、康希通信、海格通信、雅创电子、拓斯达、建设机械、东诚药业、江特电机、远东股份在内的27家A股上市公司披露并购重组进展最新公告。其中，有研硅公告，拟收购山东有研艾斯及山东有研半导体股权，预计构成重大资产重组。</div>
+                </article>
+                
+                <article class="news-card level-b" data-topic="公司公告" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">18:25</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">股市政策</span></div>
+                    </div>
+                    <h3 class="news-title">*ST萃华：预计无法按期披露2026年半年报 股票将于9月1日起停牌</h3>
+                    <div class="content-body">【*ST萃华：预计无法按期披露2026年半年报 股票将于9月1日起停牌】财联社8月30日电，*ST萃华(002731.SZ)公告称，公司原定于2026年8月22日披露2026年半年度报告，因公司2025年年度报告涉及的收入、存货等重要事项需要进一步核实补充及聘请审计机构事宜尚未完成，导致公司2026年半年度报告期初数无法确认，公司无法在法定期限内（2026年8月31日）披露2026年半年度报告，股票将于2026年9月1日开市起停牌。此外，公司因2025年年报未能在规定期限内披露，已触及规范类退市情形，深交所将决定是否终止其股票上市；公司股票将自2026年9月7日（星期一）起继续实施停牌；截至2026年8月28日，公司股票收盘总市值已连续17个交易日低于5亿元，存在因市值指标被终止上市的风险；公司披露的部分年度财务信息涉嫌虚假记载，可能触及重大违法强制退市情形。</div>
+                </article>
+                
+                <article class="news-card level-b" data-topic="公司公告" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">16:05</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">中国石油：上半年净利润同比增长22% 拟10派2.6元</h3>
+                    <div class="content-body">【中国石油：上半年净利润同比增长22% 拟10派2.6元】财联社8月30日电，中国石油(601857.SH)发布2026年半年度报告，实现营业收入15274.91亿元，同比增长5.3%；归属于母公司股东净利润1039.36亿元，同比增长22.0%。业绩增长主要由于油气产品、化工产品价格上涨及销量变化综合影响。公司董事会决定以公司2026年6月30日的总股本1830.21亿股为基数，派发2026年中期股息每股0.26元（含适用税项），总派息额约475.85亿元。其中A股现金红利421亿元(含税)。本次利润分配方案无需提交股东会审议。</div>
+                </article>
+                
+                <article class="news-card level-b" data-topic="公司公告" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">20:32</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">宏观经济</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">多家PCB行业上市公司披露半年报 金安国纪上半年净利同比增长987%</h3>
+                    <div class="content-body">【多家PCB行业上市公司披露半年报 金安国纪上半年净利同比增长987%】财联社8月30日电，据财联社不完全统计，截至发稿，包括东山精密、生益科技、深南电路、胜宏科技、沪电股份、鹏鼎控股、大族数控、生益电子、景旺电子、大族激光、广合科技、南亚新材、芯碁微装、兴森科技、金安国纪、方正科技、华正新材、世运电路在内的多家PCB上市公司披露半年报。其中，金安国纪上半年净利同比增长987%，华正新材Q2净利润环比增长359%。</div>
+                </article>
+                
+                <article class="news-card level-b" data-topic="公司公告" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">17:36</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">沐曦股份：上半年净利润6.12亿元同比扭亏 GPU产品出货量显著提升</h3>
+                    <div class="content-body">【沐曦股份：上半年净利润6.12亿元同比扭亏 GPU产品出货量显著提升】财联社8月30日电，沐曦股份(688802.SH)发布2026年半年度报告，实现营业收入13.24亿元，同比增长44.67%；归属于上市公司股东的净利润6.12亿元，同比扭亏为盈。营收同比增长主要系报告期内随着公司产品及服务持续获得下游客户的广泛认可与采购，公司GPU产品出货量显著提升，收入规模较上年同期实现显著增加。净利润本期实现扭亏为盈，主要系本期营业收入及公允价值变动损益大幅增长所致。小财注：公司Q2净利润7.11亿，Q1净利润-0.99亿，据此计算，Q2净利润环比扭亏为盈。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">23:06</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">债券固收</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">受理再融资项目68单 沪市再融资改革成效显著</h3>
+                    <div class="content-body">【受理再融资项目68单 沪市再融资改革成效显著】财联社8月30日电，上交所发布消息称，上半年优化再融资一揽子措施落地实施以来，沪市受理再融资项目68单，拟融资额1272亿元，同比分别增长48%、39%；注册生效61单，同比增长33%。再融资典型案例渐次落地。多家优质上市公司高效实现融资，审核用时不足1个月。“轻资产、高研发投入”认定标准扩展至主板，中科曙光80亿元可转债首单落地。宁波远洋再融资高效落地并成功引入战略投资者。市场热度持续升温，上半年，112家沪市公司新发布再融资预案，预计募集资金1840亿元，同比分别增加124%、170%。并购重组市场保持活跃，上半年沪市新增资产重组370家次，重大资产重组32家次、交易金额超3500亿元。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:45</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">三星重工获4445亿韩元集装箱船订单</h3>
+                    <div class="content-body">【三星重工获4445亿韩元集装箱船订单】财联社8月31日电，三星重工宣布，公司获得一家非洲船东价值4445亿韩元（约合3.2亿美元）的订单，将建造两艘集装箱船，合同期限为2026年8月至2028年12月。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:04</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">【研选•研报数据】FDE有望成为模型、云平台与企业应用之间的关键交付层，需求有望迎来加速；中高档数控机床领军者，行业需求复苏、价格战缓和，公司订单充足</h3>
+                    <div class="content-body">①FDE有望成为模型、云平台与企业应用之间的关键交付层，需求有望迎来加速；<br>②中高档数控机床领军者，行业需求复苏、价格战缓和，公司订单充足。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:17</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">国际市场</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">境外业务收入和回报大幅增长 券商业绩“第三极” 悄然成型</h3>
+                    <div class="content-body">【境外业务收入和回报大幅增长 券商业绩“第三极” 悄然成型】财联社8月31日电，随着半年报陆续披露，一个信号越来越清晰——继经纪、自营之后，境外业务已成为头部券商业绩增长的“第三极”。从已披露的数据看，中信证券、中金公司、华泰证券等头部机构的境外平台收入、利润及资产规模均实现快速增长，跨境投行、交易及机构服务等业务加速拓展。业内人士认为，随着中国企业“走出去”和国际资本“引进来”需求持续增长，中资券商国际业务正由牌照和网点布局的竞争，转向资本实力、全球网络与综合服务能力的竞争。 （上证报）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:14</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">宏观经济</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">上市券商上半年业绩创历史最佳 “百亿俱乐部”持续扩容</h3>
+                    <div class="content-body">【上市券商上半年业绩创历史最佳 “百亿俱乐部”持续扩容】财联社8月31日电，受益于市场交投活跃，上市券商交出一份历史最佳的半年度成绩单：43家上市券商上半年合计实现营业收入3647.1亿元、归母净利润1553.7亿元，同比增幅均超过40%，“百亿俱乐部”成员由去年同期的2家扩容至5家。从业务结构看：经纪与自营收入同比增幅均在50%左右，成为主要增长引擎；投行业务整体回暖但内部分化显著，前五家券商占据超五成市场份额，中小投行则在低基数下展现出较大弹性。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:01</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">【电报解读】千亿赛道加速升温，多家液冷企业订单排至年底！Vera Rubin量产确立全液冷时代下，行业龙头业绩兑现期有望加速到来，这家公司液冷产品可配套应用于不同品牌的服务器，冷板式液冷已批量交付应用</h3>
+                    <div class="content-body">千亿赛道加速升温，多家液冷企业订单排至年底！Vera Rubin量产确立全液冷时代下，行业龙头业绩兑现期有望加速到来，这家公司液冷产品可配套应用于不同品牌的服务器，冷板式液冷已批量交付应用，另一家在微通道液冷技术方向同步推进研发攻关。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">00:21</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">利比亚对立派系就总统和议会选举框架达成共识</h3>
+                    <div class="content-body">【利比亚对立派系就总统和议会选举框架达成共识】财联社8月31日电，利比亚“4+4”委员会当地时间8月30日在首都的黎波里联合国利比亚支助团（联利支助团）总部签署协议，重组全国高级选举委员会理事会，并就总统和议会选举框架达成共识。根据协议，相关选举应在协议生效后24个月内举行。选举须在统一行政权和统一国家机构下举行，若无法实现则将另建替代机制。协议规定，国民代表大会和国家最高委员会须在协议签署之日起一个月内批准协议，否则将寻求联合国安理会等批准途径。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">23:07</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">宏观经济</span> <span class="topic-chip">股市政策</span></div>
+                    </div>
+                    <h3 class="news-title">上半年427家沪市公司宣告中期分红 现金分红总额达6330亿元</h3>
+                    <div class="content-body">【上半年427家沪市公司宣告中期分红 现金分红总额达6330亿元】财联社8月30日电，上交所发布消息称，上半年，427家沪市公司宣告中期分红，现金分红总额达6330亿元，同比保持增长。其中，六大行合计中期分红总额达2209亿元，16家公司分红金额超百亿元，一批盈利稳增、经营现金流充沛的优质公司一年多次分红成常态。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:50</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">诺瓦聚变完成12亿Pre-A系列融资 创国内民营核聚变融资规模、速度与估值三纪录</h3>
+                    <div class="content-body">【诺瓦聚变完成12亿Pre-A系列融资 创国内民营核聚变融资规模、速度与估值三纪录】财联社8月31日电，诺瓦聚变能源科技（上海）有限公司（下称“诺瓦聚变”）完成总额12亿元Pre-A系列融资（含Pre-A、Pre-A+轮），至此，诺瓦聚变创立16个月内已先后完成5亿元天使轮、7亿元天使+轮、12亿元Pre-A系列三轮融资，累计融资规模达24亿元，投后估值超百亿，刷新国内民营核聚变赛道融资规模、速度与估值三项纪录，企业估值居国内民营核聚变企业第一位。本次Pre-A系列融资中，美团龙珠、高瓴创投持续加码布局，联想创投、国中资本作为全新战略投资方入局。“诺瓦一号”已完成工程设计与核心部件研制，全面转入总装集成阶段。团队正冲刺2026年底首次等离子体放电，目标是国内首家实现1亿℃聚变温度的民营企业。 （财联社记者 郭松峤）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:27</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">国际市场</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">索尼与华纳起诉美国安特罗匹克公司大规模音乐侵权</h3>
+                    <div class="content-body">【索尼与华纳起诉美国安特罗匹克公司大规模音乐侵权】财联社8月31日电，据美国方面消息，索尼音乐和华纳音乐旗下子公司日前在美国加州北区联邦地区法院起诉美国人工智能公司安特罗匹克，指控其大规模侵犯音乐作品版权，并将相关作品用于训练人工智能模型。原告在诉状中指控，安特罗匹克通过非法下载、网络抓取等方式，大规模获取受版权保护的音乐作品，用于开发和运营人工智能模型。原告称，安特罗匹克的行为是“有史以来规模最大、最明目张胆的持续性知识产权盗窃行为之一”，并要求就每部被侵权的音乐作品支付最高15万美元的赔偿。对此，安特罗匹克表示不同意原告提出的指控。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:06</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">行业动态</span> <span class="topic-chip">商品期货</span></div>
+                    </div>
+                    <h3 class="news-title">【公告全知道】PCB+覆铜板+CPO+存储芯片！公司M6~M8产品已批量应用于国内头部算力客户</h3>
+                    <div class="content-body">①PCB+覆铜板+CPO+存储芯片！这家公司M6~M8产品已批量应用于国内头部算力客户；②光芯片+CPO+光纤+薄膜铌酸锂！这家公司光通信产品订单已经实现批量交付；③英伟达+算力租赁+液冷！公司上半年净利润同比增长近13倍。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:40</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">A股限售股解禁一览：73.12亿元市值限售股今日解禁</h3>
+                    <div class="content-body">【A股限售股解禁一览：73.12亿元市值限售股今日解禁】财联社8月31日电，Wind数据显示，周一（8月31日），共有10家公司限售股解禁，合计解禁量为5.47亿股，按最新收盘价计算，合计解禁市值为73.12亿元。从解禁量来看，航天智造、上港集团、路桥信息解禁量居前，解禁股数分别为4.63亿股、3160.19万股、2621.41万股。从解禁市值来看，航天智造、路桥信息、能之光解禁市值居前，解禁市值分别为60.53亿元、6.61亿元、2.54亿元。从解禁股数占总股本比例来看，航天智造、路桥信息、能之光解禁比例居前，解禁比例分别为54.74%、34.16%、20.58%。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:35</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">五大上市险企上半年净利增近八成 持续加码权益资产</h3>
+                    <div class="content-body">【五大上市险企上半年净利增近八成 持续加码权益资产】财联社8月31日电，A股上市险企半年报已披露完毕，多家险企盈利创下历史新高。2026年上半年，中国人寿、中国平安、中国人保、中国太保、新华保险五大A股上市险企合计实现归母净利润3173.87亿元，增长78.12%，增长了1391.95亿元。这五家险企合计净利润增幅，在去年同期高基数的基础上再创新高。值得注意的是，上市险企持续加码权益资产，截至二季度末，五家险企股票类资产合计余额达2.82万亿元。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:24</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">苹果公司据悉正测试折叠屏iPhone专用手写笔</h3>
+                    <div class="content-body">【苹果公司据悉正测试折叠屏iPhone专用手写笔】财联社8月31日电，科技记者马克·古尔曼当地时间8月30日发文称，苹果已在内部开发、测试并考虑为即将推出的折叠屏iPhone配备专用Apple Pencil，但目前来看，该配件不太可能与新机同步上市。苹果测试的手写笔原型比iPad所用版本更短，以适应手机独特的机身尺寸，并可通过磁吸方式固定在手机侧面，同时实现收纳和充电。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:08</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">华润置地：上半财年净利润98.40亿元</h3>
+                    <div class="content-body">【华润置地：上半财年净利润98.40亿元】财联社8月31日电，华润置地在港交所公告，截至2026年6月30日止六个月，公司实现综合营业额678.70亿元，毛利172.20亿元；股东应占净利润98.40亿元；核心净利润101.60亿元；基本每股盈利1.38元。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:16</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月31日电，优地机器人在港交所公告，在港上市拟发行4500万股H股，发行价介于14.45港元/股至19.55港元/股，预期9月9日开始交易。</h3>
+                    <div class="content-body">财联社8月31日电，优地机器人在港交所公告，在港上市拟发行4500万股H股，发行价介于14.45港元/股至19.55港元/股，预期9月9日开始交易。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:16</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月31日电，江波龙在港交所公告，在港上市拟发行2607万股H股（视乎发售量调整权及超额配股权行使与否而定），发行价最高不超240.60港元/股，预期9月8日开始交易。</h3>
+                    <div class="content-body">财联社8月31日电，江波龙在港交所公告，在港上市拟发行2607万股H股（视乎发售量调整权及超额配股权行使与否而定），发行价最高不超240.60港元/股，预期9月8日开始交易。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">05:06</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月31日电，ONEOK表示已与阿波罗全球管理公司及其关联方达成协议，将获得90亿美元的投资。</h3>
+                    <div class="content-body">财联社8月31日电，ONEOK表示已与阿波罗全球管理公司及其关联方达成协议，将获得90亿美元的投资。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">04:27</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">谷歌地图将安大略湖标记为美国湖</h3>
+                    <div class="content-body">【谷歌地图将安大略湖标记为美国湖】财联社8月31日电，美国总统特朗普当地时间8月30日在社交媒体平台发布一张地图，显示地处美国与加拿大边境的安大略湖如今已被标注为“美国湖”。美国谷歌公司在一份声明中称，谷歌地图已为美国用户将该湖的名称更改为“美国湖”，以“反映特朗普日前签署的将湖泊更名的行政命令”。据了解，美国总统的行政命令影响的是美国地理名称信息系统，该系统为美国官方地图设定标准。它对加拿大的命名惯例或世界其他地区对该湖泊的称呼没有任何影响。去年，谷歌地图对墨西哥湾也做出了类似的更改：在特朗普就职后签署行政命令将该水域更名为“美国湾”后，谷歌地图便将其标注为“美国湾”。 （CCTV国际时讯）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:27</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">宏观经济</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">赛微微电：上半年净利润3116.54万元 同比下降20.79%</h3>
+                    <div class="content-body">【赛微微电：上半年净利润3116.54万元 同比下降20.79%】财联社8月30日电，赛微微电(688325.SH)公告，2026年上半年，公司实现营业总收入2.45亿元，同比增长11.98%；归属于上市公司股东的净利润3116.54万元，同比下降20.79%。报告期内，经营业绩变动主要受两方面因素影响：一是2026年以来，半导体晶圆代工及封测环节产能供需关系偏紧，供应链相关环节价格上行，原材料成本的上涨尚未充分传导至终端产品售价；二是公司持续加大研发投入，本期研发费用增加，同时计提了相应的资产减值准备，共同对当期盈利水平形成阶段性影响。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:12</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">国际市场</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">上海合晶：2026年半年度净利润2673.66万元 同比下降55.22%</h3>
+                    <div class="content-body">【上海合晶：2026年半年度净利润2673.66万元 同比下降55.22%】财联社8月30日电，上海合晶(688584.SH)发布2026年半年度报告，实现营业收入5.93亿元，同比下降5.13%；归属于上市公司股东的净利润2673.66万元，同比下降55.22%。业绩下降主要系募投项目资金投入导致货币资金减少、叠加人民币汇率波动影响，利息收入同比下降、汇兑损失增加。小财注：公司Q2净利润0.14亿，Q1净利润0.13亿，据此计算，Q2净利润环比增长13%。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:51</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">国际市场</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">华明装备发布2026年半年度报告 海外收入订单持续高增</h3>
+                    <div class="content-body">【华明装备发布2026年半年度报告 海外收入订单持续高增】财联社8月30日电，华明装备（002270）发布2026年半年度报告。核心业务电力设备实现营业收入10.99亿，同比增长 14.64%，直接出口、间接出口销售额实现营收4.49亿，同比增长44.59% ，占电力设备营业收入比例超过40%，新增订单增速水平与去年同期相当。报告期产生股权激励成本4,749万、汇兑损失同比净增加2,087万、市场开拓投入增加，公司最终实现归母净利润3.9亿，同比增长5.79%，实现扣非归母净利润3.67亿，同比增长1.61%。剔除股权激励成本的影响，实现归母净利润4.25亿，同比增长15.26%。报告期资产负债率从期初的39.09%下降至期末的32.71%，经营活动现金流净额4.59亿，同比增加44.41%。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:44</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">宏观经济</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">中国动力：2026年半年度净利润同比增长42.74%</h3>
+                    <div class="content-body">【中国动力：2026年半年度净利润同比增长42.74%】财联社8月30日电，中国动力(600482.SH)发布2026年半年度报告，实现营业收入308.42亿元，同比增长11.54%；归属于上市公司股东的净利润13.12亿元，同比增长42.74%。业绩增长主要系造船行业延续景气态势，柴油机业务销售规模扩大，合同结算收入增加，主要产品船用低速发动机毛利率提升。公司拟每10股派发现金红利1.1569元(含税)。小财注：公司Q2净利润7.24亿，Q1净利润5.88亿，据此计算，Q2净利润环比增长23%。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:41</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">商品期货</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">赤峰黄金：2026年半年度净利润17.32亿元 同比增长56.5%</h3>
+                    <div class="content-body">【赤峰黄金：2026年半年度净利润17.32亿元 同比增长56.5%】财联社8月30日电，赤峰黄金(600988.SH)发布2026年半年度报告，实现营业收入70.18亿元，同比增长33.11%；归属于上市公司股东的净利润17.32亿元，同比增长56.5%。业绩增长主要受益于黄金价格高位运行及全球化布局优势。小财注：公司Q2净利润7.44亿，之前预告区间为7.12亿-7.92亿，Q1净利润9.88亿，据此计算，Q2净利润环比下降24%。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:12</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">金螳螂：中标合计约5.16亿元工程项目</h3>
+                    <div class="content-body">【金螳螂：中标合计约5.16亿元工程项目】财联社8月30日电，金螳螂(002081.SZ)公告称，公司及下属子公司/孙公司于本月陆续收到中标通知书，分别被确定为“南门外大街商圈北部片区城市更新项目A地块－天津海信广场裙楼项目”“芜湖梦溪科创走廊5号楼酒店改造提升项目”及“越南S4区W塔室内精装修工程”的中标人，中标总金额合计约5.16亿元。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">23:51</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月30日电，据报道，怡安集团（AON）接近达成交易，拟以约170亿美元收购KKR旗下的美国保险经纪公司（USI）。</h3>
+                    <div class="content-body">财联社8月30日电，据报道，怡安集团（AON）接近达成交易，拟以约170亿美元收购KKR旗下的美国保险经纪公司（USI）。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">23:33</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">行业动态</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">润泽科技：高品质液冷机柜价格已回升至行业高峰时期的单价水平</h3>
+                    <div class="content-body">【润泽科技：高品质液冷机柜价格已回升至行业高峰时期的单价水平】财联社8月30日电，润泽科技(300442.SZ)发布投资者关系活动记录表公告，2026年上半年AIDC算力业务实现营业收入19.95亿元，同比增长126.24%，营收占比达53.26%，已超越机柜业务成为核心增长引擎。目前，IDC机柜价格已开始企稳回升，特别是能够在短期内交付的高品质液冷机柜，价格已回升至行业高峰时期的单价水平，传统机柜价格也在逐步回升。从后续价格展望看，区位条件较好、能够较快交付的高品质液冷机柜价格具备较强支撑，传统机柜通过改造后如能满足当前市场需求，也具备价格提升空间。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">23:09</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">科创板公司上半年实现净利润1448.87亿元 同比增长437.6%</h3>
+                    <div class="content-body">【科创板公司上半年实现净利润1448.87亿元 同比增长437.6%】财联社8月30日电，上交所发布消息称，科创板公司上半年合计实现营业收入1.01万亿元，同比增长38.6%；实现净利润1448.87亿元，同比增长437.6%，净利润超过上年全年水平。其中，36家成长层企业上半年营收同比增长29.1%，净利润大幅缩亏62.3%。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:22</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">沪市公司半年报交卷：扣非后净利润增速创2022年以来新高</h3>
+                    <div class="content-body">【沪市公司半年报交卷：扣非后净利润增速创2022年以来新高】财联社8月30日电，上交所发布消息称，截至目前，沪市上市公司完成2026年半年报披露。数据显示，2026年上半年，2318家沪市公司合计实现营业收入26.22万亿元，同比增长6.3%，净利润2.82万亿元，同比增长17.6%，扣非后净利润2.69万亿元，同比增长17.2%，增速创2022年以来新高。数据还显示，今年上半年，近八成沪市公司实现盈利。其中，924家净利润同比增长，339家净利润增幅超50%，142家扭亏为盈。蓝筹公司继续发挥“压舱石”作用，今年上半年，上证180公司实现营业收入17.87万亿元、净利润2.36万亿元，同比分别增长6.9%、14.8%。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">20:01</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月30日电，利弗莫尔证券显示，北京星辰天合科技股份有限公司向港交所提交上市申请，独家保荐人为华泰国际。</h3>
+                    <div class="content-body">财联社8月30日电，利弗莫尔证券显示，北京星辰天合科技股份有限公司向港交所提交上市申请，独家保荐人为华泰国际。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:59</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月30日电，利弗莫尔证券显示，浙江海亮股份有限公司向港交所提交上市申请，联席保荐人为中金公司、广发证券。公司已委任中国国际金融香港证券有限公司及广发证券（香港）经纪有限公司为其整体协调人。</h3>
+                    <div class="content-body">财联社8月30日电，利弗莫尔证券显示，浙江海亮股份有限公司向港交所提交上市申请，联席保荐人为中金公司、广发证券。公司已委任中国国际金融香港证券有限公司及广发证券（香港）经纪有限公司为其整体协调人。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:52</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月30日电，利弗莫尔证券显示，杭州邦顺制药股份有限公司向港交所提交上市申请，独家保荐人为中信建投国际。</h3>
+                    <div class="content-body">财联社8月30日电，利弗莫尔证券显示，杭州邦顺制药股份有限公司向港交所提交上市申请，独家保荐人为中信建投国际。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:43</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月30日电，利弗莫尔证券显示，博安通物联科技洛阳股份公司向港交所创业板提交上市申请，独家保荐人为越秀融资。</h3>
+                    <div class="content-body">财联社8月30日电，利弗莫尔证券显示，博安通物联科技洛阳股份公司向港交所创业板提交上市申请，独家保荐人为越秀融资。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:37</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">中国石油：拟出资42.05亿元参与昆仑资本增资</h3>
+                    <div class="content-body">【中国石油：拟出资42.05亿元参与昆仑资本增资】财联社8月30日电，中国石油(601857.SH)公告称，公司拟以自有资金42.05亿元，与控股股东中国石油集团共同向参股公司昆仑资本增资116亿元，增资款主要用于昆仑资本的私募股权投资基金及对外股权投资业务等。本次交易完成后，公司持有昆仑资本的股权比例由增资前的29%变更为32.16%，昆仑资本仍为公司的参股公司，不会导致公司合并报表范围发生变更。本次交易旨在推动公司业务转型升级，培育新兴产业，布局未来产业。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:30</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">行业动态</span> <span class="topic-chip">债券固收</span></div>
+                    </div>
+                    <h3 class="news-title">光明乳业2026上半年实现营收118.7亿元 经营韧性表现稳健</h3>
+                    <div class="content-body">【光明乳业2026上半年实现营收118.7亿元 经营韧性表现稳健】财联社8月30日电，光明乳业发布2026年半年报，公司经营基本面稳健，期内实现营业总收入118.73亿元，归母净利润2.51亿元，加权平均净资产收益率2.64%。公司依托国家级科研平台持续技术攻关，获批农业农村部功能乳品加工重点实验室，并推出上海城市限定鲜奶等创新产品。公司的全国“随心订”服务持续赋能终端。牧业端攻坚奶牛育种核心技术，上半年培育综合育种值（GTPI）3000以上种公牛49头、其中GTPI 3300以上22头。公司以数智化赋能全产业链，持续夯实经营基本盘。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:07</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">国际市场</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">正泰电器递表港交所 开启国际化新征程</h3>
+                    <div class="content-body">【正泰电器递表港交所 开启国际化新征程】财联社8月30日电，近日，正泰电器正式递表港交所，拟“A+H”上市，搭建双资本平台，开启国际化新征程。据了解，正泰电器2026年上半年实现营业收入380.64亿元，同比增长28.46%。此次赴港上市旨在为满足业务发展需要，深入推进国际化战略，积极借助国际资本市场拓宽多元融资渠道，进一步提升公司综合竞争力。此举将为公司在全球化市场拓展、国际品牌影响力提升等方面提供有力支撑。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:25</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">电投水电：上半年净利润11.9亿元 同比增长123.14%</h3>
+                    <div class="content-body">【电投水电：上半年净利润11.9亿元 同比增长123.14%】财联社8月30日电，电投水电(600292.SH)公告，2026年上半年，公司实现营业收入60.55亿元，同比增长2.45%；归属于上市公司股东的净利润11.9亿元，同比增长123.14%。报告期内，公司水电业务来水较好带来收入增长。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:23</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">【风口研报·公司】三星电机上调四季度MLCC价格，公司对所有类型的相关材料全面覆盖，且与国内外头部客户长期稳定合作，有望迎来历史机遇；另有公司光通信高端产品卡位与全球产能蓄力成长</h3>
+                    <div class="content-body">①三星电机上调四季度MLCC价格，公司对所有类型的相关材料全面覆盖，且与国内外头部客户长期稳定合作，有望迎来历史机遇；<br>②算力浪潮拉动光通信产品营收高增，分析师强call公司高端产品卡位与全球产能蓄力成长，叠加海内外基地稳步扩张，有望深度受益景气周期的不断延伸。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:22</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">超颖电子：上半年净亏损1.91亿元 同比由盈转亏</h3>
+                    <div class="content-body">【超颖电子：上半年净亏损1.91亿元 同比由盈转亏】财联社8月30日电，超颖电子(603175.SH)公告，2026年上半年，公司实现营业收入29.12亿元，同比增长33.29%；归属于上市公司股东的净亏损1.91亿元，上年同期盈利1.59亿元，同比由盈转亏。主要系2026年上半年汇率大幅波动，导致本期汇兑损失大幅增加；其次，泰国工厂产能尚处爬坡阶段，固定成本较高，效益尚未显现，叠加材料价格上涨等因素综合影响,导致公司上半年度出现亏损。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:13</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">卧龙电驱：2026年半年度净利润3.52亿元 同比下降34.55%</h3>
+                    <div class="content-body">【卧龙电驱：2026年半年度净利润3.52亿元 同比下降34.55%】财联社8月30日电，卧龙电驱(600580.SH)发布2026年半年度报告，实现营业收入74.67亿元，同比下降7.02%；归属于上市公司股东的净利润3.52亿元，同比下降34.55%。小财注：公司Q2净利润0.76亿，Q1净利润2.76亿，据此计算，Q2净利润环比下降72%。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:11</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">厦门通报“一消杀公司用敌敌畏给数十家餐厅消杀”：对6名犯罪嫌疑人依法刑事拘留</h3>
+                    <div class="content-body">【厦门通报“一消杀公司用敌敌畏给数十家餐厅消杀”：对6名犯罪嫌疑人依法刑事拘留】财联社8月30日电，福建厦门联合调查组8月30日发布情况通报，近日，针对媒体报道的厦门绿林森环境科技有限公司使用敌敌畏为餐饮门店消杀问题，厦门市成立联合调查组。经调查，该公司相关行为涉嫌违法违规，性质十分恶劣。公安机关已对法定代表人庄某臣、股东曾某鸣、业务培训主管李某等6名犯罪嫌疑人依法刑事拘留，案件正在进一步侦办中。经全面排查该公司提供消杀服务的经营主体，并委托具有检验检测资质的机构对场所环境、餐厨用具等进行检测，结果显示相关指标符合安全标准。厦门市将深刻汲取教训，举一反三、完善制度，严防类似事件再次发生。 （厦门日报）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:10</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">中国国航：2026年半年度净亏损22.86亿元</h3>
+                    <div class="content-body">【中国国航：2026年半年度净亏损22.86亿元】财联社8月30日电，中国国航(601111.SH)发布2026年半年度报告，实现营业收入892.68亿元，同比增长10.54%；归属于上市公司股东的净利润为亏损22.86亿元。小财注：公司Q2净利润亏损40亿，之前预告区间为-43.14亿--38.14亿，Q1净利润17.14亿，据此计算，Q2净利润环比由盈转亏。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:07</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">东吴证券：上半年净利润24.2亿元 同比增长25.32%</h3>
+                    <div class="content-body">【东吴证券：上半年净利润24.2亿元 同比增长25.32%】财联社8月30日电，东吴证券(601555.SH)公告，2026年上半年，公司实现营业收入57.51亿元，同比增长29.88%；归属于上市公司股东的净利润24.2亿元，同比增长25.32%。报告期内，公司客户规模、资产规模及业务收入等核心指标均实现较快增长。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:04</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">招商轮船：2026年半年度净利润同比增长227.57%</h3>
+                    <div class="content-body">【招商轮船：2026年半年度净利润同比增长227.57%】财联社8月30日电，招商轮船(601872.SH)发布2026年半年度报告，实现营业收入196.51亿元，同比增长56.15%；归属于上市公司股东的净利润69.6亿元，同比增长227.57%。公司拟每10股派发现金红利1.30元(含税)。小财注：公司Q2净利润41.96亿，之前预告区间为38.37亿-45.37亿，Q1净利润27.63亿，据此计算，Q2净利润环比增长51%。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:50</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">国际市场</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">三一重工：上半年净利润56.9亿元 同比增长9.13%</h3>
+                    <div class="content-body">【三一重工：上半年净利润56.9亿元 同比增长9.13%】财联社8月30日电，三一重工(600031.SH)公告，2026年上半年，公司实现营业收入533.06亿元，同比增长19.7%；归属于上市公司股东的净利润56.9亿元，同比增长9.13%。报告期内，国内和国际销售均同比增长。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:48</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">商品期货</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">中国黄金：2026年半年度净利润同比下降12.35%</h3>
+                    <div class="content-body">【中国黄金：2026年半年度净利润同比下降12.35%】财联社8月30日电，中国黄金(600916.SH)发布2026年半年度报告，实现营业收入248.996亿元，同比下降19.93%；归属于上市公司股东的净利润2.79亿元，同比下降12.35%。公司拟向全体股东每10股派发现金股利0.92元(含税)。小财注：公司Q2净利润1.16亿，Q1净利润1.64亿，据此计算，Q2净利润环比下降29%。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:42</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">华峰测控：2026年半年度净利润同比增长112.6%</h3>
+                    <div class="content-body">【华峰测控：2026年半年度净利润同比增长112.6%】财联社8月30日电，华峰测控(688200.SH)发布2026年半年度报告，实现营业收入7.38亿元，同比增长38.17%；归属于上市公司股东的净利润4.16亿元，同比增长112.6%。小财注：公司Q2净利润3.22亿，Q1净利润0.94亿，据此计算，Q2净利润环比增长241%。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:40</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">中国中冶：2026年半年度净利润同比下降24.95%</h3>
+                    <div class="content-body">【中国中冶：2026年半年度净利润同比下降24.95%】财联社8月30日电，中国中冶(601618.SH)发布2026年半年度报告，实现营业收入1759.07亿元，同比下降25.94%；归属于上市公司股东的净利润23.26亿元，同比下降24.95%。小财注：公司Q2净利润6.93亿，Q1净利润16.33亿，据此计算，Q2净利润环比下降57%。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:24</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">国际市场</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">山西汾酒上半年净利润64.39亿元 持续加码全国化与国际化布局</h3>
+                    <div class="content-body">【山西汾酒上半年净利润64.39亿元 持续加码全国化与国际化布局】财联社8月30日电，山西汾酒披露2026年半年度报告。上半年公司实现营业收入210.44亿元，归母净利润64.39亿元；经营活动现金流净额66.52亿元，同比增长11.23%，盈利现金质量扎实。报告期内，公司纵深推进全国化2.0战略，长三角、珠三角等核心战略市场保持稳健增长；通过打造沉浸式消费场景、推出年轻化新品拓宽消费群体，同时加码科研创新与国际化布局，夯实清香龙头品牌势能。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:15</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">冰岛公投反对重启加入欧盟谈判</h3>
+                    <div class="content-body">【冰岛公投反对重启加入欧盟谈判】财联社8月30日电，据冰岛国家广播公司30日报道，29日进行的冰岛全民公投初步计票结果显示，多数选民反对重启冰岛加入欧盟的谈判。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:15</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">行业动态</span></div>
+                    </div>
+                    <h3 class="news-title">中国能建：上半年净利润22.79亿元 同比下降18.67%</h3>
+                    <div class="content-body">【中国能建：上半年净利润22.79亿元 同比下降18.67%】财联社8月30日电，中国能建(601868.SH)公告，2026年上半年，公司实现营业收入2083.12亿元，同比下降1.78%；实现归属于上市公司股东的净利润22.79亿元，同比下降18.67%。报告期内，受建筑行业总量收缩的外部环境影响，上半年公司主要经营指标阶段性承压。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:09</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">天风证券：2026年半年度净利润同比增长549%</h3>
+                    <div class="content-body">【天风证券：2026年半年度净利润同比增长549%】财联社8月30日电，天风证券(601162.SH)发布2026年半年度报告，实现营业收入15.88亿元，同比增长29.94%；归属于上市公司股东的净利润2.04亿元，同比增长549.03%。小财注：公司Q2净利润2.04亿，之前预告区间为1.64亿-2.46亿，Q1净利润0亿，据此计算，Q2净利润环比增长90942%。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:08</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">京沪高铁：2026年半年度净利润同比增长7.21%</h3>
+                    <div class="content-body">【京沪高铁：2026年半年度净利润同比增长7.21%】财联社8月30日电，京沪高铁(601816.SH)发布2026年半年度报告，实现营业收入218.42亿元，同比增长3.94%；归属于上市公司股东的净利润67.71亿元，同比增长7.21%。小财注：公司Q2净利润36.29亿，Q1净利润31.43亿，据此计算，Q2净利润环比增长15%。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="公司公告" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:07</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">公司公告</span> <span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">富创精密：2026年半年度净利润同比增长992.9%</h3>
+                    <div class="content-body">【富创精密：2026年半年度净利润同比增长992.9%】财联社8月30日电，富创精密(688409.SH)发布2026年半年度报告，实现营业收入23.18亿元，同比增长34.45%；归属于上市公司股东的净利润1.34亿元，同比增长992.9%。公司拟向全体股东每10股派发现金红利2元(含税)。报告期净利润增长主要系公司收入增长，规模效应的体现带动了公司毛利的提升；公司持续优化内部管理，经营效率逐步提高，期间费用率同比下降；公司以公允价值计量且其变动计入当期损益的对外股权投资于报告期内产生公允价值变动收益4142.25万元，对当期利润形成积极贡献。小财注：公司Q2净利润0.76亿，Q1净利润0.58亿，据此计算，Q2净利润环比增长31%。</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="其他">
+                <h2 class="topic-heading">
+                    <span class="topic-name">其他</span>
+                    <span class="topic-count">45</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-b" data-topic="其他" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">08:02</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月31日电，韩国KOSPI指数跌幅扩大至3%，SK海力士跌超4%，三星电子跌逾3%。</h3>
+                    <div class="content-body">财联社8月31日电，韩国KOSPI指数跌幅扩大至3%，SK海力士跌超4%，三星电子跌逾3%。</div>
+                </article>
+                
+                <article class="news-card level-b" data-topic="其他" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">05:56</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">伊朗革命卫队：伊朗向美军基地发射导弹</h3>
+                    <div class="content-body">【伊朗革命卫队：伊朗向美军基地发射导弹】财联社8月31日电，伊朗伊斯兰革命卫队31日凌晨在社交媒体发布消息称，伊朗向美军基地发射导弹。稍早前，伊朗拉腊克岛附近传出爆炸声。据外媒报道，美方对位于该岛的军事设施实施了轰炸。伊朗伊斯兰革命卫队随后回应称，此次袭击导致伊方多名士兵和民众伤亡，美国对拉腊克岛的袭击将遭到“回应和惩罚”。 （新华社）</div>
+                </article>
+                
+                <article class="news-card level-b" data-topic="其他" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">03:50</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">美官员称美军打击伊朗两处武器装置</h3>
+                    <div class="content-body">【美官员称美军打击伊朗两处武器装置】财联社8月31日电，当地时间8月30日晚，有美国高级官员表示，当天早些时候，美军对伊朗拉腊克岛的两处武器装置进行了打击。伊朗方面对此暂无回应。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:13</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">盈利超预期夯实基本面 市场反弹窗口或渐近</h3>
+                    <div class="content-body">【盈利超预期夯实基本面 市场反弹窗口或渐近】财联社8月31日电，过去一周，A股市场呈现先抑后扬走势，市场情绪回暖。券商策略展望报告认为，当前，A股半年报披露基本结束，企业盈利延续修复态势，盈利增速超预期从基本面维度支撑了A股的运行趋势。展望9月，市场磨底已进入后半程，国内增量政策窗口打开，市场反弹动能正在积蓄。 （上证报）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">05:35</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">美国大峡谷国家公园突发山洪 超20人失联</h3>
+                    <div class="content-body">【美国大峡谷国家公园突发山洪 超20人失联】财联社8月31日电，美国国家公园管理局当地时间8月30日表示，位于亚利桑那州的大峡谷国家公园29日突发山洪，目前有超过20人被列为可能失联或下落不明人员。大峡谷国家公园工作人员正与亚利桑那州公共安全部门开展人员疏散和搜寻工作。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:54</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">基因开关让3D打印骨组织自主长出新血管</h3>
+                    <div class="content-body">【基因开关让3D打印骨组织自主长出新血管】财联社8月31日电，美国宾夕法尼亚州立大学的一个跨学科团队取得一项突破：他们在将细胞编程后，利用基因开关技术，让3D打印的骨组织能够自主生成新的血管。这项成果为治疗严重创伤或感染导致的骨缺损带来了新希望。相关论文发表在新一期《化学工程期刊》上。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:47</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">两市融资余额减少61.62亿元</h3>
+                    <div class="content-body">【两市融资余额减少61.62亿元】财联社8月31日电，截至8月28日，上交所融资余额报13429.44亿元，较前一交易日减少61.31亿元；深交所融资余额报12789.73亿元，较前一交易日减少0.31亿元；两市合计26219.17亿元，较前一交易日减少61.62亿元。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:43</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">【玩转ETF】出货量同比预计增超20%，巨头即将扎堆上新，该领域是高端市场核心角逐领域；机构称短期宽松交易可能会继续回摆，这类资产反弹可能阶段性受阻</h3>
+                    <div class="content-body">①出货量同比预计增超20%，巨头即将扎堆上新，该领域是高端市场核心角逐领域，这些核心环节价值量或将显著提升；②机构称短期宽松交易可能会继续回摆，这类资产反弹可能阶段性受阻；③如何应对快速轮动的行情。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:06</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月31日电，MSCI亚太指数下跌1%至275.30点。</h3>
+                    <div class="content-body">财联社8月31日电，MSCI亚太指数下跌1%至275.30点。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:13</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">伊朗革命卫队称摧毁位于约旦的美军基地相关基础设施</h3>
+                    <div class="content-body">【伊朗革命卫队称摧毁位于约旦的美军基地相关基础设施】财联社8月31日电，伊朗伊斯兰革命卫队当地时间8月31日发表声明称，几分钟前，为回应美国和以色列敌人对伊朗拉腊克岛的侵略，伊朗伊斯兰革命卫队航空航天部队发射导弹和无人机，摧毁了位于约旦境内的两处美军空军基地中的技术和维护基础设施，并对敌方的战斗机阵地造成严重破坏。伊朗伊斯兰革命卫队警告称，敌人的侵略和犯罪行为无法削弱伊朗对霍尔木兹海峡的控制权，每一次攻击都将遭到伊朗更加猛烈的回击。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:56</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">极端高温或关联33种健康问题</h3>
+                    <div class="content-body">【极端高温或关联33种健康问题】财联社8月31日电，美国西北大学一项最新研究显示，极端高温与皮肤病、多发性硬化症等更广泛的健康问题相关，甚至可能诱发交通事故。相关论文发表于新一期《科学进展》杂志。与高温相关的疾病一直难以追踪，因为医疗记录通常只记载正在治疗的病症，却往往忽略高温这一潜在诱因。受基因组学研究方法启发，研究团队采用一套全新框架，梳理了2011年5月至2023年9月，美国芝加哥近100万条急诊及紧急护理就诊记录中的1803次诊断，最终识别出33种与极端高温暴露相关的健康问题，包括皮疹和肿胀、急性肾衰竭、多发性硬化症、精神和行为障碍、虫咬蜇伤，以及交通事故、暴力袭击和涉枪伤害等。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:55</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">一种隐藏的成纤维细胞竟是肺癌“帮凶”</h3>
+                    <div class="content-body">【一种隐藏的成纤维细胞竟是肺癌“帮凶”】财联社8月31日电，肺癌组织中可能隐藏着一种不易被发现的细胞类型。它们不是癌细胞，却会成为肺癌的“帮凶”，为肿瘤撑起一把“免疫保护伞”。美国哥伦比亚大学研究人员发现，这类细胞能招募调节性T细胞，帮助肺癌逃避免疫系统攻击。相关研究发表于新一期《自然·免疫学》。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">20:19</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月30日电，德国药企拜耳宣布，用于研究的PET放射性示踪剂碘-124埃伐扎米特的III期REVEAL研究将在2026年欧洲心脏病学会年会（ESC 2026）上作为最新突破研究公布。这项关键性研究以视觉扫描判读为基础，在心脏淀粉样变性诊断的灵敏度与特异性评估上达成了全部主要终点；针对疑似心脏淀粉样变性患者的III期研究结果，在2026年欧洲心脏病学会大会上公布的同时，同步发表于《美国医学会杂志》。</h3>
+                    <div class="content-body">财联社8月30日电，德国药企拜耳宣布，用于研究的PET放射性示踪剂碘-124埃伐扎米特的III期REVEAL研究将在2026年欧洲心脏病学会年会（ESC 2026）上作为最新突破研究公布。这项关键性研究以视觉扫描判读为基础，在心脏淀粉样变性诊断的灵敏度与特异性评估上达成了全部主要终点；针对疑似心脏淀粉样变性患者的III期研究结果，在2026年欧洲心脏病学会大会上公布的同时，同步发表于《美国医学会杂志》。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">05:45</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月31日电，美国财长贝森特表示，本周将新增一家银行制裁对象。</h3>
+                    <div class="content-body">财联社8月31日电，美国财长贝森特表示，本周将新增一家银行制裁对象。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">05:25</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">美军中央司令部：已改变83艘商船航行路线</h3>
+                    <div class="content-body">【美军中央司令部：已改变83艘商船航行路线】财联社8月31日电，美军中央司令部当地时间8月30日表示，在美国继续对伊朗实施封锁之际，美国海军“德尔伯特·D·布莱克”号驱逐舰在阿拉伯海执行任务。截至当天，美军中央司令部已引导83艘商船改变航行路线、使3艘商船丧失航行能力，并登临检查了2艘商船，以确保其遵守相关封锁要求。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">05:18</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">伊朗南部拉腊克岛再次传出爆炸声</h3>
+                    <div class="content-body">【伊朗南部拉腊克岛再次传出爆炸声】财联社8月31日电，总台记者当地时间8月31日凌晨从伊朗方面获悉，该国南部拉腊克岛再次传出爆炸声。伊朗官方暂未发布相关声明。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">04:56</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">英海事安全信息机构：一油轮在霍尔木兹海峡遇袭</h3>
+                    <div class="content-body">【英海事安全信息机构：一油轮在霍尔木兹海峡遇袭】财联社8月31日电，英国海上贸易行动办公室当地时间8月30日发布通报说，阿曼海塞卜以北12海里（约合22公里）处，一艘油轮日前在穿越霍尔木兹海峡时遭到不明投射物袭击。通报说，目前暂无人员伤亡和对环境造成影响的报告。通报建议相关海域船只谨慎通行。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">04:12</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">伊朗革命卫队：拉腊克岛遭袭致多人受伤 必将惩罚侵略者</h3>
+                    <div class="content-body">【伊朗革命卫队：拉腊克岛遭袭致多人受伤 必将惩罚侵略者】财联社8月31日电，伊朗伊斯兰革命卫队当地时间8月30日发表声明称，敌人对伊朗拉腊克岛的袭击必将遭到报复，侵略者必将受到惩罚。声明还表示，美国和以色列对伊朗拉腊克岛发动袭击，导致伊朗多人受伤。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">04:05</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">乌克兰首都基辅传出爆炸声</h3>
+                    <div class="content-body">【乌克兰首都基辅传出爆炸声】财联社8月31日电，总台记者获悉，当地时间8月30日，乌克兰首都基辅市内传出爆炸声。此前基辅拉响了防空警报。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">03:56</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">伊朗南部拉腊克岛传出爆炸声</h3>
+                    <div class="content-body">【伊朗南部拉腊克岛传出爆炸声】财联社8月31日电，记者当地时间8月30日晚获悉，当地居民报告称，在伊朗南部拉腊克岛附近听到爆炸声。爆炸的确切地点和原因尚不清楚。据伊朗方面消息，根据初步情报，一小时前，敌方无人机袭击了伊朗南部拉腊克岛。一些初步的非官方报告显示，此次袭击造成2人死亡、2人受伤。目前尚未发布官方正式报告。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">03:04</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">智利北部地区发生5.1级地震</h3>
+                    <div class="content-body">【智利北部地区发生5.1级地震】财联社8月31日电，根据智利大学全国地震中心报告，当地时间8月30日12时04分，该国北部阿里卡和帕里纳科塔大区发生5.1级地震，震源深度108.25公里。目前暂无人员伤亡及财产损失报告。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">02:42</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">佩斯科夫：俄美乌三方会晤需待协议最终敲定方可举行</h3>
+                    <div class="content-body">【佩斯科夫：俄美乌三方会晤需待协议最终敲定方可举行】财联社8月31日电，俄罗斯总统新闻秘书佩斯科夫当地时间8月30日表示，俄总统普京、美国总统特朗普与乌克兰总统泽连斯基之间的会晤，只有到需要最终敲定已有协议时才有可能举行。他强调，关于乌克兰问题的协议并非“原始交易”，而是一个涉及诸多细节的复杂过程。佩斯科夫还称，俄罗斯对谈判持开放态度，但目前尚不具备先决条件。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">01:53</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月31日电，美国国家飓风中心表示，未来48小时内，北美湾区附近的风暴有50%的可能性形成气旋。</h3>
+                    <div class="content-body">财联社8月31日电，美国国家飓风中心表示，未来48小时内，北美湾区附近的风暴有50%的可能性形成气旋。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">01:14</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">美国两地接连发生枪击事件 共致3死18伤</h3>
+                    <div class="content-body">【美国两地接连发生枪击事件 共致3死18伤】财联社8月31日电，记者当地时间8月30日获悉，美国芝加哥和新泽西州特伦顿接连发生两起大规模枪击事件，共造成3人死亡、18人受伤。芝加哥警方表示，当地一公园29日23时37分左右发生枪击事件。事件造成1名35岁男子死亡，另有9人受伤。警方称，枪手可能不止一人，目前尚未宣布逮捕任何嫌疑人。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">01:10</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">以军空袭加沙地带中部 造成两人死亡</h3>
+                    <div class="content-body">【以军空袭加沙地带中部 造成两人死亡】财联社8月31日电，加沙地带卫生部门官员当地时间8月30日表示，当天以色列军队在加沙地带中部的代尔拜拉赫发动空袭，造成两人死亡，其中包括一名三岁的儿童。以色列国防军称当天对一名巴勒斯坦伊斯兰抵抗运动（哈马斯）武装人员发动了袭击，但未提供具体细节。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">00:39</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月31日电，中国地震台网正式测定：08月31日00时25分在新疆阿克苏地区沙雅县（北纬39.99度，东经83.49度）发生3.2级地震，震源深度10千米。</h3>
+                    <div class="content-body">财联社8月31日电，中国地震台网正式测定：08月31日00时25分在新疆阿克苏地区沙雅县（北纬39.99度，东经83.49度）发生3.2级地震，震源深度10千米。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:56</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月30日电，中国地震台网正式测定：08月30日22时50分在新疆阿克苏地区温宿县（北纬42.20度，东经80.52度）发生3.8级地震，震源深度10千米。</h3>
+                    <div class="content-body">财联社8月30日电，中国地震台网正式测定：08月30日22时50分在新疆阿克苏地区温宿县（北纬42.20度，东经80.52度）发生3.8级地震，震源深度10千米。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:37</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">塞浦路斯渡轮倾覆事故已致7人死亡23人失踪</h3>
+                    <div class="content-body">【塞浦路斯渡轮倾覆事故已致7人死亡23人失踪】财联社8月30日电，塞浦路斯北部土族领导人表示，当天早些时候在塞北部海域发生的渡轮倾覆事故已造成7人死亡、23人失踪，其余237人获救。目前搜救失踪者的行动仍在进行中。据悉，涉事渡轮上共载有259名乘客和8名船员。事发海域位于塞浦路斯北部基利尼亚港以北2公里处，海域和港口均位于塞浦路斯土族控制区，出事渡轮原本的目的港是土耳其塔苏科港。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">22:17</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">习近平同吉尔吉斯斯坦总统小范围晤谈</h3>
+                    <div class="content-body">【习近平同吉尔吉斯斯坦总统小范围晤谈】当地时间8月30日晚，国家主席习近平和夫人彭丽媛应邀同吉尔吉斯斯坦总统扎帕罗夫和夫人扎帕罗娃在总统官邸共进晚餐，在亲切友好的气氛中进行了交流。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">21:59</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">美中情局局长被曝访俄期间提议举行美俄乌三方峰会</h3>
+                    <div class="content-body">【美中情局局长被曝访俄期间提议举行美俄乌三方峰会】财联社8月30日电，据美国方面8月29日消息，美国中央情报局局长拉特克利夫日前访问俄罗斯时，提议举行由美国总统特朗普、俄罗斯总统普京和乌克兰总统泽连斯基参加的三方会晤，以推动结束俄乌战事。两名知情人士称，拉特克利夫此次访俄的目的之一，是评估俄情报部门负责人能否说服普京同意恢复由美国斡旋的俄乌谈判。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">20:43</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">NASA罗曼太空望远镜发射升空后开始独立飞行 预计明年初发布首批图像</h3>
+                    <div class="content-body">【NASA罗曼太空望远镜发射升空后开始独立飞行 预计明年初发布首批图像】财联社8月30日电，美国国家航空航天局（NASA）的南希·格蕾丝·罗曼太空望远镜搭乘SpaceX猎鹰重型火箭从佛罗里达州发射升空。按计划，罗曼空间望远镜将前往距离地球约150万公里的日地拉格朗日L2点展开观测，该点位于地球背向太阳一侧的引力平衡位置，罗曼空间望远镜将获得比哈勃等近地轨道望远镜更为开阔的视野。美航空航天局表示，罗曼空间望远镜的设计运行时间为5年，可支持额外5年的延期任务，其拍摄的首批科学图像预计将于2027年初发布。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">20:40</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">塞浦路斯客轮倾覆事故中已救起159人</h3>
+                    <div class="content-body">【塞浦路斯客轮倾覆事故中已救起159人】财联社8月30日电，据塞浦路斯北部土耳其语媒体30日报道，当天发生的客轮倾覆事故中已找到并救起159人，有落水人员遇难，搜救工作仍在进行中。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:41</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月30日电，美国国家飓风中心（NHC）表示，未来48小时内，墨西哥湾北部上空附近的风暴有30%的概率发展为气旋。</h3>
+                    <div class="content-body">财联社8月30日电，美国国家飓风中心（NHC）表示，未来48小时内，墨西哥湾北部上空附近的风暴有30%的概率发展为气旋。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:39</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">西藏吉隆口岸通信信号抢通</h3>
+                    <div class="content-body">【西藏吉隆口岸通信信号抢通】财联社8月30日电，西藏自治区通信管理局局长尼玛多吉30日18时告诉记者，其所处位置距离吉隆口岸热索桥约1.6公里，通过道路抢修最前端新建的基站已与在口岸的救援队员完成通话，信号已经能够送达核心救援现场。30日13时30分，吉隆口岸首个紧邻国门的应急基站开通投用。截至目前，西藏电信企业已抢通修复1个基站，新增8个基站，其中吉隆县至吉隆镇方向新建2个基站、吉隆镇至吉隆口岸方向新建6个基站。 （新华社）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:31</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月30日电，美国国家航空航天局（NASA）新一代旗舰级太空观测平台南希·格雷斯·罗曼空间望远镜搭乘SpaceX的猎鹰重型火箭从佛罗里达州发射升空。</h3>
+                    <div class="content-body">财联社8月30日电，美国国家航空航天局（NASA）新一代旗舰级太空观测平台南希·格雷斯·罗曼空间望远镜搭乘SpaceX的猎鹰重型火箭从佛罗里达州发射升空。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:06</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">塞浦路斯附近一载有267人客货渡船沉没</h3>
+                    <div class="content-body">【塞浦路斯附近一载有267人客货渡船沉没】财联社8月30日电，据土耳其媒体30日报道，一艘客货渡船当天在塞浦路斯北部港口城市杰尔内附近海域沉没，船上载有267人。目前搜救工作仍在进行，人员遇难、失踪或获救的统计数字尚未公布。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:05</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">中足联官方：国安英博两队被通报批评 达万被禁赛6场</h3>
+                    <div class="content-body">【中足联官方：国安英博两队被通报批评 达万被禁赛6场】财联社8月30日电，中足联官方发布了对大连英博对阵北京国安比赛中发生冲突的处罚决定。两支球队均被通报批评，北京国安外援达万被禁赛6场，罚款6万元；大连英博助教鲁丹被禁赛3场，罚款3万元；大连英博翻译李钢被禁赛5场，罚款5万元。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">19:04</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">自然资源部：全面启动吉隆泥石流灾害区域风险隐患排查</h3>
+                    <div class="content-body">【自然资源部：全面启动吉隆泥石流灾害区域风险隐患排查】财联社8月30日电，从自然资源部了解到，目前自然资源部已全面启动吉隆泥石流灾害区域风险隐患排查工作，初步判定8处地质灾害高风险点。自然资源部表示，目前正持续调集专业技术力量，重点针对冰崩源区、堰塞湖、沟道沿线及流域周边，分区域对灾害影响范围实施应急测绘和风险隐患调查，并对应急救援通道、周边村庄和安置点等重点区域加强地质灾害巡查排查。前后方专家结合遥感解译和现场调查，在灾害影响区共解译出地质灾害隐患点60余处，初步判定高风险8处。自然资源部建议在搜救期间以无人机航测结合人工巡视的方式进行监测，并要求进一步加强泥石流物源区风险监测，对泥石流途径沟道铲刮导致的崩塌、滑坡隐患持续开展风险研判和监测预警。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:23</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">水利部和中国气象局8月30日18时联合发布橙色山洪灾害气象预警</h3>
+                    <div class="content-body">【水利部和中国气象局8月30日18时联合发布橙色山洪灾害气象预警】财联社8月30日电，水利部和中国气象局8月30日18时联合发布橙色山洪灾害气象预警:预计，8月30日20时至31日20时，内蒙古东北部、黑龙江西部、安徽中部、福建南部、江西西北部和南部、湖南南部、广东北部、海南西部、四川南部、云南北部、西藏东南部等地部分地区发生山洪灾害可能性较大(黄色预警)，其中，江西东北部、湖南南部、海南西部等地部分地区发生山洪灾害可能性大(橙色预警)其他地区也可能因局地短历时强降水引发山洪灾害，请各地注意做好实时监测、防汛预警和转移避险等防范工作。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:22</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">自然资源部与中国气象局8月30日18时联合发布黄色地质灾害气象风险预警</h3>
+                    <div class="content-body">【自然资源部与中国气象局8月30日18时联合发布黄色地质灾害气象风险预警】财联社8月30日电，自然资源部与中国气象局8月30日18时联合发布黄色地质灾害气象风险预警:预计，8月30日20时至31日20时，安徽中部江西西部和南部、福建东南部、湖南南部和东部、广东北部、广西东北部、海南西部、云南西部、西藏南部等地部分地区发生地质灾害的气象风险较高(黄色预警)各级政府及有关部门按照应急预案做好地质灾害防御工作。请社会公众及时关注地质灾害气象风险预警信息，谨慎前往地质灾害预警区域。黄色预警区内人员，请随时关注预警信息变化，注意附近警示标志，避免在沟谷、斜坡、陡崖(坎)等高风险地带逗留。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:57</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月30日电，美国联合航空将于2027年3月27日恢复特拉维夫与旧金山之间的航班，每周三班。</h3>
+                    <div class="content-body">财联社8月30日电，美国联合航空将于2027年3月27日恢复特拉维夫与旧金山之间的航班，每周三班。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:52</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">国家防总办公室、应急管理部组织多部门联合会商持续调度部署防汛防台风工作</h3>
+                    <div class="content-body">【国家防总办公室、应急管理部组织多部门联合会商持续调度部署防汛防台风工作】财联社8月30日电，8月30日上午，国家防总办公室、应急管理部组织中国气象局、水利部、自然资源部、工业和信息化部、住房城乡建设部、交通运输部等部门以及江西、湖南、云南等重点省份联合会商，研判台风和强降雨发展趋势，研究部署重点地区防汛防台风工作。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">17:32</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月30日电，中国地震台网正式测定：08月30日17时02分在新西兰克马德克群岛（南纬30.09度，西经177.30度）发生5.8级地震，震源深度50千米。</h3>
+                    <div class="content-body">财联社8月30日电，中国地震台网正式测定：08月30日17时02分在新西兰克马德克群岛（南纬30.09度，西经177.30度）发生5.8级地震，震源深度50千米。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:59</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">尼泊尔泥石流灾害已致752人遇难2502人失联</h3>
+                    <div class="content-body">【尼泊尔泥石流灾害已致752人遇难2502人失联】财联社8月30日电，据尼泊尔国家减少灾害风险管理局公布的数据，截至当地时间30日13时，尼泊尔泥石流造成的死亡人数升至752人，失联人数升至2502人。 （央视新闻）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="其他" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">16:48</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">其他</span></div>
+                    </div>
+                    <h3 class="news-title">2026年国家社科基金年度项目评审工作会议在京召开</h3>
+                    <div class="content-body">【2026年国家社科基金年度项目评审工作会议在京召开】财联社8月30日电，2026年国家社科基金年度项目评审工作会议8月30日在京召开。会议强调，中国式现代化为哲学社会科学高质量发展提供了丰富的实践基础和广阔的创新空间。要聚焦首要任务，充分运用各学科资源、方法，持续深化党的创新理论体系化学理化研究阐释。要加快构建中国哲学社会科学自主知识体系，积极研究解决中国式现代化重大理论和现实问题，推动中华优秀传统文化创造性转化、创新性发展，促进文明交流互鉴。要着力构建有利于研究解决真问题的科研管理体制和组织形式，深化国家社科基金系统性改革，倡导优良学风文风，完善学术评价体系，激发科研活力，推动数智化赋能哲学社会科学研究。</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="商品期货">
+                <h2 class="topic-heading">
+                    <span class="topic-name">商品期货</span>
+                    <span class="topic-count">3</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-b" data-topic="商品期货" data-level="B">
+                    <div class="card-header">
+                        <span class="time-badge">06:03</span>
+                        <span class="level-badge level-b">B</span>
+                        <div class="topic-chips"><span class="topic-chip">商品期货</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">国际原油周一高开 美伊局势再升级</h3>
+                    <div class="content-body">【国际原油周一高开 美伊局势再升级】财联社8月31日电，WTI原油期货涨幅扩大至2%，报85.137美元/桶。布伦特原油期货向上触及90美元/桶，最新报90.044美元/桶，日内上涨2.21%。此前伊朗革命卫队表示，伊朗向美军基地发射导弹。稍早前，伊朗拉腊克岛附近传出爆炸声。据外媒报道，美方对位于该岛的军事设施实施了轰炸。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="商品期货" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:02</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">商品期货</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月31日电，美股三大股指期货走低，其中纳指期货跌0.7%。</h3>
+                    <div class="content-body">财联社8月31日电，美股三大股指期货走低，其中纳指期货跌0.7%。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="商品期货" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:14</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">商品期货</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月31日电，WTI原油期货回落至85美元/桶，最新报84.994美元/桶，日内上涨1.91%。</h3>
+                    <div class="content-body">财联社8月31日电，WTI原油期货回落至85美元/桶，最新报84.994美元/桶，日内上涨1.91%。</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="货币政策">
+                <h2 class="topic-heading">
+                    <span class="topic-name">货币政策</span>
+                    <span class="topic-count">2</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-c" data-topic="货币政策" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:23</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">货币政策</span> <span class="topic-chip">国际市场</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月31日电，美国财政部长贝森特表示，预计日本央行行长植田和男在货币政策上“会做正确的事”。近期日元的走势“控制得相当好”。</h3>
+                    <div class="content-body">财联社8月31日电，美国财政部长贝森特表示，预计日本央行行长植田和男在货币政策上“会做正确的事”。近期日元的走势“控制得相当好”。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="货币政策" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:55</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">货币政策</span></div>
+                    </div>
+                    <h3 class="news-title">公募FOF年内合计募集逾1300亿元 规模超过去三年总和</h3>
+                    <div class="content-body">【公募FOF年内合计募集逾1300亿元 规模超过去三年总和】财联社8月31日电，今年以来，公募FOF发行明显回暖。数据显示，截至8月28日，年内共有131只FOF成立，合计募集约1375亿元，已超过过去2023年至2025年的募集规模总和。从发行质量看，今年新发FOF的募集规模中位数、平均募集规模均较往年明显提高，募集规模超过10亿元的产品达到46只。此外，今年发行的大规模FOF产品数量显著增加，显示FOF发行回暖并非仅由少数爆款推动。产品结构方面，三个月及六个月持有期产品成为发行主力，带有“稳健”“多元配置”等特征的产品较为集中。在低利率环境与资产价格波动并存的背景下，投资者对跨资产配置和波动管理的需求有所提升。</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="宏观经济">
+                <h2 class="topic-heading">
+                    <span class="topic-name">宏观经济</span>
+                    <span class="topic-count">6</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-c" data-topic="宏观经济" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:04</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">宏观经济</span> <span class="topic-chip">货币政策</span></div>
+                    </div>
+                    <h3 class="news-title">周一（8月31日）重点关注财经事件和经济数据</h3>
+                    <div class="content-body">【周一（8月31日）重点关注财经事件和经济数据】<br>① 待定 G20财长与央行行长会议召开；<br>② 09:30 中国8月官方制造业PMI；<br>③ 20:00 德国8月CPI月率初值；<br>④ 22:30 美国8月达拉斯联储商业活动指数。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="宏观经济" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:15</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">河南：实施城市更新重点工程三年行动 深入开展城市体检</h3>
+                    <div class="content-body">【河南：实施城市更新重点工程三年行动 深入开展城市体检】财联社8月31日电，河南省人民政府办公厅日前印发《坚决打好打赢经济发展夏秋季战役 推动2026年下半年经济持续向新向优向好发展重点任务举措的通知》，其中提到，高质量推进城市更新。实施城市更新重点工程三年行动，深入开展城市体检，制定支持存量建筑功能转换和混合利用政策，出台推进城市完整社区建设实施方案，抓好郑州、洛阳中央财政支持城市更新行动，“一城一策”探索城市更新模式，力争全年建设完整社区300个，更新住宅老旧电梯2000台，新增城市公共停车泊位5万个以上，新建公共服务领域充电桩（枪）1.5万个。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="宏观经济" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:51</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月31日电，日本7月份工业产值同比增长4.1%，预估3.3%。</h3>
+                    <div class="content-body">财联社8月31日电，日本7月份工业产值同比增长4.1%，预估3.3%。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="宏观经济" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:51</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月31日电，日本7月份零售额同比增长4.0%，预估为3.3%。</h3>
+                    <div class="content-body">财联社8月31日电，日本7月份零售额同比增长4.0%，预估为3.3%。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="宏观经济" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">07:00</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月31日电，韩国7月工业产出同比增长3.6%，预期4.4%，前值5.80%。</h3>
+                    <div class="content-body">财联社8月31日电，韩国7月工业产出同比增长3.6%，预期4.4%，前值5.80%。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="宏观经济" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">00:50</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">宏观经济</span></div>
+                    </div>
+                    <h3 class="news-title">冰岛总理：本届政府任期内不再推进入盟谈判</h3>
+                    <div class="content-body">【冰岛总理：本届政府任期内不再推进入盟谈判】财联社8月31日电，冰岛总理弗罗斯塔多蒂尔当地时间8月30日表示，政府尊重全民公投结果，本届政府任期内不会再推进加入欧盟的谈判。冰岛29日就是否重启入盟谈判举行全民公投。据冰岛方面30日发布的消息，初步计票数据显示，赞成票占47.2%，反对票占52.8%，反对一方已确定胜出。弗罗斯塔多蒂尔当天在新闻发布会上说，政府将尊重并落实公投结果，除非未来24个月内发生重大事件，否则入盟问题短期内不太可能再次成为议会首要议题。弗罗斯塔多蒂尔还说，许多投下反对票的选民认可冰岛主要通过欧洲经济区与欧盟保持关系，政府下一步将继续加强在欧洲经济区框架内的相关合作。 （央视新闻）</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="股市政策">
+                <h2 class="topic-heading">
+                    <span class="topic-name">股市政策</span>
+                    <span class="topic-count">2</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-c" data-topic="股市政策" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">06:27</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">股市政策</span> <span class="topic-chip">公司公告</span></div>
+                    </div>
+                    <h3 class="news-title">超八百家公司计划中期分红</h3>
+                    <div class="content-body">【超八百家公司计划中期分红】财联社8月31日电，A股2026年半年度报告披露工作冲刺收官，上市公司中期利润分配预案密集出炉。在监管常态化引导、上市公司盈利韧性凸显、现金流持续改善的多重加持下，A股中期分红热度持续升温。截至8月30日22时50分，A股已有856家上市公司披露了2026年中期分红计划，总体计划分红规模达到7166亿元。业内人士分析，A股上市公司常态化分红、中期分红、高比例分红的生态持续成型，切实以稳健经营成果回馈广大中小投资者与机构股东。 （中证报）</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="股市政策" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">18:57</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">股市政策</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月30日电，利弗莫尔证券显示，纳真科技IPO获港交所批准。</h3>
+                    <div class="content-body">财联社8月30日电，利弗莫尔证券显示，纳真科技IPO获港交所批准。</div>
+                </article>
+                
+                </div>
+            </section>
+            
+            <section class="topic-section" data-topic="债券固收">
+                <h2 class="topic-heading">
+                    <span class="topic-name">债券固收</span>
+                    <span class="topic-count">2</span>
+                    <button class="toggle-btn" aria-expanded="true">折叠</button>
+                </h2>
+                <div class="topic-content">
+                    
+                <article class="news-card level-c" data-topic="债券固收" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:39</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">债券固收</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月31日电，10年期日本国债收益率上升1.0个基点，至2.935%。30年期日本国债收益率上涨1.5个基点，至4.135%。</h3>
+                    <div class="content-body">财联社8月31日电，10年期日本国债收益率上升1.0个基点，至2.935%。30年期日本国债收益率上涨1.5个基点，至4.135%。</div>
+                </article>
+                
+                <article class="news-card level-c" data-topic="债券固收" data-level="C">
+                    <div class="card-header">
+                        <span class="time-badge">08:14</span>
+                        <span class="level-badge level-c">C</span>
+                        <div class="topic-chips"><span class="topic-chip">债券固收</span></div>
+                    </div>
+                    <h3 class="news-title">财联社8月31日电，日本2年期国债收益率上升0.5个基点至1.73%，为1995年4月以来最高水平。</h3>
+                    <div class="content-body">财联社8月31日电，日本2年期国债收益率上升0.5个基点至1.73%，为1995年4月以来最高水平。</div>
+                </article>
+                
+                </div>
+            </section>
+            
+    </main>
+</div>
+<script>
+    const searchInput = document.getElementById('search');
+    const topicPills = document.querySelectorAll('.topic-pill');
+    const sections = document.querySelectorAll('.topic-section');
+    let activeTopic = 'all';
+
+    function updateFilter() {
+        const query = (searchInput.value || '').toLowerCase();
+        sections.forEach(section => {
+            const topic = section.dataset.topic;
+            const visibleByTopic = activeTopic === 'all' || activeTopic === topic;
+            let hasVisibleCard = false;
+            section.querySelectorAll('.news-card').forEach(card => {
+                const text = card.innerText.toLowerCase();
+                const visible = visibleByTopic && text.includes(query);
+                card.style.display = visible ? '' : 'none';
+                if (visible) hasVisibleCard = true;
+            });
+            section.style.display = visibleByTopic && hasVisibleCard ? '' : 'none';
+        });
+    }
+
+    searchInput.addEventListener('input', updateFilter);
+
+    topicPills.forEach(pill => {
+        pill.addEventListener('click', () => {
+            const topic = pill.dataset.topic;
+            if (activeTopic === topic) {
+                activeTopic = 'all';
+                topicPills.forEach(p => p.classList.remove('active'));
+            } else {
+                activeTopic = topic;
+                topicPills.forEach(p => p.classList.toggle('active', p.dataset.topic === topic));
+            }
+            updateFilter();
+        });
+    });
+
+    document.querySelectorAll('.toggle-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const content = btn.closest('.topic-heading').nextElementSibling;
+            const expanded = btn.getAttribute('aria-expanded') === 'true';
+            content.style.display = expanded ? 'none' : 'block';
+            btn.setAttribute('aria-expanded', String(!expanded));
+            btn.textContent = expanded ? '展开' : '折叠';
+        });
+    });
+    </script>
+</body>
+</html>
